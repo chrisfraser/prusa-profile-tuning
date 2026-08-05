@@ -156,11 +156,53 @@ total flow = M221 (firmware, %) × extrusion multiplier (slicer)</code></pre>
     </tbody>
   </table>
 
+  <h2><span class="num">6</span>Shipping a profile</h2>
+
+  <div class="codefig">
+    <div class="difflabel">Naming and scoping</div>
+    <pre><code><span class="c"># &lt;Vendor&gt; &lt;Material&gt; @&lt;PRINTER&gt; &lt;nozzle&gt;</span>
+eSun PETG @MK3S 0.4      eSun PETG @MK4S 0.4      eSun PETG @COREONE 0.4
+
+<span class="c"># Filament Settings → Dependencies → Compatible printers condition</span>
+printer_model=~/.*MK3.*/     and nozzle_diameter[<span class="n">0</span>]==<span class="n">0.4</span>
+printer_model=~/.*MK4.*/     and nozzle_diameter[<span class="n">0</span>]==<span class="n">0.4</span>
+printer_model=~/.*COREONE.*/ and nozzle_diameter[<span class="n">0</span>]==<span class="n">0.4</span>
+
+<span class="c"># Filament Settings → Custom G-code → Start G-code — NEVER printer start G-code</span>
+<span class="k">M900</span> <span class="f">K</span><span class="n">0.07</span>   <span class="c">; MK3S only</span>
+<span class="k">M572</span> <span class="f">S</span><span class="n">0.05</span>   <span class="c">; MK4S / Core One only</span>
+
+<span class="c"># Backup, after every session</span>
+File → Export → Export Config Bundle</code></pre>
+  </div>
+
+  <p>Verify <code>printer_model</code> by slicing and reading the config comments at the end of the G-code.
+  Never tighten a regex you haven't confirmed — an over-strict condition hides the profile silently.</p>
+
+  <table>
+    <caption>Validation — each failure names the step to go back to.</caption>
+    <thead><tr><th>Criterion</th><th>Failure means</th></tr></thead>
+    <tbody>
+      <tr><td>Top surface uniform</td><td>pinholes or ridges → <b>L10 extrusion multiplier</b></td></tr>
+      <tr><td>Corners square</td><td>bulge → advance low · gap after corner → advance high → <b>L11</b></td></tr>
+      <tr><td>Seam a fine line</td><td><b>L11 advance</b> + <b>L12 retraction</b>, then scarf seams</td></tr>
+      <tr><td>Layer lines even</td><td>degrading upward → <b>L13 cooling</b> / <b>L14 MVS</b> (Core One: chamber)</td></tr>
+      <tr><td>Snap test granular</td><td>clean layer plane → <b>L9 temperature</b> or too much fan</td></tr>
+    </tbody>
+  </table>
+
+  <p>Three prints: dimensional cube (±0.15 mm, and X must agree with Y) · overhang/bridge/stringing combo ·
+  a real part of your own. <b>Elephant foot compensation last</b> — <code>Print Settings → Advanced</code>,
+  ~0.2 mm for a 0.4 nozzle. Record the scope: material, machine, speeds, enclosure state, date.</p>
+
+  <p><b>Log every value <code>(m)</code> measured or <code>(i)</code> inherited.</b> Record date, printer,
+  spool <em>including colour</em>, and when it was dried. A profile of <code>(i)</code> values is a
+  hypothesis; a profile of <code>(m)</code> values is a measurement.</p>
+
   <div class="callout note">
     <div class="callout-label">⌁ Still to come</div>
-    <p>Phase 2 will add the per-material starting tables and the custom G-code blocks for temperature, PA/LA
-    and MVS towers. Phase 3 will add profile naming, <code>compatible_printers_condition</code> patterns and
-    the sign-off criteria. Until then, the Phase 2 numbers live in
+    <p>Phase 2 will add the per-material starting tables and the custom G-code blocks for the temperature,
+    PA/LA and MVS towers. Until then, those numbers live in
     <a href="source-material/prusaslicer-profile-tuning.md">the original guide</a> §4.</p>
   </div>
 

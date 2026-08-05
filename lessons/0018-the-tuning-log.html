@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L18 · The tuning log</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 3 · Ship it · L18</p>
+  <h1 class="lesson-title">The tuning log</h1>
+  <p class="lesson-sub">In six months you will look at a number and have exactly one question: did I measure
+  this, or did I copy it? This is how you answer.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~15 minutes</span><span class="sep">•</span>
+    <span>🏁 Closes the course</span><span class="sep">•</span>
+    <span class="tag accent">Phase 3</span>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>This course exists because you had a complete, well-researched tuning guide full of numbers that
+    nobody had measured — and no way, from the file alone, to tell which were which. That is the exact
+    failure a log prevents. It's also what makes a three-printer fleet maintainable rather than three
+    separate hobbies: a shared record means a measurement on one machine informs the others instead of being
+    lost. This is the last habit, and it's the one that makes the other seventeen lessons compound.</p>
+  </div>
+
+  <p>Two places to write, and they do different jobs.</p>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>Two homes, one record</h2>
+
+  <table>
+    <caption>Both, not either. They fail in different ways.</caption>
+    <thead><tr><th>&nbsp;</th><th><code>Filament Settings → Notes</code></th><th><code>tuning-log.md</code> in this repo</th></tr></thead>
+    <tbody>
+      <tr><td>Holds</td><td>the essentials, compressed</td><td>the full history, dated</td></tr>
+      <tr><td>Travels with</td><td>the profile, into a <a href="../reference/glossary.html#config-bundle">config bundle</a></td><td>the repository</td></tr>
+      <tr><td>Visible</td><td>while you're about to print</td><td>when you're deciding what to trust</td></tr>
+      <tr><td>Survives</td><td>a machine rebuild, if the bundle is exported</td><td>a PrusaSlicer reinstall</td></tr>
+      <tr><td>Diffable</td><td>no</td><td><b>yes</b> — this is the real advantage</td></tr>
+    </tbody>
+  </table>
+
+  <p>The notes field is the one you'll actually read at the moment of use, so keep it short and current. The
+  Markdown log is the one that answers <em>how did this number get here</em>, so it's append-only — you add
+  a dated row, you don't edit the old one. Superseded measurements are signal: they show whether a value is
+  stable across spools or drifting.</p>
+
+  <div class="codefig">
+    <div class="difflabel">The notes field — enough to act on, no more</div>
+    <pre><code>eSun PETG @MK4S 0.4 | spool: eSun PETG black, opened 2026-07-12
+dried 65C/8h on 2026-08-02 | EM 0.94 measured | M572 S0.048 measured
+MVS 13 measured | validated 2026-08-04, all 5 criteria
+NB: black runs ~0.02 lower EM than the green spool</code></pre>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>What a row has to contain</h2>
+
+  <p>Six fields, and each one exists because leaving it out has cost somebody an evening.</p>
+
+  <ul class="steps">
+    <li><span class="step-title">Date</span>
+      <span class="step-detail">Absolute, never "last week". It's what lets you correlate a drift with a
+      firmware update, a nozzle change, or a wet season.</span></li>
+    <li><span class="step-title">Printer</span>
+      <span class="step-detail">MK3S, MK4S or Core One. A number without a machine is worse than no
+      number — it invites exactly the cross-family copy this course keeps warning about.</span></li>
+    <li><span class="step-title">Spool — brand, material, <em>and colour</em></span>
+      <span class="step-detail">Pigment loading changes flow behaviour within the same brand and material,
+      so a black and a white spool of identical eSUN PETG can legitimately want different
+      <a href="../reference/glossary.html#extrusion-multiplier">extrusion multipliers</a>. Colour is not
+      decoration in this table.</span></li>
+    <li><span class="step-title">Dried — when, at what, for how long</span>
+      <span class="step-detail">In Mauritius this is the field most likely to explain a strange result.
+      "Unknown" is a valid and useful entry; it tells you not to trust the row.</span></li>
+    <li><span class="step-title">The measurements</span>
+      <span class="step-detail">Temperature, EM, K or S, retraction, MVS. And critically —</span></li>
+    <li><span class="step-title">Measured or inherited?</span>
+      <span class="step-detail">Mark every value. <code>0.94 (m)</code> for measured, <code>0.95 (i)</code>
+      for inherited from a table or another spool. This single convention is the whole point of the
+      log.</span></li>
+  </ul>
+
+  <div class="callout key">
+    <div class="callout-label">▲ The measured/inherited mark is the load-bearing part</div>
+    <p>Everything else in a log is convenience. This one is the thing that distinguishes your log from the
+    guide you started with. A profile full of <code>(i)</code> values is a hypothesis; a profile full of
+    <code>(m)</code> values is a measurement. Both are legitimate — you cannot measure everything for every
+    spool — but you have to be able to tell them apart, because they warrant different confidence when a
+    print goes wrong.</p>
+  </div>
+
+  <div class="codefig">
+    <div class="difflabel">A row that answers the six-month question</div>
+    <pre><code><span class="c">### MK4S · Filament</span>
+| Date | Spool | Dried | Temp | EM | S | Retract | MVS | Validated |
+|---|---|---|---|---|---|---|---|---|
+| 2026-08-04 | eSun PETG black | 65C/8h 08-02 | 235 (m) | 0.94 (m) | 0.048 (m) | 0.8 (m) | 13 (m) | ✅ all 5 |
+| 2026-08-11 | eSun PETG green | 65C/8h 08-10 | 235 (i) | 0.96 (m) | 0.048 (i) | 0.8 (i) | 13 (i) | cube only |</code></pre>
+  </div>
+
+  <p>Read the second row. One evening's work, one measurement — and it says so. Next time that spool
+  misbehaves you know instantly that its advance value was never measured, and you know where to start.</p>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>Keeping three machines honest over time</h2>
+
+  <p>A fleet drifts. Nozzles wear, belts relax, firmware updates change defaults, and the humidity does what
+  it does. The log's second job is to make drift visible.</p>
+
+  <p>Three habits, each cheap:</p>
+
+  <ul>
+    <li><b>Re-export the config bundle after every session</b>, into this repo, dated. <code>File → Export →
+    Export Config Bundle</code>.<span class="cite"><a href="#r1">1</a></span> Because it's an
+    <code>.ini</code> in version control, <code>git diff</code> will show you exactly which values moved
+    between two sessions — including ones you changed without meaning to.</li>
+    <li><b>Re-run the Phase 1 sign-off after any hardware change</b>, and log it. Nozzle, belt, sheet,
+    firmware, or moving the printer. A machine that hasn't been re-verified is a suspect again, and the log
+    is what tells you when it was last verified.</li>
+    <li><b>Periodically diff your self-contained profiles against the current system profile.</b> This is the
+    price of the self-contained choice from Lesson 16: you don't get Prusa's fixes automatically, so you
+    have to go and look. Once a couple of firmware releases is plenty. Adopt deliberately, and log what you
+    adopted and why.</li>
+  </ul>
+
+  <div class="callout note">
+    <div class="callout-label">⌁ What "done" looks like</div>
+    <p>Your mission asked for a specific thing: go from a newly opened spool to a signed-off profile in one
+    evening, without re-reading the guide. That is now a concrete procedure — dry it, confirm the machine's
+    sign-off is current, run the seven Phase 2 steps in order, name and scope the profile, validate against
+    five criteria, log it with measured/inherited marks, export the bundle. Eighteen lessons compress to one
+    checklist, and the checklist is on
+    <a href="../reference/calibration-card.html">The Calibration Card</a>.</p>
+  </div>
+
+  <!-- ===== INTERACTIVE WIDGET ===== -->
+  <h2><span class="num">4</span>Read the log</h2>
+  <p>Each of these is a real log entry with a problem in it. Decide what's wrong before you open the answer.</p>
+
+  <details class="panel">
+    <summary><code>| 2026-08-04 | eSun PETG | dried | 235 | 0.94 | 0.048 | 0.8 | 13 |</code></summary>
+    <div class="panel-body">
+      <p><b>Three faults.</b> No <b>printer</b> — so the <code>0.048</code> is unattributable, and on a
+      Marlin machine it would be meaningless anyway. No <b>colour</b> — so you can't tell whether a future
+      spool of the same brand should reuse the EM. And "dried" without a date or a schedule tells you
+      nothing you can act on; "unknown" would actually be more useful, because it's honest.</p>
+      <p>Also missing: the measured/inherited marks. Every one of those five numbers is now a claim with no
+      provenance, which is precisely the state this course started in.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary><code>| 2026-08-11 | MK3S | eSun PETG grey | 65C/8h | 235 (m) | 0.94 (m) | S 0.048 (m) | ... |</code></summary>
+    <div class="panel-body">
+      <p><b>The advance value is on the wrong scale.</b> <code>S</code> is <code>M572</code> — Buddy
+      firmware, Pressure Advance. The MK3S is Marlin and wants <code>M900 K</code>, whose values sit in a
+      different range entirely. Marked <code>(m)</code>, so somebody believes they measured it.</p>
+      <p>Most likely what happened: the value was measured on the MK4S and copied across, then re-marked as
+      measured. That's the single most expensive mistake available in this course, and here it is preserved
+      in the log — which is the log doing its job. Re-run L11 on the MK3S and record a <code>K</code>
+      value.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Every row for the last four months is marked <code>(m)</code>, on all three machines</summary>
+    <div class="panel-body">
+      <p><b>Suspiciously complete.</b> Measuring all seven values for every spool on every machine is a lot
+      of evenings, and the whole point of the marks is that they distinguish. If everything is marked
+      measured, either the marks stopped being applied honestly or they stopped being applied thoughtfully.</p>
+      <p>Realistic practice: temperature and advance are usually stable within a brand and material, so
+      they're often legitimately <code>(i)</code> after the first spool. Extrusion multiplier is the one that
+      genuinely moves with colour and is worth measuring per spool. A healthy log is mostly
+      <code>(i)</code> with a few well-chosen <code>(m)</code>.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>A row with full measurements and <code>Validated: ✅</code>, but no scope recorded</summary>
+    <div class="panel-body">
+      <p><b>Validated at what?</b> Lesson 17 ended with the claim's scope: material, machine, speeds,
+      enclosure state, date. A tick without those is not a falsifiable claim — you can't later determine
+      whether a failure is inside or outside what you certified.</p>
+      <p>Concretely: if this was a Core One row validated with the door open and you now print with it shut,
+      the tick doesn't cover you. Record the scope or the tick means "it looked fine once".</p>
+    </div>
+  </details>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">5</span>Check yourself</h2>
+  <p>From memory. These interleave the whole course.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read section 2.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">Why does spool <em>colour</em> earn its own field in the log?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Pigment loading changes flow behaviour, so two colours of the same brand and material can legitimately want different extrusion multipliers.">Pigment changes flow within the same brand and material</button>
+      <button class="opt" data-feedback="It does make a spool easier to identify on the shelf, which is convenient — but the reason it's a data field is that it changes a measurement.">It makes the physical spool easier to identify later</button>
+      <button class="opt" data-feedback="Darker colours can absorb heat differently in a warm chamber, but that's a marginal effect next to the flow difference pigment loading causes.">Darker colours absorb more chamber heat when enclosed</button>
+      <button class="opt" data-feedback="Colour has no bearing on moisture uptake — that's a property of the polymer. Storage and time are what drive it.">Different colours take up moisture at different rates</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read the callout in section 2.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">What does the measured/inherited mark buy you that a plain number doesn't?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. It tells you how much confidence a value deserves when a print goes wrong — which is where to start looking.">It says how much to trust each value when something fails</button>
+      <button class="opt" data-feedback="Inherited values aren't wrong — you can't measure everything for every spool. The mark distinguishes them, it doesn't condemn them.">It flags the values that are wrong and need replacing</button>
+      <button class="opt" data-feedback="Ordering is what the calibration order gives you, and it's fixed regardless of how any individual value was arrived at.">It records the order the measurements were taken in</button>
+      <button class="opt" data-feedback="Compatibility scoping is the job of the compatible printers condition from Lesson 16, not of anything in the log.">It stops a value being applied to the wrong printer</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read section 3.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">Why does choosing self-contained profiles create an ongoing obligation?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. They don't inherit Prusa's fixes, so adopting anything useful requires you to go and diff against the current system profile deliberately.">Prusa's later fixes never reach them unless you look</button>
+      <button class="opt" data-feedback="They survive system updates rather than breaking on them — that's the reason to choose them. The obligation is about what you don't receive, not what breaks.">They break whenever a system profile is updated</button>
+      <button class="opt" data-feedback="Compatibility conditions are set once in Dependencies and persist. Nothing about being self-contained makes them need re-checking.">They lose their compatibility conditions over time</button>
+      <button class="opt" data-feedback="Re-exporting after every session is good practice for any profile, inheriting or not — it's your only backup either way.">They need re-exporting more often than inheriting ones</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Backfill the log, honestly</h3>
+    <p>Open <code>tuning-log.md</code> — you started it in Lesson 4 — and bring it up to date. The important
+    part is the honesty of the marks, not the completeness of the table.</p>
+    <ol>
+      <li>A <b>Machine</b> section per printer, with the Phase 1 sign-off numbers you actually measured, dated.</li>
+      <li>A <b>Filament</b> section per printer. Backfill a row for every profile currently in your bundle —
+      including the ones you haven't tuned yet. Mark every single value <code>(m)</code> or <code>(i)</code>.
+      Most of the starter bundle will be <code>(i)</code>. That's the correct answer and the point of the
+      exercise.</li>
+      <li>A <b>Fleet</b> section: the three <code>printer_model</code> strings from Lesson 16, current
+      firmware versions, and the date of each machine's last hardware change.</li>
+      <li>Export a config bundle into the repo and commit it alongside the log.</li>
+      <li>Finally, one paragraph: <em>"The value in my current profiles I trust least is ___, because ___,
+      and the measurement that would earn it is ___."</em></li>
+    </ol>
+    <p class="go">→ Paste it back to me. That last paragraph is the real assessment — and it's also your
+    to-do list for the first Phase 2 session.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>Two homes: the notes field for acting, the Markdown log for deciding what to trust.</strong>
+      The log is append-only, because superseded values are signal.</li>
+      <li><strong>Six fields, and colour is one of them</strong> — pigment moves flow within a brand.</li>
+      <li><strong>Mark every value measured or inherited.</strong> That mark is what separates a measurement
+      from a hypothesis.</li>
+      <li><strong>A config bundle in version control makes drift diffable</strong>, including changes you
+      made without meaning to.</li>
+      <li><strong>Self-contained profiles owe you a periodic diff</strong> against the current system
+      profile — the price of not inheriting.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/category/configuration-and-profiles_207" target="_blank" rel="noopener">Configuration and profiles — Prusa Knowledge Base</a></div>
+      <div class="desc">The hub for everything profile-related: where they live, how the wizard installs
+      them, and how compatibility flags behave. Worth a skim now that you have somewhere to put what you
+      learn from it.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> That's the end of the written course, which makes this the
+    most useful moment to ask: paste me your log and I'll tell you which values I'd challenge and which
+    machine I'd start Phase 2 on. From here the work is measurement, and I'm here for every session of it.
+    Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#tuning-log">tuning log</a>,
+    <a href="../reference/glossary.html#config-bundle">config bundle</a>,
+    <a href="../reference/glossary.html#system-profile">system profile</a>,
+    <a href="../reference/glossary.html#compatible-printers-condition">compatible printers condition</a>,
+    <a href="../reference/glossary.html#validation-set">validation set</a>,
+    <a href="../reference/glossary.html#extrusion-multiplier">extrusion multiplier</a>,
+    <a href="../reference/glossary.html#linear-advance">Linear Advance</a>,
+    <a href="../reference/glossary.html#pressure-advance">Pressure Advance</a>,
+    <a href="../reference/glossary.html#drying">drying</a>,
+    <a href="../reference/glossary.html#one-variable-rule">one-variable rule</a>,
+    <a href="../reference/glossary.html#calibration-order">calibration order</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>How to import and export custom profiles in PrusaSlicer</i>. The
+    <code>File → Export → Export Config Bundle</code> path, and that a bundle contains all custom settings
+    saved in the current PrusaSlicer version.
+    <a href="https://help.prusa3d.com/article/how-to-import-and-export-custom-profiles-in-prusaslicer_382766" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">This course. <i>Master tuning guide</i>, §1 — logging spool brand, colour, date, measured EM,
+    advance value and MVS in the filament notes field, and that colour matters because pigment changes flow
+    behaviour within the same brand.
+    <a href="../reference/source-material/prusaslicer-profile-tuning.md">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0017-the-validation-set.html">
+      <div class="dir">← Previous · L17</div>
+      <div class="ttl">The validation set</div>
+    </a>
+    <a class="next" href="../index.html">
+      <div class="dir">Course complete</div>
+      <div class="ttl">All lessons →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L18 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

@@ -159,7 +159,35 @@ temperature, flow and retraction measurement taken with that spool.
 Baking moisture out of filament before use. Not an optimisation in a humid climate — a prerequisite,
 because a wet spool makes the whole calibration chain measure the water rather than the plastic.
 
-## F · Method
+## F · Profiles
+
+**System profile**:
+A filament, print or printer preset shipped by Prusa and bound to a printer family. It carries the
+printer-specific conditional G-code and receives vendor updates. You start from one and **Save as** —
+overwriting it loses both.
+
+**Compatible printers condition**:
+An expression on a preset (`Filament Settings → Dependencies`) that decides which printers the preset
+appears for. If it evaluates false the preset is hidden entirely, with no message — which is what makes
+it a guard rather than a warning. Written against `printer_model` and `nozzle_diameter`.
+_Avoid_: "printer filter"
+
+**Config bundle**:
+A single `.ini` holding every custom print, filament and printer preset in the current PrusaSlicer
+version. Exported via `File → Export → Export Config Bundle`. It is the only backup of your measured
+values, and being a text file it is diffable in version control.
+
+**Elephant foot compensation**:
+A print setting that shrinks the first layer's perimeters to counter the bulge caused by squishing it
+against the bed. Around 0.2 mm suits a 0.4 mm nozzle. A *top-level* setting — influenced by every other
+calibration, so it is tuned last, at validation.
+
+**Validation set**:
+The three prints and five acceptance criteria that decide whether a profile is finished: a dimensional
+test, a combined overhang/bridge/stringing test, and a real part of your own. Each failing criterion
+names the [calibration order](#calibration-order) step to return to.
+
+## G · Method
 
 **Calibration order**:
 The fixed dependency chain this course follows: **machine → temperature → extrusion multiplier →

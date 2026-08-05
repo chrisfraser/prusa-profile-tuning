@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L16 · Profile structure and naming</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 3 · Ship it · L16</p>
+  <h1 class="lesson-title">Profile structure and naming</h1>
+  <p class="lesson-sub">Measurements that live in your head are lost. This is how they become named,
+  machine-scoped presets that can't end up on the wrong printer.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~20 minutes in PrusaSlicer</span><span class="sep">•</span>
+    <span>💾 No printing required</span><span class="sep">•</span>
+    <span class="tag accent">Phase 3</span>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>You run three printers with two firmware families. The specific way that goes wrong is not dramatic:
+    it's selecting <em>eSun PETG</em> on the Core One when the numbers in it were measured on the MK3S, and
+    the print coming out <em>nearly</em> right. Slightly bulged corners, slightly wrong dimensions, no error
+    message. A profile that cannot physically appear on the wrong machine is the only reliable fix, and
+    PrusaSlicer gives you the mechanism. This lesson wires it up.</p>
+  </div>
+
+  <p>Four decisions, and they compound. Get them right once and the fleet stays sane for years; get them
+  wrong and you'll be renaming presets in three months trying to work out which number came from where.</p>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>One profile per printer family — not per spool</h2>
+
+  <p>The temptation is a profile per spool, since <a href="../reference/glossary.html#extrusion-multiplier">extrusion
+  multiplier</a> genuinely varies between colours. Resist it. You will have forty presets by Christmas and
+  no idea which are current.</p>
+
+  <p>The unit that earns a preset is <b>vendor + material + printer family + nozzle</b>:</p>
+
+  <div class="codefig">
+    <div class="difflabel">The naming convention</div>
+    <pre><code><span class="c"># &lt;Vendor&gt; &lt;Material&gt; @&lt;PRINTER&gt; &lt;nozzle&gt;</span>
+
+eSun PETG @MK3S 0.4
+eSun PETG @MK4S 0.4
+eSun PETG @COREONE 0.4</code></pre>
+  </div>
+
+  <p>Per-spool variation goes in the <b>notes field</b>, not in a new preset — that's Lesson 18. The reason
+  the printer belongs in the <em>name</em> and not just in the metadata is that the name is what you read in
+  a dropdown at 11 pm.</p>
+
+  <div class="callout key">
+    <div class="callout-label">▲ Why "family", not "printer"</div>
+    <p>An <a href="../reference/glossary.html#extrusion-multiplier">EM</a> and a temperature transfer between
+    two machines of the same family. A <a href="../reference/glossary.html#pressure-advance">Pressure
+    Advance</a> value does not transfer from an MK3S — different firmware, different feature, different
+    scale. Your MK4S and Core One share an MK4S-class hotend, so their <em>filament</em> profiles will end up
+    close; their <em>print</em> profiles won't, because one is a
+    <a href="../reference/glossary.html#bedslinger">bedslinger</a> and the other is
+    <a href="../reference/glossary.html#corexy">CoreXY</a>. Keep them as separate presets anyway — you want
+    to be able to change one without touching the other.</p>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>Save as. Never overwrite a system profile</h2>
+
+  <p>The workflow, every time:</p>
+
+  <ul class="steps">
+    <li><span class="step-title">Select the target printer first</span>
+      <span class="step-detail">Then pick a <b>system</b> filament profile of the same material — e.g.
+      <code>Generic PETG</code> or <code>Prusament PETG</code>. Starting from a system profile for the right
+      machine means you inherit its printer-specific conditional G-code rather than writing it.</span></li>
+    <li><span class="step-title">Change your measured values</span>
+      <span class="step-detail">Temperature, EM, advance, retraction overrides, cooling, MVS — the seven
+      Phase 2 numbers.</span></li>
+    <li><span class="step-title">Save as, with the name above</span>
+      <span class="step-detail">Never <em>Save</em> over the system profile. Overwriting one loses the update
+      path and the printer-specific conditionals, and you cannot get them back without a reset.</span></li>
+    <li><span class="step-title">Set the compatibility condition</span>
+      <span class="step-detail"><code>Filament Settings → Dependencies → Compatible printers
+      condition</code>. Section 3.</span></li>
+    <li><span class="step-title">Export a config bundle</span>
+      <span class="step-detail"><code>File → Export → Export Config Bundle</code> writes every custom
+      setting in your current PrusaSlicer version — print, filament and printer profiles — to one
+      <code>.ini</code>.<span class="cite"><a href="#r1">1</a></span> Do this after every tuning
+      session.</span></li>
+  </ul>
+
+  <p>That last step is your only backup. PrusaSlicer's user presets are not in your repo and are not in
+  version control; a reinstall or a profile-update collision loses them silently.</p>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>The compatibility condition — the part that keeps a fleet honest</h2>
+
+  <p><code>Filament Settings → Dependencies → Compatible printers condition</code> takes an expression. If it
+  evaluates false for the selected printer, the profile <b>does not appear</b>. That is the mechanism that
+  makes a mis-selection impossible rather than merely unlikely.<span class="cite"><a href="#r2">2</a></span></p>
+
+  <p><b>Open your machine.</b> The pattern and the advance command both differ.</p>
+
+  <details class="panel">
+    <summary>MK3S · Marlin, Linear Advance</summary>
+    <div class="panel-body">
+      <pre><code><span class="c">; Filament Settings → Dependencies → Compatible printers condition</span>
+printer_model=~/.*MK3.*/ and nozzle_diameter[<span class="n">0</span>]==<span class="n">0.4</span></code></pre>
+      <pre><code><span class="c">; Filament Settings → Custom G-code → Start G-code</span>
+<span class="k">M900</span> <span class="f">K</span><span class="n">0.07</span> <span class="c">; eSun PETG — measured L11, MK3S only</span></code></pre>
+      <p><code>M900 K</code> is Marlin's <a href="../reference/glossary.html#linear-advance">Linear
+      Advance</a>.<span class="cite"><a href="#r3">3</a></span> Putting an <code>M572</code> here does
+      nothing on this machine.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>MK4S · Buddy, Pressure Advance</summary>
+    <div class="panel-body">
+      <pre><code><span class="c">; Filament Settings → Dependencies → Compatible printers condition</span>
+printer_model=~/.*MK4.*/ and nozzle_diameter[<span class="n">0</span>]==<span class="n">0.4</span></code></pre>
+      <pre><code><span class="c">; Filament Settings → Custom G-code → Start G-code</span>
+<span class="k">M572</span> <span class="f">S</span><span class="n">0.05</span> <span class="c">; eSun PETG — measured L11, MK4S only</span></code></pre>
+      <p>Note that <code>/.*MK4.*/</code> matches an MK4 <em>and</em> an MK4S. That is deliberately loose. If
+      you want it strict, read your machine's actual model string first — see the callout below — and change
+      it to <code>/.*MK4S.*/</code>. Don't tighten a pattern you haven't verified: an over-strict condition
+      makes the profile vanish with no error, which looks exactly like having lost it.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Core One · Buddy, Pressure Advance, enclosed</summary>
+    <div class="panel-body">
+      <pre><code><span class="c">; Filament Settings → Dependencies → Compatible printers condition</span>
+printer_model=~/.*COREONE.*/ and nozzle_diameter[<span class="n">0</span>]==<span class="n">0.4</span></code></pre>
+      <pre><code><span class="c">; Filament Settings → Custom G-code → Start G-code</span>
+<span class="k">M572</span> <span class="f">S</span><span class="n">0.05</span> <span class="c">; eSun PETG — measured L11, Core One only</span></code></pre>
+      <p>Same command family as the MK4S, <b>different measured value</b> — measure it on this machine. And
+      if you own more than one Core One variant, note that Core One, Core One+ and Core One L are distinct
+      models with distinct strings; verify before assuming <code>/.*COREONE.*/</code> catches yours.</p>
+    </div>
+  </details>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ Verify the model string, don't guess it</div>
+    <p>Select the printer, slice anything, and open the G-code in a text editor. PrusaSlicer writes its
+    configuration as comments at the end of the file — search for <code>printer_model</code> and read the
+    literal value. That is the string your regex has to match. Guessing and getting it wrong produces the
+    quietest possible failure: the profile simply isn't in the dropdown, and nothing tells you why.</p>
+    <p>A related quiet failure worth knowing: when a printer change makes a filament profile incompatible,
+    PrusaSlicer flags it <b>red</b> rather than hiding it, and there's a preference to show incompatible
+    profiles at all times.<span class="cite"><a href="#r2">2</a></span> If you've enabled that preference,
+    a red-flagged profile is selectable — and selecting one is exactly the mistake this section exists to
+    prevent.</p>
+  </div>
+
+  <!-- ===== SECTION 4 ===== -->
+  <h2><span class="num">4</span>Inherit, or stand alone?</h2>
+
+  <p>A PrusaSlicer preset can <b>inherit</b> from a system profile — carrying only your changes, and picking
+  up Prusa's updates to everything else. Or it can be <b>self-contained</b>, listing every value explicitly.
+  Your existing bundle is deliberately self-contained.</p>
+
+  <div class="compare">
+    <figure class="before">
+      <div class="difflabel">Inherits — the cost</div>
+      <pre><code><span class="c"># upside</span>
+picks up Prusa's fixes
+smaller, easier to read
+tracks new settings
+
+<span class="c"># downside</span>
+<span class="hl">a system update can
+move a value you never
+measured, silently</span></code></pre>
+    </figure>
+    <figure class="after">
+      <div class="difflabel">Self-contained — the trade</div>
+      <pre><code><span class="c"># upside</span>
+survives system updates
+imports on any version
+<span class="ok">what you measured is
+what you print</span>
+
+<span class="c"># downside</span>
+misses Prusa's fixes
+you own every value</code></pre>
+    </figure>
+  </div>
+
+  <p>For a tuning baseline, self-contained is the right call and your bundle already makes it. The point of
+  this whole course is that the numbers are <em>yours</em>, measured, attributable. A value that can change
+  under you because a vendor bundle updated is a value you can't reason about. The price is that you must
+  periodically diff your profile against the current system one and decide, deliberately, whether to adopt
+  anything — which is a Lesson 18 habit.</p>
+
+  <p>One more structural rule, from your own conventions and worth restating because it is easy to get
+  backwards: <b>the advance command lives in the <em>filament</em> profile's start G-code, never in the
+  printer's.</b> PrusaSlicer is unusual in offering per-filament custom G-code, and that is precisely what
+  makes the K or S value change automatically when you switch material.<span class="cite"><a href="#r4">4</a></span>
+  Put it in the printer profile and every filament on that machine gets one material's value.</p>
+
+  <!-- ===== INTERACTIVE WIDGET ===== -->
+  <h2><span class="num">5</span>Find the fault</h2>
+  <p>Click each. Each one is a real way a three-printer fleet goes wrong.</p>
+  <div class="faultfinder">
+    <div class="ff-q">What breaks, and when will you notice?</div>
+    <ul class="ff-list">
+      <li class="ff-item"
+          data-cause="Nothing stops you selecting it, so a PA value measured on Buddy firmware gets sent to a Marlin machine that ignores M572 entirely — and the M900 the MK3S needs is absent. The print works, badly, with no error."
+          data-fix="Set the compatible printers condition on every filament profile. A profile that can't appear on the wrong machine can't be chosen on the wrong machine.">A filament profile with no compatibility condition set<span class="ff-tag">Scoping</span></li>
+      <li class="ff-item"
+          data-cause="Overwriting a system profile destroys its printer-specific conditional G-code and its update path. You won't notice until you switch nozzles or a new firmware needs a changed default — and then there's nothing to fall back to."
+          data-fix="Always Save as with your own name. If you've already overwritten one, re-run the Configuration Wizard to restore the system profiles, then rebuild yours on top.">Tuned values saved straight over <code>Generic PETG</code><span class="ff-tag">Save as</span></li>
+      <li class="ff-item"
+          data-cause="You tightened to /.*MK4S.*/ without checking the literal printer_model string. If it doesn't match, the profile silently disappears from the dropdown — which looks identical to having deleted it."
+          data-fix="Slice anything, open the G-code, read the printer_model value from the config comments at the end, and match that exactly. Loose-but-working beats strict-but-guessed.">A condition regex that was tightened but never verified<span class="ff-tag">Regex</span></li>
+      <li class="ff-item"
+          data-cause="M572 in the printer's start G-code applies to every filament on that machine. Switch from PETG to TPU and you keep PETG's pressure advance — which is roughly double what TPU wants."
+          data-fix="Move it to Filament Settings → Custom G-code → Start G-code. Per-filament custom G-code is the reason the value can follow the material at all.">The <code>M572</code> line living in printer start G-code<span class="ff-tag">Placement</span></li>
+      <li class="ff-item"
+          data-cause="PrusaSlicer's user presets live in its own config directory, not in your repo. A reinstall, a version upgrade or a profile-update collision can lose them, and there is no warning and no undo."
+          data-fix="File → Export → Export Config Bundle after every tuning session, and keep the .ini in this repository where it's version-controlled and diffable.">Three evenings of measurements, never exported<span class="ff-tag">Backup</span></li>
+    </ul>
+    <div class="ff-panel"><div class="ff-cause"></div><div class="ff-fix"></div></div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">6</span>Check yourself</h2>
+  <p>From memory. Question 2 reaches back to Phase 0.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read section 3.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">Your new PETG profile doesn't appear in the dropdown at all. Most likely cause?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. A condition that evaluates false hides the profile entirely, with no message — the commonest cause is a model regex or nozzle diameter that doesn't match.">Its compatibility condition doesn't match this printer</button>
+      <button class="opt" data-feedback="A failed save would mean the preset doesn't exist, which is possible — but PrusaSlicer tells you when a save fails. A silent absence points at scoping.">The save didn't complete and the preset was lost</button>
+      <button class="opt" data-feedback="Self-contained profiles have no inherits line by design, and that doesn't affect visibility. It affects what happens on a system update.">It is self-contained and has no parent to inherit from</button>
+      <button class="opt" data-feedback="Custom G-code in the wrong pane causes the wrong advance value to be applied, not a profile to vanish. The print would run — badly.">Its advance command is in the wrong G-code section</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read the callout in section 1.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">Which measured value is safe to copy from your MK4S profile to your Core One profile?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Same hotend class, same firmware, so temperature is a sound starting point — though it still wants verifying, since the enclosure changes the thermal environment.">Nozzle temperature — as a starting point, then verify</button>
+      <button class="opt" data-feedback="Both machines use M572, so the units at least match — but pressure advance depends on the whole motion and extrusion path, and these two differ. Measure it.">Pressure advance — both machines use <code>M572 S</code></button>
+      <button class="opt" data-feedback="Cooling is where the enclosure bites hardest: the Core One retains heat that an open-frame MK4S doesn't, so its fan bands are deliberately different.">Fan speeds — the hotend class is the same on both</button>
+      <button class="opt" data-feedback="They do share a flow ceiling, so this is closer than most — but MVS is measured per material per machine, and the enclosure changes the thermal picture.">Max volumetric speed — same practical flow ceiling</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read section 4.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">Why does this course prefer self-contained profiles over ones that inherit?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. The whole point is that every number is one you measured. A value that a vendor update can change under you is a value you can't reason about.">A system update can't silently move a measured value</button>
+      <button class="opt" data-feedback="They are larger and more repetitive, not smaller — that's the cost you accept. The benefit is that nothing changes without you doing it.">They are smaller and easier to read in a text editor</button>
+      <button class="opt" data-feedback="Both kinds respect a compatibility condition equally — that's set in Dependencies and is independent of whether the preset inherits.">They can carry a compatible printers condition safely</button>
+      <button class="opt" data-feedback="Inheriting profiles pick up Prusa's fixes automatically, which is a genuine advantage of that approach — and the reason to periodically diff yours against the current system one.">They automatically pick up fixes from Prusa's updates</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Audit and scope your existing bundle</h3>
+    <p>Your <code>reference/source-material/esun-starter-profiles-bundle.ini</code> already follows most of
+    this. Verify it against a real machine rather than against the file:</p>
+    <ol>
+      <li>For each of your three printers: select it, slice anything, export the G-code, and read the literal
+      <code>printer_model</code> value out of the config comments at the end. Write all three down.</li>
+      <li>Compare each against the regex in the bundle. Does <code>/.*MK4.*/</code> match your MK4S's actual
+      string? Does <code>/.*COREONE.*/</code> match your Core One's? Decide — with the evidence in front of
+      you — whether to tighten <code>/.*MK4.*/</code> to <code>/.*MK4S.*/</code>.</li>
+      <li>Import the bundle and confirm each profile appears on exactly one machine and disappears on the
+      other two. That's the test that matters; the file being correct is not the same as it working.</li>
+      <li>Export your own config bundle and save it into this repo. Note what it contains that the starter
+      bundle doesn't.</li>
+    </ol>
+    <p class="go">→ Paste me the three model strings and your tighten-or-not decision with its reason. If you
+    tightened without step 1, I'll ask you to undo it.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>One profile per vendor + material + printer family + nozzle</strong> — per-spool variation
+      goes in notes, not in new presets.</li>
+      <li><strong>Save as, never over a system profile</strong>, or you lose its conditionals and its update
+      path.</li>
+      <li><strong>The compatibility condition makes mis-selection impossible</strong>, which is stronger than
+      making it unlikely.</li>
+      <li><strong>Verify the model string from sliced G-code</strong> before tightening a regex — an
+      over-strict condition fails silently.</li>
+      <li><strong>Advance lives in the filament profile's start G-code</strong>, which is what lets the value
+      follow the material.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/article/how-to-import-and-export-custom-profiles-in-prusaslicer_382766" target="_blank" rel="noopener">How to import and export custom profiles in PrusaSlicer — Prusa Knowledge Base</a></div>
+      <div class="desc">Short, and it distinguishes the three export options clearly — Export Config, Export
+      Config Bundle, and Export Config Bundle with Physical Printers. Only the second is your backup;
+      knowing which is which saves an unpleasant discovery later.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> Paste me a condition expression and the model string you read
+    off the machine, and I'll tell you whether it matches before you find out the hard way. Regexes that
+    almost work are the worst kind. Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#system-profile">system profile</a>,
+    <a href="../reference/glossary.html#compatible-printers-condition">compatible printers condition</a>,
+    <a href="../reference/glossary.html#config-bundle">config bundle</a>,
+    <a href="../reference/glossary.html#linear-advance">Linear Advance</a>,
+    <a href="../reference/glossary.html#pressure-advance">Pressure Advance</a>,
+    <a href="../reference/glossary.html#extrusion-multiplier">extrusion multiplier</a>,
+    <a href="../reference/glossary.html#max-volumetric-speed">max volumetric speed</a>,
+    <a href="../reference/glossary.html#bedslinger">bedslinger</a>,
+    <a href="../reference/glossary.html#corexy">CoreXY</a>,
+    <a href="../reference/glossary.html#tuning-log">tuning log</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>How to import and export custom profiles in PrusaSlicer</i>. The
+    <code>File → Import</code> and <code>File → Export</code> paths, and that a config bundle contains all
+    custom settings saved in the current PrusaSlicer version.
+    <a href="https://help.prusa3d.com/article/how-to-import-and-export-custom-profiles-in-prusaslicer_382766" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">Prusa Research. <i>Configuration and profiles</i>. The <code>Dependencies → Compatible
+    printers condition</code> setting, that profiles made incompatible by a printer or nozzle change are
+    flagged red, and the preference that shows incompatible profiles anyway.
+    <a href="https://help.prusa3d.com/category/configuration-and-profiles_207" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r3">Prusa Research. <i>Linear Advance</i>. <code>M900 K</code> on Marlin-firmware MK3-family
+    machines.
+    <a href="https://help.prusa3d.com/article/linear-advance_2252" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r4">This course. <i>Master tuning guide</i>, §2.3 — PrusaSlicer is the only slicer with
+    per-filament custom G-code, which is what makes the advance value change automatically per filament
+    preset.
+    <a href="../reference/source-material/prusaslicer-profile-tuning.md">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="../index.html#phase-2">
+      <div class="dir">← Phase 2</div>
+      <div class="ttl">The filament</div>
+    </a>
+    <a class="next" href="0017-the-validation-set.html">
+      <div class="dir">Next · L17</div>
+      <div class="ttl">The validation set →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L16 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

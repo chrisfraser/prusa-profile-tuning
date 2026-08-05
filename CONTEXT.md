@@ -41,7 +41,7 @@ profiles/esun-starter-profiles-bundle.ini <- importable PrusaSlicer config bundl
 
 ## Key conventions (do not break)
 
-1. **Profile naming:** `<Vendor> <Material> @<PRINTER> <nozzle>` e.g. `eSun PETG @MK4 0.4`. Ini section headers: `[filament:<name>]`.
+1. **Profile naming:** `<Vendor> <Material> @<PRINTER> <nozzle>` e.g. `eSun PETG @MK4S 0.4`. Ini section headers: `[filament:<name>]`. (Renamed from `@MK4` on 2026-08-05 — the machine is an MK4S.)
 2. **Self-contained profiles** — no `inherits` in the bundle. Deliberate: survives system-profile updates, imports on any vendor bundle version. Keep it that way for new profiles.
 3. **`compatible_printers_condition`** on every filament profile: `printer_model=~/.*MK3.*/`, `.*MK4.*`, `.*COREONE.*` plus `nozzle_diameter[0]==0.4`.
 4. **PA/LA lives in `start_filament_gcode`**, never in printer start G-code. MK3S profiles use `M900 K…`; MK4/Core One use `M572 S…`.

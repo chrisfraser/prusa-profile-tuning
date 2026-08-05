@@ -61,8 +61,17 @@
       up with *similar filament profiles* but *different speed/accel profiles* — the MK4S is still a
       bedslinger. `CONTEXT.md` and `reference/source-material/` still carry the old MK4 row; they are
       preserved as the original brief, with a correction note in `CONTEXT.md`.
-- [ ] Write Phase 2 (lessons 9–15) from `reference/source-material/prusaslicer-profile-tuning.md` §2.
-- [ ] Write Phase 3 (lessons 16–18) from §1, §6 and the CONTEXT.md conventions.
-- [ ] Fill `reference/calibration-card.html` once Phase 1 is signed off — it should carry the
-      per-machine target numbers (belt status, belt Hz, IS frequency band) on one page.
+- [ ] **Write Phase 2 (lessons 9–15)** from `reference/source-material/prusaslicer-profile-tuning.md` §2.
+      This is now the only gap in the course. When L15 lands, repoint L16's prev nav link from
+      `../index.html#phase-2` to `0015-*.html`.
+- [x] Phase 3 (lessons 16–18) written 2026-08-05, ahead of Phase 2 at the learner's request. It stands
+      alone and gives Phase 2 somewhere to put its results.
+- [x] `reference/calibration-card.html` carries Phase 1 targets, the calibration order, the arithmetic
+      and the method rules. **Still to add when Phase 2 lands:** the per-material starting tables and the
+      custom G-code tower blocks.
 - [ ] Find a better source for drying temperatures/times (see RESOURCES.md § Gaps).
+
+- [ ] Profile naming was corrected 2026-08-05: bundle presets renamed `@MK4` → `@MK4S`. The
+      `compatible_printers_condition` was deliberately **left** as `/.*MK4.*/` — L16's task has the
+      learner read the real `printer_model` off each machine before tightening it. Follow up on their
+      answer; tighten the bundle only once the strings are confirmed.

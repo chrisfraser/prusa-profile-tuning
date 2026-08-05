@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L17 · The validation set</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 3 · Ship it · L17</p>
+  <h1 class="lesson-title">The validation set</h1>
+  <p class="lesson-sub">Three prints and five criteria. Either the profile passes, or it names the step you
+  have to go back to.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~3 printer-hours, 20 minutes of you</span><span class="sep">•</span>
+    <span>📏 Tools: digital calipers</span><span class="sep">•</span>
+    <span class="tag accent">Phase 3</span>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>Your mission says: hit print, walk away, get a part that's dimensionally right and doesn't
+    delaminate. That is a claim, and a claim needs a test. Without one, "the profile is done" means "I got
+    bored of tuning" — and you'll discover the gap on a part you actually needed. The validation set turns
+    <em>done</em> into something with a pass mark. Its second job is diagnostic: each acceptance criterion
+    maps to exactly one Phase 2 step, so a failure tells you where to go rather than leaving you to guess.</p>
+  </div>
+
+  <p>Three prints, in this order, and you only sign off when all three pass.</p>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>The three prints</h2>
+
+  <ul class="steps">
+    <li><span class="step-title">1 · Dimensional test — a calibration cube</span>
+      <span class="step-detail">Measure X, Y and Z with calipers. Target <b>within ±0.15 mm</b>. This is the
+      only one of the three that catches a <em>machine</em> problem surviving from Phase 1, so run it
+      first.</span></li>
+    <li><span class="step-title">2 · Overhang + bridge + stringing combo</span>
+      <span class="step-detail">One print that exercises temperature, cooling and retraction together. These
+      three interact, so a combined test is more honest than three isolated ones — a temperature that passes
+      alone can fail once the fan is doing real work.</span></li>
+    <li><span class="step-title">3 · A real part you actually print</span>
+      <span class="step-detail">Non-negotiable. A profile is only good if it's good on <em>your</em>
+      geometry. Test models are chosen to be hard in generic ways; your parts are hard in specific ones — a
+      thin boss, a captive nut, a long unsupported span you happen to need.</span></li>
+  </ul>
+
+  <div class="callout note">
+    <div class="callout-label">⌁ Elephant foot compensation belongs here, at the end</div>
+    <p><code>Print Settings → Advanced → Elephant foot compensation</code>, visible in Advanced or Expert
+    mode. It shrinks the first layer's perimeters to counter the squish that makes the bottom edge bulge;
+    around <b>0.2 mm</b> works for a 0.4 mm nozzle.<span class="cite"><a href="#r1">1</a></span></p>
+    <p><b>Tune it last, and only here.</b> It's a top-level setting influenced by every other calibration —
+    flow, retraction, temperatures, Z height. Tuning it before those are settled and then changing them
+    invalidates it immediately.<span class="cite"><a href="#r1">1</a></span> It is the natural companion to
+    print 1, since both are about dimensional truth.</p>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>The five criteria, and what each one accuses</h2>
+
+  <p>This is the table that makes the validation set worth running. Each criterion points at one step.</p>
+
+  <table>
+    <caption>Read a failure as an accusation, not a verdict.</caption>
+    <thead><tr><th>Criterion</th><th>How to check</th><th>Failure means → go back to</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>Top surface uniform</b><br>no pinholes, no ridges</td>
+        <td>Low-angle light across the top solid layer</td>
+        <td>Pinholes → under-extrusion → <b>L10 extrusion multiplier</b><br>Ridges → over-extrusion → same step, other direction</td>
+      </tr>
+      <tr>
+        <td><b>Corners square</b><br>no bulge, no post-travel gap</td>
+        <td>Sight along an external perimeter through a 90° corner</td>
+        <td>Bulging → advance too low<br>Pinched or gappy after the corner → too high → <b>L11 advance</b></td>
+      </tr>
+      <tr>
+        <td><b>Seam a fine line</b><br>not a blob</td>
+        <td>Find the seam on a curved wall and run a thumbnail down it</td>
+        <td><b>L11 advance</b> + <b>L12 retraction</b>, then scarf seams in the print profile</td>
+      </tr>
+      <tr>
+        <td><b>Layer lines even</b><br>top to bottom</td>
+        <td>Compare the bottom third against the top third under the same light</td>
+        <td>Degrading upward → <b>L13 cooling</b> or <b>L14 MVS</b><br>(on the Core One, suspect chamber heat first)</td>
+      </tr>
+      <tr>
+        <td><b>Snap test granular</b><br>not a clean layer plane</td>
+        <td>Break the part. Yes, really</td>
+        <td>Clean fracture along a layer → <b>L9 temperature</b>, or too much fan in <b>L13</b></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout key">
+    <div class="callout-label">▲ The dependency rule still applies</div>
+    <p>If validation sends you back to <b>L9 temperature</b>, you are not making one small change. Temperature
+    is step 1 of the <a href="../reference/glossary.html#calibration-order">calibration order</a>, so
+    everything below it — EM, advance, retraction, cooling, MVS — is void again. Re-run the chain, then
+    re-validate. This is exactly why validation happens at the end and not continuously: an early failure is
+    expensive, and the order exists to make early failures rare.</p>
+  </div>
+
+  <p>Note the asymmetry the snap test forces on you. It is the only criterion that requires destroying the
+  part, and it is the only one that tests <b>strength</b> rather than appearance. Skipping it is how people
+  end up with beautiful profiles that produce parts which fail under load — the exact opposite of what a
+  functional print is for.</p>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>What to watch on your machine</h2>
+
+  <p><b>Open your machine.</b> The criteria are the same on all three; what fails first is not.</p>
+
+  <details class="panel">
+    <summary>MK3S · dimensional and motion first</summary>
+    <div class="panel-body">
+      <p><b>Most likely to fail:</b> the dimensional test and the corner criterion, because this is the
+      machine where motion gives out first. Its Y axis is carrying your part.</p>
+      <ul>
+        <li>Check the cube's <b>X against its Y</b>, not just each against nominal. A consistent difference
+        between the two axes points at <a href="../reference/glossary.html#skew">skew</a> or belt tension —
+        that's Phase 1 leaking through, not a profile fault. Re-run <code>Calibrate XYZ</code>.</li>
+        <li><b>Validate at MK3S speeds.</b> If you validated at 45–60 mm/s perimeters, you've certified the
+        profile at 45–60 mm/s perimeters. Don't then print production parts at 90.</li>
+        <li>Diagonal moiré on the cube's walls is the linearity-correction signature from Lesson 8, not an
+        extrusion problem. Don't chase it with EM.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>MK4S · flow and cooling first</summary>
+    <div class="panel-body">
+      <p><b>Most likely to fail:</b> the layer-lines and top-surface criteria, because with a ~22–28 mm³/s
+      ceiling this machine is fast enough to outrun its own part cooling before it outruns its hotend.</p>
+      <ul>
+        <li>If layer lines degrade in the <b>upper third only</b>, that's a cooling-time problem: layers are
+        returning sooner than the previous one has set. Check <b>L13</b> before <b>L14</b>.</li>
+        <li>If the top surface goes matte and thin at a specific <em>speed</em> rather than a specific
+        height, that's <b>L14 MVS</b> — the hotend, not the fan.</li>
+        <li>Validate at your real production acceleration. Input Shaper lets you run high accel, but corners
+        and seams still degrade first, and the seam criterion is where you'll see it.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Core One · the chamber is part of the test</summary>
+    <div class="panel-body">
+      <p><b>Most likely to fail:</b> the layer-lines criterion on PLA, and for a reason that isn't in the
+      profile at all.</p>
+      <ul>
+        <li><b>Record the door and vent state on every validation print</b>, as you did in Phase 1. A profile
+        validated with the door open is only validated with the door open — that's the honest scope of the
+        claim.</li>
+        <li>PLA degrading steadily upward, with rounded fine detail, is chamber heat approaching PLA's
+        <a href="../reference/glossary.html#glass-transition">glass transition</a>, not a cooling setting.
+        Vent it and re-run before touching <b>L13</b>.</li>
+        <li>Run the dimensional test <b>from a cold chamber and after 30 minutes of printing</b>. Thermal
+        expansion of bed, sheet and frame is real on an enclosed machine, and if the two measurements differ
+        materially, that difference is a property of this machine you need on record.</li>
+        <li>PETG and TPU should do <em>better</em> here than on the open-frame machines. If they don't,
+        suspect the enclosure state was wrong rather than the profile.</li>
+      </ul>
+    </div>
+  </details>
+
+  <!-- ===== INTERACTIVE WIDGET ===== -->
+  <h2><span class="num">4</span>The sign-off sheet</h2>
+  <p>Run this against one material on one machine. Every box, or it doesn't ship.</p>
+  <div class="checklist-widget">
+    <div class="cl-title">✓ Validation sign-off — one printer, one material, one date</div>
+    <ul class="checklist">
+      <li data-check>Phase 1 health check is current for this machine (no hardware change since)</li>
+      <li data-check>Spool dried, and the date it was dried is recorded</li>
+      <li data-check>Print 1 · calibration cube: X, Y and Z all within ±0.15 mm</li>
+      <li data-check>Print 1 · X and Y agree with <em>each other</em>, not just with nominal</li>
+      <li data-check>Elephant foot compensation set — tuned last, after everything else</li>
+      <li data-check>Print 2 · overhangs clean, bridges not sagging, no stringing between towers</li>
+      <li data-check>Print 3 · a real part of my own, at production speeds and acceleration</li>
+      <li data-check>Criterion 1 · top surface uniform — no pinholes, no ridges</li>
+      <li data-check>Criterion 2 · corners square — no bulges, no post-travel gaps</li>
+      <li data-check>Criterion 3 · seam is a fine line, not a blob</li>
+      <li data-check>Criterion 4 · layer lines even from bottom to top</li>
+      <li data-check>Criterion 5 · snap test gives a granular fracture, not a clean layer plane</li>
+      <li data-check>Core One only: door and vent state recorded for every print above</li>
+      <li data-check>Config bundle re-exported and dated (Lesson 16)</li>
+      <li data-check>Result written into <code>tuning-log.md</code> — pass or the step it sent me back to</li>
+    </ul>
+    <div class="checklist-bar"><span>Tick as you go</span><span data-checklist-progress></span></div>
+  </div>
+
+  <p>A partial pass is not a pass. It's a diagnosis: the unticked box names the lesson you go back to, you
+  re-run everything below that step in the order, and you validate again. That loop is the whole method,
+  and it terminates — which trial and error does not.</p>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">5</span>Check yourself</h2>
+  <p>From memory. Question 3 interleaves Phase 1.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read the criteria table.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">Corners bulge outward on the validation print. Which step does that accuse?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Bulging corners are the classic under-compensated advance signature — pressure hasn't been bled off before the direction change.">Advance — the value is too low for this material</button>
+      <button class="opt" data-feedback="Over-extrusion shows up as ridges on top surfaces and general dimensional growth, not specifically as bulges concentrated at corners.">Extrusion multiplier — too much material overall</button>
+      <button class="opt" data-feedback="Retraction governs what happens during travel moves. A corner is a direction change with continuous extrusion — no travel, no retraction involved.">Retraction — too little pull-back before travel</button>
+      <button class="opt" data-feedback="Too little cooling softens overhangs and fine detail, but it doesn't preferentially deposit extra material at corners. That's a pressure effect.">Cooling — the corner isn't setting before the turn</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read the elephant foot callout.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">Why is elephant foot compensation tuned at validation rather than during Phase 2?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. It's a top-level setting influenced by flow, temperature, retraction and Z height — so tuning it before those settle means re-tuning it after.">Every other calibration setting influences its value</button>
+      <button class="opt" data-feedback="It is quick to test, which is convenient — but convenience isn't the reason for its position. Dependency is.">It is quick to test and belongs with the fast checks</button>
+      <button class="opt" data-feedback="It lives in Print Settings rather than Filament Settings, which is true — but plenty of print settings get tuned earlier. Its lateness is about dependency.">It is a print setting, not a per-filament setting</button>
+      <button class="opt" data-feedback="First layer height does affect it, and that was fixed back in Phase 1 — but so do flow, temperature and retraction, which were fixed much later.">It depends on the first layer height set in Phase 1</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read the MK3S panel.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">Your cube measures 20.00 in X and 20.28 in Y. What is that telling you?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. A difference between axes is mechanical — skew or belt tension — so it's Phase 1 leaking through, not something a filament setting can fix.">A machine problem — the axes disagree with each other</button>
+      <button class="opt" data-feedback="Over-extrusion would grow both axes together, since flow doesn't know which direction the nozzle is moving. A per-axis difference has to be mechanical.">Over-extrusion — reduce the extrusion multiplier</button>
+      <button class="opt" data-feedback="Elephant foot affects the bottom layers' outline, not the overall dimension measured up the part, and it wouldn't favour one axis.">Elephant foot — raise the compensation value</button>
+      <button class="opt" data-feedback="Shrinkage is a material property and applies roughly equally in X and Y. A 0.28 mm split between axes points at geometry, not chemistry.">Material shrinkage — expected and within tolerance</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Validate one material on one machine</h3>
+    <p>Pick the machine and material you've carried furthest. Run all three prints and work the sign-off
+    sheet. Then write into <code>tuning-log.md</code>:</p>
+    <ol>
+      <li>The three cube measurements, to two decimal places, and X versus Y explicitly.</li>
+      <li>Your verdict against each of the five criteria — <b>pass, or the lesson number it sends you
+      back to</b>. Not "looks fine".</li>
+      <li>A photo of the <b>fracture surface</b> from the snap test. This is the one people skip.</li>
+      <li>What "a real part I actually print" was, and why that part is a harder test than the calibration
+      cube for <em>your</em> use.</li>
+      <li>The scope of the claim, in one sentence: <em>"This profile is validated for ___ on ___ at ___
+      speeds, with ___ enclosure state, as of ___."</em></li>
+    </ol>
+    <p class="go">→ Paste it back to me. If every criterion passed first time I'll be suspicious, and I'll
+    ask to see the fracture photo before I believe it.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>Three prints: dimensional, combo, and a real part of my own.</strong> The third is
+      non-negotiable.</li>
+      <li><strong>Each criterion accuses one step</strong>, so a failure is a diagnosis rather than a
+      setback.</li>
+      <li><strong>The snap test is the only one that measures strength</strong> — and the only one that
+      costs a part.</li>
+      <li><strong>Elephant foot compensation goes last</strong>, because every other setting moves it.</li>
+      <li><strong>A validated profile has a scope</strong>: this material, this machine, these speeds, this
+      enclosure state, this date.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/article/elephant-foot-compensation_114487" target="_blank" rel="noopener">Elephant foot compensation — Prusa Knowledge Base</a></div>
+      <div class="desc">Two minutes, with the ~0.2 mm starting figure for a 0.4 mm nozzle and the reason this
+      setting has to come after everything else. The clearest short statement of a top-level setting in the
+      whole KB.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> Send photos, especially of fracture surfaces and seams — those
+    two are the hardest to judge from a written description and the easiest to judge from an image. If you're
+    torn between "pass" and "pass, I think", that's worth a conversation. Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#validation-set">validation set</a>,
+    <a href="../reference/glossary.html#elephant-foot">elephant foot compensation</a>,
+    <a href="../reference/glossary.html#calibration-order">calibration order</a>,
+    <a href="../reference/glossary.html#extrusion-multiplier">extrusion multiplier</a>,
+    <a href="../reference/glossary.html#pressure-advance">Pressure Advance</a>,
+    <a href="../reference/glossary.html#retraction">retraction</a>,
+    <a href="../reference/glossary.html#max-volumetric-speed">max volumetric speed</a>,
+    <a href="../reference/glossary.html#skew">skew</a>,
+    <a href="../reference/glossary.html#glass-transition">glass transition temperature</a>,
+    <a href="../reference/glossary.html#tuning-log">tuning log</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>Elephant foot compensation</i>. The
+    <code>Print Settings → Advanced → Elephant foot compensation</code> path, the ~0.2 mm figure for a
+    0.4 mm nozzle, that Advanced or Expert mode is required, and that it is a top-level setting influenced by
+    every other calibration and so must be tuned after them.
+    <a href="https://help.prusa3d.com/article/elephant-foot-compensation_114487" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">This course. <i>Master tuning guide</i>, §6 — the three-print validation set and the five
+    acceptance criteria.
+    <a href="../reference/source-material/prusaslicer-profile-tuning.md">Link</a>.</li>
+    <li id="r3">Printables. <i>All-in-one 3D printer test</i>. The combined overhang, bridge and stringing
+    model used for print 2.
+    <a href="https://www.printables.com/model/112181" target="_blank" rel="noopener">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0016-profile-structure-and-naming.html">
+      <div class="dir">← Previous · L16</div>
+      <div class="ttl">Profile structure and naming</div>
+    </a>
+    <a class="next" href="0018-the-tuning-log.html">
+      <div class="dir">Next · L18</div>
+      <div class="ttl">The tuning log →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L17 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

@@ -87,6 +87,7 @@ Keep in sync with `reference/glossary.html`. Lessons link only to anchors listed
 `#linear-advance` `#pressure-advance` `#input-shaper` `#ghosting`
 `#selftest` `#belt-tension` `#pinda` `#loadcell` `#live-adjust-z` `#mesh-bed-levelling` `#pid-tuning` `#skew`
 `#glass-transition` `#hygroscopic` `#drying`
+`#system-profile` `#compatible-printers-condition` `#config-bundle` `#elephant-foot` `#validation-set`
 `#calibration-order` `#one-variable-rule` `#tuning-log`
 
 ## Phase / lesson map (for nav + kicker)
@@ -107,8 +108,14 @@ Keep in sync with `reference/glossary.html`. Lessons link only to anchors listed
 - L9 temperature tower · L10 extrusion multiplier · L11 pressure/linear advance · L12 retraction ·
   L13 cooling · L14 max volumetric speed · L15 speeds and accelerations
 
-**Phase 3 · Ship it** — `#phase-3` (not yet written)
-- L16 profile structure and naming · L17 the validation set · L18 the tuning log
+**Phase 3 · Ship it** — `#phase-3`
+- L16 `0016-profile-structure-and-naming.html`
+- L17 `0017-the-validation-set.html`
+- L18 `0018-the-tuning-log.html`
+
+Phase 3 was written **before** Phase 2, at the learner's request — it stands alone, and gives Phase 2 a
+place to put its results. L16's `nav.lesson-nav` prev therefore points at `../index.html#phase-2` rather
+than at L15. **When L15 is written, repoint it.**
 
 Source material for Phases 2–3 is already written and fact-checked:
 `reference/source-material/prusaslicer-profile-tuning.md`.

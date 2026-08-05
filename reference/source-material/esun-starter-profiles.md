@@ -1,4 +1,10 @@
-# eSun Starter Profiles — eTPU-95A & eSUN PETG (MK3S · MK4 · Core One)
+# eSun Starter Profiles — eTPU-95A & eSUN PETG (MK3S · MK4S · Core One)
+
+> **Revised 2026-08-05.** The fleet is MK3S / **MK4S** / Core One. The `@MK4` presets in the bundle
+> have been renamed `@MK4S`. Their `compatible_printers_condition` still matches on `/.*MK4.*/`,
+> which also matches an MK4S — see Lesson 16 for how to verify the real `printer_model` and tighten
+> it. Note also that the MK4S hotend is the same class as the Core One's, so their flow ceilings
+> match (~22–28 mm³/s) even though their motion systems do not.
 
 ## Importing the bundle
 
@@ -11,10 +17,10 @@ The companion file `esun-starter-profiles-bundle.ini` contains all six profiles 
 5. After tuning EM / PA / retraction, just **Save** over the same preset name, and re-export your own bundle (**File → Export → Export Config Bundle**) as backup.
 
 Notes on the bundle:
-- MK4 profiles match any MK4-family model (MK4/MK4S); MK3S profiles match MK3-family; Core One matches COREONE.
+- `@MK4S` profiles match any MK4-family model, because the condition is `/.*MK4.*/`; MK3S profiles match MK3-family; Core One matches COREONE.
 - `filament_colour` is just a UI swatch (green = PETG, orange = TPU) — change freely.
 - The PA/LA starting value lives in each profile's **Custom G-code → Start G-code**; that's the line you edit after running the tower test.
-- If you print with other nozzle sizes, duplicate the preset, rename (e.g. `@MK4 0.6`), change the condition to `nozzle_diameter[0]==0.6`, and re-tune MVS + PA.
+- If you print with other nozzle sizes, duplicate the preset, rename (e.g. `@MK4S 0.6`), change the condition to `nozzle_diameter[0]==0.6`, and re-tune MVS + PA.
 
 Manufacturer datasheet values cross-checked against community results on Prusa hardware. The tables below document what's inside the bundle.
 
@@ -24,9 +30,9 @@ Manufacturer datasheet values cross-checked against community results on Prusa h
 
 **Manufacturer envelope (TDS v4.0):** nozzle 210–250 °C, bed 45–60 °C, speed 20–50 mm/s, fan 100 %, dry 55 °C for >4 h (longer is better — community MK3S consensus is 8–12 h).
 
-**Base system profile:** `Generic FLEX` (MK3S) / `Prusament TPU 95A` (MK4, Core One) — the Prusament profile is the better starting skeleton on Nextruder machines since it carries the correct PA block and Nextruder-tuned overrides.
+**Base system profile:** `Generic FLEX` (MK3S) / `Prusament TPU 95A` (MK4S, Core One) — the Prusament profile is the better starting skeleton on Nextruder machines since it carries the correct PA block and Nextruder-tuned overrides.
 
-| Filament Settings | MK3S | MK4 | Core One |
+| Filament Settings | MK3S | MK4S | Core One |
 |---|---|---|---|
 | Nozzle first / other | 235 / 230 | 230 / 228 | 230 / 228 |
 | Bed first / other | 50 / 50 | 50 / 50 | 50 / 50 |
@@ -41,7 +47,7 @@ Manufacturer datasheet values cross-checked against community results on Prusa h
 
 **Filament Overrides (tick and set):**
 
-| | MK3S | MK4 / Core One |
+| | MK3S | MK4S / Core One |
 |---|---|---|
 | Retraction length | 0.8 mm | 0.6 mm |
 | Retraction speed | 20 mm/s | 25 mm/s |
@@ -52,7 +58,7 @@ Manufacturer datasheet values cross-checked against community results on Prusa h
 
 **Print speeds** (set in the print profile you pair with it):
 - External perimeter 15 / perimeters 20 / infill 25 / travel 120 (MK3S)
-- External perimeter 25 / perimeters 35 / infill 45 / travel 250 (MK4, Core One)
+- External perimeter 25 / perimeters 35 / infill 45 / travel 250 (MK4S, Core One)
 - First layer: 15 mm/s everywhere, first layer extrusion width 120 %
 
 **Known behaviour of this specific filament on Prusa machines:**
@@ -60,7 +66,7 @@ Manufacturer datasheet values cross-checked against community results on Prusa h
 - MK3S: loosen the idler screws noticeably from PLA tension, and print cooler rather than hotter if you get blobs — the community-settled MK3S recipe is cooler + slower + slightly more retraction than the generic FLEX profile.
 - Bed 50 °C; on smooth PEI use glue stick as separator (it bonds hard), textured sheet preferred.
 - eSun's own sheet says fan 100 %; if inter-layer bonding suffers on functional parts, drop max fan to 60–70 % and slow down instead.
-- Nextruder (MK4/Core One) handles it far better than the MK3S drive; don't transfer MK3S caution to those machines — just respect the MVS cap.
+- Nextruder (MK4S/Core One) handles it far better than the MK3S drive; don't transfer MK3S caution to those machines — just respect the MVS cap.
 
 ---
 
@@ -70,7 +76,7 @@ Manufacturer datasheet values cross-checked against community results on Prusa h
 
 **Base system profile:** `Generic PETG` (all three), or `Prusament PETG` if you want its conditional G-code as skeleton.
 
-| Filament Settings | MK3S | MK4 | Core One |
+| Filament Settings | MK3S | MK4S | Core One |
 |---|---|---|---|
 | Nozzle first / other | 240 / 238 | 240 / 235 | 240 / 235 |
 | Bed first / other | 85 / 90 | 80 / 85 | 80 / 85 |
@@ -86,7 +92,7 @@ Manufacturer datasheet values cross-checked against community results on Prusa h
 
 **Filament Overrides:**
 
-| | MK3S | MK4 / Core One |
+| | MK3S | MK4S / Core One |
 |---|---|---|
 | Retraction length | 1.2 mm | 0.8 mm |
 | Retraction speed | 35 mm/s | 35 mm/s |
@@ -95,7 +101,7 @@ Manufacturer datasheet values cross-checked against community results on Prusa h
 
 **Print speeds:**
 - External perimeter 25 / perimeters 40 / infill 55 (MK3S)
-- External perimeter 40 / perimeters 100 / infill 160 (MK4) — MVS will clamp these correctly
+- External perimeter 40 / perimeters 100 / infill 160 (MK4S) — MVS will clamp these correctly
 - External perimeter 40 / perimeters 110 / infill 170 (Core One)
 
 **Known behaviour:**
