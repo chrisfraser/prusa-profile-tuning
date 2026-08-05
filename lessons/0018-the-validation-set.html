@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>L17 · The validation set</title>
+<title>L18 · The validation set</title>
 <link rel="stylesheet" href="../assets/styles.css">
 <script defer src="../assets/widgets.js"></script>
 </head>
@@ -23,7 +23,7 @@
 <!-- NAV:END -->
 
 <main class="wrap">
-  <p class="kicker">Phase 3 · Ship it · L17</p>
+  <p class="kicker">Phase 3 · Ship it · L18</p>
   <h1 class="lesson-title">The validation set</h1>
   <p class="lesson-sub">Three prints and five criteria. Either the profile passes, or it names the step you
   have to go back to.</p>
@@ -62,6 +62,19 @@
       thin boss, a captive nut, a long unsupported span you happen to need.</span></li>
   </ul>
 
+  <div class="callout build">
+    <div class="callout-label">⬇ Download · prints 1 and 2</div>
+    <p>Print 1: <a href="../downloads/calibration-cube-20.stl" download><b>calibration-cube-20.stl</b></a> —
+    a plain 20 mm cube with clean caliper faces (no embossed lettering to sit under the jaws). Mark the X
+    face with a pen before you take it off the plate, while the orientation is still obvious.</p>
+    <p>Print 2: <a href="../downloads/overhang-bridge-test.stl" download><b>overhang-bridge-test.stl</b></a>
+    from Lesson 14, printed <em>together with</em>
+    <a href="../downloads/retraction-spikes.stl" download><b>retraction-spikes.stl</b></a> from Lesson 13 —
+    overhangs, a bridge and stringing on one plate, exercising temperature, cooling and retraction against
+    each other. Prefer a single combined model? The Printables all-in-one test linked in the references does
+    the same job.</p>
+  </div>
+
   <div class="callout note">
     <div class="callout-label">⌁ Elephant foot compensation belongs here, at the end</div>
     <p><code>Print Settings → Advanced → Elephant foot compensation</code>, visible in Advanced or Expert
@@ -85,34 +98,34 @@
       <tr>
         <td><b>Top surface uniform</b><br>no pinholes, no ridges</td>
         <td>Low-angle light across the top solid layer</td>
-        <td>Pinholes → under-extrusion → <b>L10 extrusion multiplier</b><br>Ridges → over-extrusion → same step, other direction</td>
+        <td>Pinholes → under-extrusion → <b>L11 extrusion multiplier</b><br>Ridges → over-extrusion → same step, other direction</td>
       </tr>
       <tr>
         <td><b>Corners square</b><br>no bulge, no post-travel gap</td>
         <td>Sight along an external perimeter through a 90° corner</td>
-        <td>Bulging → advance too low<br>Pinched or gappy after the corner → too high → <b>L11 advance</b></td>
+        <td>Bulging → advance too low<br>Pinched or gappy after the corner → too high → <b>L12 advance</b></td>
       </tr>
       <tr>
         <td><b>Seam a fine line</b><br>not a blob</td>
         <td>Find the seam on a curved wall and run a thumbnail down it</td>
-        <td><b>L11 advance</b> + <b>L12 retraction</b>, then scarf seams in the print profile</td>
+        <td><b>L12 advance</b> + <b>L13 retraction</b>, then scarf seams in the print profile</td>
       </tr>
       <tr>
         <td><b>Layer lines even</b><br>top to bottom</td>
         <td>Compare the bottom third against the top third under the same light</td>
-        <td>Degrading upward → <b>L13 cooling</b> or <b>L14 MVS</b><br>(on the Core One, suspect chamber heat first)</td>
+        <td>Degrading upward → <b>L14 cooling</b> or <b>L15 MVS</b><br>(on the Core One, suspect chamber heat first)</td>
       </tr>
       <tr>
         <td><b>Snap test granular</b><br>not a clean layer plane</td>
         <td>Break the part. Yes, really</td>
-        <td>Clean fracture along a layer → <b>L9 temperature</b>, or too much fan in <b>L13</b></td>
+        <td>Clean fracture along a layer → <b>L10 temperature</b>, or too much fan in <b>L14</b></td>
       </tr>
     </tbody>
   </table>
 
   <div class="callout key">
     <div class="callout-label">▲ The dependency rule still applies</div>
-    <p>If validation sends you back to <b>L9 temperature</b>, you are not making one small change. Temperature
+    <p>If validation sends you back to <b>L10 temperature</b>, you are not making one small change. Temperature
     is step 1 of the <a href="../reference/glossary.html#calibration-order">calibration order</a>, so
     everything below it — EM, advance, retraction, cooling, MVS — is void again. Re-run the chain, then
     re-validate. This is exactly why validation happens at the end and not continuously: an early failure is
@@ -153,9 +166,9 @@
       ceiling this machine is fast enough to outrun its own part cooling before it outruns its hotend.</p>
       <ul>
         <li>If layer lines degrade in the <b>upper third only</b>, that's a cooling-time problem: layers are
-        returning sooner than the previous one has set. Check <b>L13</b> before <b>L14</b>.</li>
+        returning sooner than the previous one has set. Check <b>L14</b> before <b>L15</b>.</li>
         <li>If the top surface goes matte and thin at a specific <em>speed</em> rather than a specific
-        height, that's <b>L14 MVS</b> — the hotend, not the fan.</li>
+        height, that's <b>L15 MVS</b> — the hotend, not the fan.</li>
         <li>Validate at your real production acceleration. Input Shaper lets you run high accel, but corners
         and seams still degrade first, and the seam criterion is where you'll see it.</li>
       </ul>
@@ -173,7 +186,7 @@
         claim.</li>
         <li>PLA degrading steadily upward, with rounded fine detail, is chamber heat approaching PLA's
         <a href="../reference/glossary.html#glass-transition">glass transition</a>, not a cooling setting.
-        Vent it and re-run before touching <b>L13</b>.</li>
+        Vent it and re-run before touching <b>L14</b>.</li>
         <li>Run the dimensional test <b>from a cold chamber and after 30 minutes of printing</b>. Thermal
         expansion of bed, sheet and frame is real on an enclosed machine, and if the two measurements differ
         materially, that difference is a property of this machine you need on record.</li>
@@ -202,7 +215,7 @@
       <li data-check>Criterion 4 · layer lines even from bottom to top</li>
       <li data-check>Criterion 5 · snap test gives a granular fracture, not a clean layer plane</li>
       <li data-check>Core One only: door and vent state recorded for every print above</li>
-      <li data-check>Config bundle re-exported and dated (Lesson 16)</li>
+      <li data-check>Config bundle re-exported and dated (Lesson 17)</li>
       <li data-check>Result written into <code>tuning-log.md</code> — pass or the step it sent me back to</li>
     </ul>
     <div class="checklist-bar"><span>Tick as you go</span><span data-checklist-progress></span></div>
@@ -335,17 +348,17 @@
   </ol>
 
   <nav class="lesson-nav">
-    <a href="0016-profile-structure-and-naming.html">
-      <div class="dir">← Previous · L16</div>
+    <a href="0017-profile-structure-and-naming.html">
+      <div class="dir">← Previous · L17</div>
       <div class="ttl">Profile structure and naming</div>
     </a>
-    <a class="next" href="0018-the-tuning-log.html">
-      <div class="dir">Next · L18</div>
+    <a class="next" href="0019-the-tuning-log.html">
+      <div class="dir">Next · L19</div>
       <div class="ttl">The tuning log →</div>
     </a>
   </nav>
 
-  <p class="pagefoot">Lesson L17 of the prusa-profile-tuning course ·
+  <p class="pagefoot">Lesson L18 of the prusa-profile-tuning course ·
     <a href="../index.html">all lessons</a> ·
     <a href="../reference/calibration-card.html">The Calibration Card</a> ·
     <a href="../reference/glossary.html">glossary</a></p>

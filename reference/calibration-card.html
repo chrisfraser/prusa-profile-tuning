@@ -214,17 +214,17 @@ total flow = M221 (firmware, %) × extrusion multiplier (slicer)</code></pre>
 
   <div class="codefig">
     <div class="difflabel">The three test blocks · Printer Settings → Custom G-code → After layer change</div>
-    <pre><code><span class="c"># L9 · temperature tower — 0.2 mm layers, 50 layers = 10 mm bands.</span>
+    <pre><code><span class="c"># L10 · temperature tower — 0.2 mm layers, 50 layers = 10 mm bands.</span>
 <span class="c"># Set the profile to the TOP of the range and step DOWN. M104 does not wait.</span>
 {if layer_num == <span class="n">50</span>}<span class="k">M104</span> <span class="f">S</span><span class="n">245</span>{endif}
 {if layer_num == <span class="n">100</span>}<span class="k">M104</span> <span class="f">S</span><span class="n">240</span>{endif}   <span class="c">← judge the MIDDLE of each band</span>
 
-<span class="c"># L11 · advance tower. MK3S uses M900 K; MK4S and Core One use M572 S.</span>
+<span class="c"># L12 · advance tower. MK3S uses M900 K; MK4S and Core One use M572 S.</span>
 <span class="c"># Print with the print profile you actually intend to use.</span>
 {if layer_num == <span class="n">20</span>}<span class="k">M900</span> <span class="f">K</span><span class="n">0.02</span>{endif}    <span class="c">← MK3S only</span>
 {if layer_num == <span class="n">20</span>}<span class="k">M572</span> <span class="f">S</span><span class="n">0.02</span>{endif}    <span class="c">← MK4S / Core One only</span>
 
-<span class="c"># L14 · MVS ramp. Set MVS to 40 first so it can't clamp what you're measuring.</span>
+<span class="c"># L15 · MVS ramp. Set MVS to 40 first so it can't clamp what you're measuring.</span>
 {if layer_num == <span class="n">30</span>}<span class="k">M220</span> <span class="f">S</span><span class="n">150</span>{endif}
 {if layer_num == <span class="n">60</span>}<span class="k">M220</span> <span class="f">S</span><span class="n">200</span>{endif}   <span class="c">← take 85 % of the failure band</span>
 
@@ -236,19 +236,19 @@ total flow = M221 (firmware, %) × extrusion multiplier (slicer)</code></pre>
     <caption>Diagnostic shorthand for Phase 2.</caption>
     <thead><tr><th>What you see</th><th>Which step</th><th>Which way</th></tr></thead>
     <tbody>
-      <tr><td>Clean flat split along a layer line</td><td>L9 temperature</td><td>too cold — go up a band</td></tr>
-      <tr><td>Strings, sag, curl, gloss</td><td>L9 temperature</td><td>too hot — go down a band</td></tr>
-      <tr><td>Wall measures over nominal</td><td>L10 flow</td><td>EM down</td></tr>
-      <tr><td>Pinholes in top surface</td><td>L10 flow</td><td>EM up</td></tr>
-      <tr><td>Blob on the outside of a corner</td><td>L11 advance</td><td>value up</td></tr>
-      <tr><td>Gap just after a corner or travel</td><td>L11 advance</td><td>value down</td></tr>
-      <tr><td>Strings, everything else ruled out</td><td>L12 retraction</td><td>length up, 0.1 mm at a time</td></tr>
-      <tr><td>Extruder clicking, ground filament</td><td>L12 retraction</td><td>length down, immediately</td></tr>
-      <tr><td>Overhangs droop, bridges sag</td><td>L13 cooling</td><td>fan up</td></tr>
-      <tr><td>Layers delaminate, part is brittle</td><td>L13 cooling</td><td>fan down</td></tr>
-      <tr><td>Wall goes matte and thin at speed</td><td>L14 MVS</td><td>ceiling down to 85 % of failure</td></tr>
-      <tr><td>Infill far slower than the profile says</td><td>L14 MVS</td><td>at the ceiling — lower layer height</td></tr>
-      <tr><td>Ghosting downstream of a feature</td><td>L15 accel</td><td>down — and re-check belts</td></tr>
+      <tr><td>Clean flat split along a layer line</td><td>L10 temperature</td><td>too cold — go up a band</td></tr>
+      <tr><td>Strings, sag, curl, gloss</td><td>L10 temperature</td><td>too hot — go down a band</td></tr>
+      <tr><td>Wall measures over nominal</td><td>L11 flow</td><td>EM down</td></tr>
+      <tr><td>Pinholes in top surface</td><td>L11 flow</td><td>EM up</td></tr>
+      <tr><td>Blob on the outside of a corner</td><td>L12 advance</td><td>value up</td></tr>
+      <tr><td>Gap just after a corner or travel</td><td>L12 advance</td><td>value down</td></tr>
+      <tr><td>Strings, everything else ruled out</td><td>L13 retraction</td><td>length up, 0.1 mm at a time</td></tr>
+      <tr><td>Extruder clicking, ground filament</td><td>L13 retraction</td><td>length down, immediately</td></tr>
+      <tr><td>Overhangs droop, bridges sag</td><td>L14 cooling</td><td>fan up</td></tr>
+      <tr><td>Layers delaminate, part is brittle</td><td>L14 cooling</td><td>fan down</td></tr>
+      <tr><td>Wall goes matte and thin at speed</td><td>L15 MVS</td><td>ceiling down to 85 % of failure</td></tr>
+      <tr><td>Infill far slower than the profile says</td><td>L15 MVS</td><td>at the ceiling — lower layer height</td></tr>
+      <tr><td>Ghosting downstream of a feature</td><td>L16 accel</td><td>down — and re-check belts</td></tr>
     </tbody>
   </table>
 
@@ -294,11 +294,11 @@ File → Export → Export Config Bundle</code></pre>
     <caption>Validation — each failure names the step to go back to.</caption>
     <thead><tr><th>Criterion</th><th>Failure means</th></tr></thead>
     <tbody>
-      <tr><td>Top surface uniform</td><td>pinholes or ridges → <b>L10 extrusion multiplier</b></td></tr>
-      <tr><td>Corners square</td><td>bulge → advance low · gap after corner → advance high → <b>L11</b></td></tr>
-      <tr><td>Seam a fine line</td><td><b>L11 advance</b> + <b>L12 retraction</b>, then scarf seams</td></tr>
-      <tr><td>Layer lines even</td><td>degrading upward → <b>L13 cooling</b> / <b>L14 MVS</b> (Core One: chamber)</td></tr>
-      <tr><td>Snap test granular</td><td>clean layer plane → <b>L9 temperature</b> or too much fan</td></tr>
+      <tr><td>Top surface uniform</td><td>pinholes or ridges → <b>L11 extrusion multiplier</b></td></tr>
+      <tr><td>Corners square</td><td>bulge → advance low · gap after corner → advance high → <b>L12</b></td></tr>
+      <tr><td>Seam a fine line</td><td><b>L12 advance</b> + <b>L13 retraction</b>, then scarf seams</td></tr>
+      <tr><td>Layer lines even</td><td>degrading upward → <b>L14 cooling</b> / <b>L15 MVS</b> (Core One: chamber)</td></tr>
+      <tr><td>Snap test granular</td><td>clean layer plane → <b>L10 temperature</b> or too much fan</td></tr>
     </tbody>
   </table>
 

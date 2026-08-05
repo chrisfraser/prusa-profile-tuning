@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>L11 · Pressure / Linear Advance</title>
+<title>L12 · Pressure / Linear Advance</title>
 <link rel="stylesheet" href="../assets/styles.css">
 <script defer src="../assets/widgets.js"></script>
 </head>
@@ -23,7 +23,7 @@
 <!-- NAV:END -->
 
 <main class="wrap">
-  <p class="kicker">Phase 2 · The filament · L11</p>
+  <p class="kicker">Phase 2 · The filament · L12</p>
   <h1 class="lesson-title">Pressure / Linear Advance</h1>
   <p class="lesson-sub">The single biggest quality win in the course — and the one place where a number
   copied between two of your machines does real damage.</p>
@@ -126,7 +126,16 @@ visible dashed restart</code></pre>
 
   <p>A tall object with sharp 90° corners — a thin-walled square tube is ideal — with the advance value
   stepped per band via <code>Printer Settings → Custom G-code → After layer change G-code</code>. Same
-  mechanism as <a href="0009-the-temperature-tower.html">Lesson 9</a>, different command.</p>
+  mechanism as <a href="0010-the-temperature-tower.html">Lesson 10</a>, different command.</p>
+
+  <div class="callout build">
+    <div class="callout-label">⬇ Download · the tower</div>
+    <p><a href="../downloads/pa-corner-tower.stl" download><b>pa-corner-tower.stl</b></a> — a 30 × 30 mm
+    square tube with genuine sharp corners, 32 mm tall, plus a pillar 40 mm away that forces a travel move
+    every layer so you can judge extrusion restart at the same time. At 0.2 mm layers the sample block's
+    20-layer bands are 4 mm each — eight bands fit, so a 6-line bracket leaves the top in your final
+    value.</p>
+  </div>
 
   <div class="callout warning">
     <div class="callout-label">⚠ Tune at production speeds and accelerations, or don't bother</div>
@@ -136,23 +145,23 @@ visible dashed restart</code></pre>
     value, it will starve your corners at speed.</p>
     <p><b>Print the tower with the print profile you actually intend to use.</b> This is the one place in the
     <a href="../reference/glossary.html#calibration-order">calibration order</a> where a later step
-    (<a href="0015-speeds-and-accelerations.html">Lesson 15</a>, speeds and accelerations) legitimately loops
-    back to an earlier one. If you significantly change acceleration in L15, come back here.</p>
+    (<a href="0016-speeds-and-accelerations.html">Lesson 16</a>, speeds and accelerations) legitimately loops
+    back to an earlier one. If you significantly change acceleration in L16, come back here.</p>
   </div>
 
   <div class="checklist-widget">
     <div class="cl-title">✓ Preflight — tick all of these before the tower goes on the bed</div>
     <ul class="checklist">
-      <li data-check>Temperature is the value measured in Lesson 9, not a stock number</li>
-      <li data-check>Extrusion multiplier is the value measured in Lesson 10 and is in the profile</li>
-      <li data-check>Firmware flow (<code>M221</code>) is at the state I recorded in Lesson 10</li>
+      <li data-check>Temperature is the value measured in Lesson 10, not a stock number</li>
+      <li data-check>Extrusion multiplier is the value measured in Lesson 11 and is in the profile</li>
+      <li data-check>Firmware flow (<code>M221</code>) is at the state I recorded in Lesson 11</li>
       <li data-check>The print profile loaded is the one I intend to print production parts with</li>
       <li data-check>Acceleration and external perimeter speed are at production values, not slowed</li>
       <li data-check>The model has genuine sharp 90° corners, not fillets</li>
       <li data-check>The model forces travel moves, so I can judge extrusion restart too</li>
       <li data-check>I know which command my machine takes — <code>M900 K</code> or <code>M572 S</code></li>
       <li data-check>My band values bracket the stock value for this machine, above and below</li>
-      <li data-check>The spool is the same one from Lessons 9 and 10, still dry</li>
+      <li data-check>The spool is the same one from Lessons 10 and 11, still dry</li>
     </ul>
     <div class="checklist-bar"><span>Tick as you go</span><span data-checklist-progress></span></div>
   </div>
@@ -241,7 +250,7 @@ visible dashed restart</code></pre>
         isn't, tell me before you run the tower — a tower whose command does nothing produces seven identical
         bands and an hour of confusion.</p>
       </div>
-      <p><b>And fix the chamber state</b>, as in Lesson 9. Advance is a pressure phenomenon and pressure
+      <p><b>And fix the chamber state</b>, as in Lesson 10. Advance is a pressure phenomenon and pressure
       depends on viscosity, which depends on how hot the ambient air is. Door and vent state decided,
       recorded, unchanged.</p>
     </div>
@@ -269,7 +278,7 @@ visible dashed restart</code></pre>
   <p>Two habits in that snippet worth keeping. The <b>conditional</b> means swapping to a 0.6 mm nozzle
   doesn't silently apply a 0.4 mm value. The <b>comment</b> records which machine and which date — because in
   four months the only thing standing between you and a guess is that line of text. That's
-  <a href="0018-the-tuning-log.html">Lesson 18</a>, arriving early.</p>
+  <a href="0019-the-tuning-log.html">Lesson 19</a>, arriving early.</p>
 
   <p><b>Then delete the tower block</b> from <code>Printer Settings → Custom G-code → After layer change</code>.
   Left in place, it overrides your carefully measured filament value on every subsequent print of every
@@ -305,10 +314,10 @@ visible dashed restart</code></pre>
 
   <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read the production-speed warning.">
     <div class="q-kicker">Question 3 of 3</div>
-    <div class="q-text">Why is this the one step allowed to loop back after Lesson 15?</div>
+    <div class="q-text">Why is this the one step allowed to loop back after Lesson 16?</div>
     <div class="q-options">
       <button class="opt" data-correct data-feedback="Right. The size of the pressure lag scales with how hard the machine accelerates, so a large change to acceleration genuinely changes the correct advance value.">The lag it compensates for scales with acceleration</button>
-      <button class="opt" data-feedback="Speed does interact with flow, but that's the max volumetric speed relationship in Lesson 14. Advance is about the timing of pressure, not the quantity of it.">Higher speeds demand more flow than the hotend gives</button>
+      <button class="opt" data-feedback="Speed does interact with flow, but that's the max volumetric speed relationship in Lesson 15. Advance is about the timing of pressure, not the quantity of it.">Higher speeds demand more flow than the hotend gives</button>
       <button class="opt" data-feedback="Both commands work identically at any speed. The issue is physical — how much pressure builds up — not a firmware limitation at particular speeds.">The firmware applies the value only above a speed</button>
       <button class="opt" data-feedback="Nothing about advance is time-limited or drift-prone in that way. It changes when the mechanical conditions it compensates for change.">The value drifts over long prints and needs resetting</button>
     </div>
@@ -414,17 +423,17 @@ visible dashed restart</code></pre>
   </ol>
 
   <nav class="lesson-nav">
-    <a href="0010-extrusion-multiplier.html">
-      <div class="dir">← Previous · L10</div>
+    <a href="0011-extrusion-multiplier.html">
+      <div class="dir">← Previous · L11</div>
       <div class="ttl">Extrusion multiplier</div>
     </a>
-    <a class="next" href="0012-retraction.html">
-      <div class="dir">Next · L12</div>
+    <a class="next" href="0013-retraction.html">
+      <div class="dir">Next · L13</div>
       <div class="ttl">Retraction →</div>
     </a>
   </nav>
 
-  <p class="pagefoot">Lesson L11 of the prusa-profile-tuning course ·
+  <p class="pagefoot">Lesson L12 of the prusa-profile-tuning course ·
     <a href="../index.html">all lessons</a> ·
     <a href="../reference/calibration-card.html">The Calibration Card</a> ·
     <a href="../reference/glossary.html">glossary</a></p>

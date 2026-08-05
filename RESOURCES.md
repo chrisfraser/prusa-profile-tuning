@@ -53,12 +53,12 @@ actual menu paths and target numbers per model, and those differ between MK3S, M
 
 - [Extrusion multiplier calibration](https://help.prusa3d.com/article/extrusion-multiplier-calibration_2257)
   Prusa's own EM procedure, and the crucial fact that total flow = firmware `M221` × slicer EM. Use
-  for: Lesson 10.
+  for: Lesson 11.
 - [Pressure Advance (`M572`)](https://help.prusa3d.com/article/pressure-advance_814986)
-  PA on MK4-family and Core One; replaces Linear Advance from firmware 5.0.0. Use for: Lesson 11,
+  PA on MK4-family and Core One; replaces Linear Advance from firmware 5.0.0. Use for: Lesson 12,
   MK4S / Core One sections.
 - [Linear Advance (`M900 K`)](https://help.prusa3d.com/article/linear-advance_2252)
-  LA 1.5 on the MK3S — a different scale to PA, not interchangeable. Use for: Lesson 11, MK3S section.
+  LA 1.5 on the MK3S — a different scale to PA, not interchangeable. Use for: Lesson 12, MK3S section.
 - [Extruder linearity correction calibration](https://help.prusa3d.com/article/extruder-linearity-correction-calibration_2254)
   MK3/MK3S-only Trinamic driver correction. Use for: Lesson 8, MK3S section.
 - [Buddy firmware-specific G-code commands](https://help.prusa3d.com/article/buddy-firmware-specific-g-code-commands_633112)
@@ -70,26 +70,26 @@ actual menu paths and target numbers per model, and those differ between MK3S, M
 - [Max volumetric speed](https://help.prusa3d.com/article/max-volumetric-speed_127176)
   The best-written article in Prusa's slicer documentation. The four limits on final print speed, the
   `Max speed = MVS / cross-section area` rule, the two MVS settings and which wins, AutoSpeed, the
-  per-material and per-hotend tables, and the Volumetric flow rate preview. Use for: Lesson 14. **Note the
+  per-material and per-hotend tables, and the Volumetric flow rate preview. Use for: Lesson 15. **Note the
   hotend table predates the MK4S and Core One** — readers say so in the comments.
 - [Cooling](https://help.prusa3d.com/article/cooling_127569)
   The whole cooling pane: Min/Max fan speed against the two layer-time thresholds with proportional
   interpolation between, bridges fan speed, disable-fan-for-first-N, dynamic fan speeds, and Min print
-  speed with its heat-creep warning. Use for: Lesson 13. The article's dynamic-fan-speed example image is
+  speed with its heat-creep warning. Use for: Lesson 14. The article's dynamic-fan-speed example image is
   backwards; the text is correct.
 - [Stringing and oozing](https://help.prusa3d.com/article/stringing-and-oozing_1805)
   The full retraction setting list with Prusa's own cost notes, the 2 mm MK3-family ceiling, the MINI/+
   Bowden default of 3.2 mm, and — importantly — moisture, temperature and nozzle cleanliness given equal
-  billing as causes. Use for: Lessons 9 and 12.
+  billing as causes. Use for: Lessons 10 and 13.
 - [Speed settings](https://help.prusa3d.com/article/speed-settings_480325)
   That acceleration and jerk mean target speeds are often never reached, the Speed preview mode, and
-  dynamic overhang speed's four control points. Use for: Lesson 15.
+  dynamic overhang speed's four control points. Use for: Lesson 16.
 - [Pressure equalizer](https://help.prusa3d.com/article/pressure-equalizer_331504)
   The clearest statement anywhere of what advance does (affects *extrusion*) versus what speed smoothing
   does (affects *speed*), plus the speed hierarchy — infill fastest, external perimeter slowest. Use for:
-  Lesson 15, and as a remedial read for Lesson 11.
+  Lesson 16, and as a remedial read for Lesson 12.
 - [Compare presets](https://help.prusa3d.com/article/compare-presets_301482)
-  PrusaSlicer's built-in preset diff. Use for: Lesson 15's task, auditing your profile against stock.
+  PrusaSlicer's built-in preset diff. Use for: Lesson 16's task, auditing your profile against stock.
 - [PrusaSlicer releases / changelogs](https://github.com/prusa3d/PrusaSlicer/releases)
   Which version introduced which setting. Use for: checking a setting exists before teaching it.
 - [PrusaSlicer 2.9 — what's new](https://blog.prusa3d.com/prusaslicer-2-9-whats-new_107659/)
@@ -103,10 +103,10 @@ actual menu paths and target numbers per model, and those differ between MK3S, M
   second opinion on method, especially pressure advance and flow. Cross-check every number against
   the Prusa KB before applying it to a Prusa.
 - [Extrusion multiplier / flow-rate test blocks for PrusaSlicer (Printables)](https://www.printables.com/model/1190404-extrusion-multiplierflow-rate-calibration-for-prus)
-  Stepped flow blocks built for PrusaSlicer's own extrusion-width maths. Use for: Lesson 10, if you
+  Stepped flow blocks built for PrusaSlicer's own extrusion-width maths. Use for: Lesson 11, if you
   prefer a print to calipers.
 - [All-in-one printer test (Printables)](https://www.printables.com/model/112181)
-  The validation model. Use for: Lesson 17 sign-off.
+  The validation model. Use for: Lesson 18 sign-off.
 
 ### In this repo
 
@@ -116,7 +116,12 @@ actual menu paths and target numbers per model, and those differ between MK3S, M
 - [`reference/source-material/esun-starter-profiles.md`](reference/source-material/esun-starter-profiles.md)
   eSUN PETG + eSun eTPU-95A starting values and import instructions.
 - [`reference/source-material/esun-starter-profiles-bundle.ini`](reference/source-material/esun-starter-profiles-bundle.ini)
-  Importable PrusaSlicer config bundle, six filament profiles.
+  Importable PrusaSlicer config bundle, six filament profiles. Downloaded and imported in Lesson 9.
+- [`downloads/`](downloads/) — the course's calibration STLs, generated by
+  [`tools/generate-stls.py`](tools/generate-stls.py) and dimensioned to match each lesson's spec:
+  `temp-tower.stl` (L10), `em-single-wall-box.stl` (L11), `pa-corner-tower.stl` (L12),
+  `retraction-spikes.stl` (L13), `overhang-bridge-test.stl` (L14, L18), `mvs-vase-cylinder.stl` (L15),
+  `calibration-cube-20.stl` (L18). Purpose-built, so no licence restrictions and no Printables login.
 
 ## Wisdom (Communities)
 
@@ -150,10 +155,10 @@ actual menu paths and target numbers per model, and those differ between MK3S, M
   at "Prusa Nextruder (MK4/XL) 15–20 mm³/s" and never mentions either machine; readers flag this in the
   comments. The 22–28 mm³/s figures this course uses come from the master guide plus comment-thread
   reports of Prusa's MK4S launch claim (24 mm³/s for Prusament PLA) and a support answer. **Marketing copy
-  and forum reports, not specification** — flagged as such in L14.
+  and forum reports, not specification** — flagged as such in L15.
 - **Pressure Advance article does not list the Core One.** It names the MK4, XL, MINI and MK3.9 families
   from firmware 5.0.0. Almost certainly staleness rather than absence — the Core One runs Buddy and `M572`
-  is in the Buddy G-code reference — but L11 has the learner verify it in sliced G-code rather than assume.
+  is in the Buddy G-code reference — but L12 has the learner verify it in sliced G-code rather than assume.
 - **Prusa and this course's guide disagree on retraction for flexibles.** Prusa: flexibles need *longer*
   retractions because the material stretches. The guide: keep them short or the filament buckles in the
-  drive path. Both mechanisms are real; L12 §4 states the conflict rather than picking a side.
+  drive path. Both mechanisms are real; L13 §4 states the conflict rather than picking a side.

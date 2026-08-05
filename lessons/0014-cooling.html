@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>L13 · Cooling</title>
+<title>L14 · Cooling</title>
 <link rel="stylesheet" href="../assets/styles.css">
 <script defer src="../assets/widgets.js"></script>
 </head>
@@ -23,7 +23,7 @@
 <!-- NAV:END -->
 
 <main class="wrap">
-  <p class="kicker">Phase 2 · The filament · L13</p>
+  <p class="kicker">Phase 2 · The filament · L14</p>
   <h1 class="lesson-title">Cooling</h1>
   <p class="lesson-sub">Not one fan speed — a small control system with two thresholds, a speed brake and an
   interpolation between them. Worth understanding rather than copying.</p>
@@ -106,7 +106,7 @@
     to problems such as heat creep."<span class="cite"><a href="#r1">1</a></span> A nozzle crawling over a tiny
     layer is barely pulling filament through, so heat climbs the filament path instead of being carried away
     by it — and you get a jam that looks like a retraction problem
-    (<a href="0012-retraction.html">Lesson 12</a>).</p>
+    (<a href="0013-retraction.html">Lesson 13</a>).</p>
     <p>The counter-warning is on the same page: raising Min print speed too high "may partially invalidate the
     minimum layer time",<span class="cite"><a href="#r1">1</a></span> because even at that floor the layer can
     still finish faster than you asked for. Both settings are real constraints and they genuinely fight. If a
@@ -181,7 +181,7 @@
       same layer in a fraction of the MK3S's time, so far more of your layers fall below "Slow down if layer
       print time is below" — which means Max fan more often, <em>and</em> the speed brake engaging more often.
       A part that prints at 40 mm/s despite a 120 mm/s profile is usually not a max volumetric speed problem
-      (<a href="0014-max-volumetric-speed.html">Lesson 14</a>) — it is the cooling brake.</p>
+      (<a href="0015-max-volumetric-speed.html">Lesson 15</a>) — it is the cooling brake.</p>
       <p><b>How to tell them apart:</b> slice and look at the preview. If the slow regions are small layers near
       the top of a tapering part, it's the cooling brake. If they're large flat infill regions, it's MVS.</p>
     </div>
@@ -354,6 +354,14 @@
     <div class="q-feedback"></div>
   </div>
 
+  <div class="callout build">
+    <div class="callout-label">⬇ Download · the test</div>
+    <p><a href="../downloads/overhang-bridge-test.stl" download><b>overhang-bridge-test.stl</b></a> — four
+    fins leaning 30°, 40°, 50° and 60° from vertical plus a 25 mm bridge, on one small plate. The fin where
+    the underside turns from clean to shaggy is your overhang limit at this fan band; the bridge underside is
+    judged separately because Bridges fan speed overrides everything else there.</p>
+  </div>
+
   <!-- ===== TASK ===== -->
   <div class="task">
     <div class="task-label">✎ Your task · do this with your tutor</div>
@@ -451,17 +459,17 @@
   </ol>
 
   <nav class="lesson-nav">
-    <a href="0012-retraction.html">
-      <div class="dir">← Previous · L12</div>
+    <a href="0013-retraction.html">
+      <div class="dir">← Previous · L13</div>
       <div class="ttl">Retraction</div>
     </a>
-    <a class="next" href="0014-max-volumetric-speed.html">
-      <div class="dir">Next · L14</div>
+    <a class="next" href="0015-max-volumetric-speed.html">
+      <div class="dir">Next · L15</div>
       <div class="ttl">Max volumetric speed →</div>
     </a>
   </nav>
 
-  <p class="pagefoot">Lesson L13 of the prusa-profile-tuning course ·
+  <p class="pagefoot">Lesson L14 of the prusa-profile-tuning course ·
     <a href="../index.html">all lessons</a> ·
     <a href="../reference/calibration-card.html">The Calibration Card</a> ·
     <a href="../reference/glossary.html">glossary</a></p>

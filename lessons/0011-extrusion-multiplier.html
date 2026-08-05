@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>L10 · Extrusion multiplier</title>
+<title>L11 · Extrusion multiplier</title>
 <link rel="stylesheet" href="../assets/styles.css">
 <script defer src="../assets/widgets.js"></script>
 </head>
@@ -23,7 +23,7 @@
 <!-- NAV:END -->
 
 <main class="wrap">
-  <p class="kicker">Phase 2 · The filament · L10</p>
+  <p class="kicker">Phase 2 · The filament · L11</p>
   <h1 class="lesson-title">Extrusion multiplier</h1>
   <p class="lesson-sub">One hollow box, a pair of calipers, and the only Phase 2 number you get to compute
   rather than judge by eye.</p>
@@ -97,7 +97,7 @@
         <div class="callout-label">⚠ Verify this on your own machine, don't take it on trust</div>
         <p>Slice anything for the MK3S, open the G-code in a text editor, and search for <code>M221</code>.
         Whatever you find there is the truth for <em>your</em> firmware and profile version. This is the same
-        habit as reading <code>printer_model</code> in <a href="0016-profile-structure-and-naming.html">Lesson
+        habit as reading <code>printer_model</code> in <a href="0017-profile-structure-and-naming.html">Lesson
         16</a>: verify the string, don't guess it.</p>
         <p><b>Leave the line alone.</b> It is part of the system profile and Prusa's MK3S numbers are built
         around it. Just don't correct for it a second time in the slicer. Your measured wall already contains
@@ -174,6 +174,14 @@ ironing off, vase off
 <span class="ok">prints the way your
 real parts print</span></code></pre>
     </figure>
+  </div>
+
+  <div class="callout build">
+    <div class="callout-label">⬇ Download · the box</div>
+    <p><a href="../downloads/em-single-wall-box.stl" download><b>em-single-wall-box.stl</b></a> — the exact
+    30 × 30 × 12 mm hollow box this lesson measures. Slice it with <b>perimeters 1, infill 0, top layers 0,
+    bottom layers 1, ironing off, vase off</b> — the settings do the single-wall work, the model is just an
+    honest prism.</p>
   </div>
 
   <p>Either works. This course leans to the hollow box because it keeps the extrusion regime closer to normal
@@ -391,7 +399,7 @@ new EM = 1.00 × (0.45 / 0.472) = <span class="n">0.953</span></code></pre>
   <div class="task">
     <div class="task-label">✎ Your task · do this with your tutor</div>
     <h3>Measure flow on the machine you towered</h3>
-    <p>Same machine, same spool, same temperature you chose in Lesson 9. One variable at a time.</p>
+    <p>Same machine, same spool, same temperature you chose in Lesson 10. One variable at a time.</p>
     <ol>
       <li>Slice anything for that printer and report what <code>M221</code> is doing in your start G-code —
       quote the literal line, or say there isn't one.</li>
@@ -475,17 +483,17 @@ new EM = 1.00 × (0.45 / 0.472) = <span class="n">0.953</span></code></pre>
   </ol>
 
   <nav class="lesson-nav">
-    <a href="0009-the-temperature-tower.html">
-      <div class="dir">← Previous · L9</div>
+    <a href="0010-the-temperature-tower.html">
+      <div class="dir">← Previous · L10</div>
       <div class="ttl">The temperature tower</div>
     </a>
-    <a class="next" href="0011-pressure-and-linear-advance.html">
-      <div class="dir">Next · L11</div>
+    <a class="next" href="0012-pressure-and-linear-advance.html">
+      <div class="dir">Next · L12</div>
       <div class="ttl">Pressure / Linear Advance →</div>
     </a>
   </nav>
 
-  <p class="pagefoot">Lesson L10 of the prusa-profile-tuning course ·
+  <p class="pagefoot">Lesson L11 of the prusa-profile-tuning course ·
     <a href="../index.html">all lessons</a> ·
     <a href="../reference/calibration-card.html">The Calibration Card</a> ·
     <a href="../reference/glossary.html">glossary</a></p>

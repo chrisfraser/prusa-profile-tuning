@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>L16 · Profile structure and naming</title>
+<title>L17 · Profile structure and naming</title>
 <link rel="stylesheet" href="../assets/styles.css">
 <script defer src="../assets/widgets.js"></script>
 </head>
@@ -23,7 +23,7 @@
 <!-- NAV:END -->
 
 <main class="wrap">
-  <p class="kicker">Phase 3 · Ship it · L16</p>
+  <p class="kicker">Phase 3 · Ship it · L17</p>
   <h1 class="lesson-title">Profile structure and naming</h1>
   <p class="lesson-sub">Measurements that live in your head are lost. This is how they become named,
   machine-scoped presets that can't end up on the wrong printer.</p>
@@ -63,7 +63,7 @@ eSun PETG @MK4S 0.4
 eSun PETG @COREONE 0.4</code></pre>
   </div>
 
-  <p>Per-spool variation goes in the <b>notes field</b>, not in a new preset — that's Lesson 18. The reason
+  <p>Per-spool variation goes in the <b>notes field</b>, not in a new preset — that's Lesson 19. The reason
   the printer belongs in the <em>name</em> and not just in the metadata is that the name is what you read in
   a dropdown at 11 pm.</p>
 
@@ -123,7 +123,7 @@ eSun PETG @COREONE 0.4</code></pre>
       <pre><code><span class="c">; Filament Settings → Dependencies → Compatible printers condition</span>
 printer_model=~/.*MK3.*/ and nozzle_diameter[<span class="n">0</span>]==<span class="n">0.4</span></code></pre>
       <pre><code><span class="c">; Filament Settings → Custom G-code → Start G-code</span>
-<span class="k">M900</span> <span class="f">K</span><span class="n">0.07</span> <span class="c">; eSun PETG — measured L11, MK3S only</span></code></pre>
+<span class="k">M900</span> <span class="f">K</span><span class="n">0.07</span> <span class="c">; eSun PETG — measured L12, MK3S only</span></code></pre>
       <p><code>M900 K</code> is Marlin's <a href="../reference/glossary.html#linear-advance">Linear
       Advance</a>.<span class="cite"><a href="#r3">3</a></span> Putting an <code>M572</code> here does
       nothing on this machine.</p>
@@ -136,7 +136,7 @@ printer_model=~/.*MK3.*/ and nozzle_diameter[<span class="n">0</span>]==<span cl
       <pre><code><span class="c">; Filament Settings → Dependencies → Compatible printers condition</span>
 printer_model=~/.*MK4.*/ and nozzle_diameter[<span class="n">0</span>]==<span class="n">0.4</span></code></pre>
       <pre><code><span class="c">; Filament Settings → Custom G-code → Start G-code</span>
-<span class="k">M572</span> <span class="f">S</span><span class="n">0.05</span> <span class="c">; eSun PETG — measured L11, MK4S only</span></code></pre>
+<span class="k">M572</span> <span class="f">S</span><span class="n">0.05</span> <span class="c">; eSun PETG — measured L12, MK4S only</span></code></pre>
       <p>Note that <code>/.*MK4.*/</code> matches an MK4 <em>and</em> an MK4S. That is deliberately loose. If
       you want it strict, read your machine's actual model string first — see the callout below — and change
       it to <code>/.*MK4S.*/</code>. Don't tighten a pattern you haven't verified: an over-strict condition
@@ -150,7 +150,7 @@ printer_model=~/.*MK4.*/ and nozzle_diameter[<span class="n">0</span>]==<span cl
       <pre><code><span class="c">; Filament Settings → Dependencies → Compatible printers condition</span>
 printer_model=~/.*COREONE.*/ and nozzle_diameter[<span class="n">0</span>]==<span class="n">0.4</span></code></pre>
       <pre><code><span class="c">; Filament Settings → Custom G-code → Start G-code</span>
-<span class="k">M572</span> <span class="f">S</span><span class="n">0.05</span> <span class="c">; eSun PETG — measured L11, Core One only</span></code></pre>
+<span class="k">M572</span> <span class="f">S</span><span class="n">0.05</span> <span class="c">; eSun PETG — measured L12, Core One only</span></code></pre>
       <p>Same command family as the MK4S, <b>different measured value</b> — measure it on this machine. And
       if you own more than one Core One variant, note that Core One, Core One+ and Core One L are distinct
       models with distinct strings; verify before assuming <code>/.*COREONE.*/</code> catches yours.</p>
@@ -208,7 +208,7 @@ you own every value</code></pre>
   this whole course is that the numbers are <em>yours</em>, measured, attributable. A value that can change
   under you because a vendor bundle updated is a value you can't reason about. The price is that you must
   periodically diff your profile against the current system one and decide, deliberately, whether to adopt
-  anything — which is a Lesson 18 habit.</p>
+  anything — which is a Lesson 19 habit.</p>
 
   <p>One more structural rule, from your own conventions and worth restating because it is easy to get
   backwards: <b>the advance command lives in the <em>filament</em> profile's start G-code, never in the
@@ -370,17 +370,17 @@ you own every value</code></pre>
   </ol>
 
   <nav class="lesson-nav">
-    <a href="0015-speeds-and-accelerations.html">
-      <div class="dir">← Previous · L15</div>
+    <a href="0016-speeds-and-accelerations.html">
+      <div class="dir">← Previous · L16</div>
       <div class="ttl">Speeds and accelerations</div>
     </a>
-    <a class="next" href="0017-the-validation-set.html">
-      <div class="dir">Next · L17</div>
+    <a class="next" href="0018-the-validation-set.html">
+      <div class="dir">Next · L18</div>
       <div class="ttl">The validation set →</div>
     </a>
   </nav>
 
-  <p class="pagefoot">Lesson L16 of the prusa-profile-tuning course ·
+  <p class="pagefoot">Lesson L17 of the prusa-profile-tuning course ·
     <a href="../index.html">all lessons</a> ·
     <a href="../reference/calibration-card.html">The Calibration Card</a> ·
     <a href="../reference/glossary.html">glossary</a></p>

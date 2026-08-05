@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>L14 · Max volumetric speed</title>
+<title>L15 · Max volumetric speed</title>
 <link rel="stylesheet" href="../assets/styles.css">
 <script defer src="../assets/widgets.js"></script>
 </head>
@@ -23,7 +23,7 @@
 <!-- NAV:END -->
 
 <main class="wrap">
-  <p class="kicker">Phase 2 · The filament · L14</p>
+  <p class="kicker">Phase 2 · The filament · L15</p>
   <h1 class="lesson-title">Max volumetric speed</h1>
   <p class="lesson-sub">Your real speed limit — and the reason a fast print can come out matte, weak and
   under-extruded without a single error message.</p>
@@ -59,7 +59,7 @@
   <ul class="steps">
     <li><span class="step-title">Per-feature speed</span>
       <span class="step-detail">What you set in <code>Print Settings → Speed</code> for perimeters, infill,
-      bridges and the rest. That's <a href="0015-speeds-and-accelerations.html">Lesson 15</a>.</span></li>
+      bridges and the rest. That's <a href="0016-speeds-and-accelerations.html">Lesson 16</a>.</span></li>
     <li><span class="step-title">Max volumetric speed</span>
       <span class="step-detail">Reduces the requested speed when flow would exceed the ceiling. Wider and
       taller extrusions get slowed more, because they carry more plastic per
@@ -70,7 +70,7 @@
     <li><span class="step-title">Layer time cooldown</span>
       <span class="step-detail">If a layer is too short in time, all speeds scale down, with Min print speed as
       the floor.<span class="cite"><a href="#r1">1</a></span> That's
-      <a href="0013-cooling.html">Lesson 13</a>.</span></li>
+      <a href="0014-cooling.html">Lesson 14</a>.</span></li>
   </ul>
 
   <p>Knowing which of the four is biting is the whole diagnostic skill. Three of them are visible in the
@@ -143,6 +143,14 @@
   <p>Print a <b>spiral-vase cylinder</b> — single wall, 0.2 mm layers, continuous extrusion with no travels
   and no seams to confuse the picture — and ramp the speed through it with
   <code>M220</code>, the speed factor override.<span class="cite"><a href="#r2">2</a></span></p>
+
+  <div class="callout build">
+    <div class="callout-label">⬇ Download · the cylinder</div>
+    <p><a href="../downloads/mvs-vase-cylinder.stl" download><b>mvs-vase-cylinder.stl</b></a> — a 40 mm
+    diameter, 40 mm tall cylinder. Slice it in <b>Spiral vase</b> mode at 0.2 mm layers; the
+    <code>M220</code> ramp below steps every 30 layers, so each speed gets a 6 mm band of wall to go matte
+    in.</p>
+  </div>
 
   <div class="codefig">
     <div class="difflabel">Printer Settings → Custom G-code → After layer change G-code</div>
@@ -224,7 +232,7 @@
       <p><b>And remember the temperature coupling.</b> Prusa note that with larger nozzles you should consider
       raising nozzle temperature to allow a bigger MVS — PLA 10–20 °C hotter than standard on a 0.6
       mm.<span class="cite"><a href="#r1">1</a></span> The same logic applies to high flow through a 0.4: if
-      your measured ceiling here is lower than you expected, going back to Lesson 9 and adding 10 °C is a
+      your measured ceiling here is lower than you expected, going back to Lesson 10 and adding 10 °C is a
       legitimate move. Just re-measure extrusion multiplier afterwards, because temperature is upstream of
       everything.</p>
     </div>
@@ -244,7 +252,7 @@
       If it moves toward lower flow when closed, you are seeing heat creep territory and that is a real
       operating constraint on this machine, not a curiosity.</p>
       <p><b>The MK4S and Core One will land close on filament MVS</b> — same melting capacity — while landing
-      far apart on speeds and accelerations in Lesson 15, because one is a
+      far apart on speeds and accelerations in Lesson 16, because one is a
       <a href="../reference/glossary.html#bedslinger">bedslinger</a> and the other is
       <a href="../reference/glossary.html#corexy">CoreXY</a>. Same flow ceiling, different motion ceiling.</p>
     </div>
@@ -279,7 +287,7 @@
           data-cause="MVS is set too high or to zero, so the requested flow goes through unchecked. The hotend delivers less than commanded, the wall thins, and the surface loses its gloss. Nothing errors because nothing is out of range as far as the firmware is concerned."
           data-fix="Set MVS to 85 % of your measured failure point. Remember zero means no limit at all, not disabled — check you didn't leave it at zero after a test.">Fast prints come out matte, thin and weak<span class="ff-tag">No ceiling</span></li>
       <li class="ff-item"
-          data-cause="Not MVS at all — this is the layer-time cooling brake from Lesson 13. Small layers finish too quickly, so all speeds are scaled down to stretch the layer out, with Min print speed as the floor."
+          data-cause="Not MVS at all — this is the layer-time cooling brake from Lesson 14. Small layers finish too quickly, so all speeds are scaled down to stretch the layer out, with Min print speed as the floor."
           data-fix="Check whether the slow regions are small layers near a taper (cooling brake) or large flat areas (MVS). The two look identical in the speed preview and have completely different fixes.">Only the top of a tapering part prints slowly<span class="ff-tag">Wrong limit</span></li>
       <li class="ff-item"
           data-cause="A per-feature speed was left at 0, which activates AutoSpeed for that feature. MVS stops being a brake and becomes the basis for calculating speed, so the feature now runs at whatever flow allows rather than what you intended."
@@ -430,17 +438,17 @@
   </ol>
 
   <nav class="lesson-nav">
-    <a href="0013-cooling.html">
-      <div class="dir">← Previous · L13</div>
+    <a href="0014-cooling.html">
+      <div class="dir">← Previous · L14</div>
       <div class="ttl">Cooling</div>
     </a>
-    <a class="next" href="0015-speeds-and-accelerations.html">
-      <div class="dir">Next · L15</div>
+    <a class="next" href="0016-speeds-and-accelerations.html">
+      <div class="dir">Next · L16</div>
       <div class="ttl">Speeds and accelerations →</div>
     </a>
   </nav>
 
-  <p class="pagefoot">Lesson L14 of the prusa-profile-tuning course ·
+  <p class="pagefoot">Lesson L15 of the prusa-profile-tuning course ·
     <a href="../index.html">all lessons</a> ·
     <a href="../reference/calibration-card.html">The Calibration Card</a> ·
     <a href="../reference/glossary.html">glossary</a></p>

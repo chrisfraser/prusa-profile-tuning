@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>L12 · Retraction</title>
+<title>L13 · Retraction</title>
 <link rel="stylesheet" href="../assets/styles.css">
 <script defer src="../assets/widgets.js"></script>
 </head>
@@ -23,7 +23,7 @@
 <!-- NAV:END -->
 
 <main class="wrap">
-  <p class="kicker">Phase 2 · The filament · L12</p>
+  <p class="kicker">Phase 2 · The filament · L13</p>
   <h1 class="lesson-title">Retraction</h1>
   <p class="lesson-sub">A printer setting with a material-dependent answer — which is why it gets overridden
   per filament, and why more is emphatically not better.</p>
@@ -76,7 +76,7 @@
       a humid climate this is the first suspect, not the last.</span></li>
     <li><span class="step-title">Temperature</span>
       <span class="step-detail">Prusa suggest dropping the nozzle 5–10 °C and checking whether stringing
-      reduces.<span class="cite"><a href="#r1">1</a></span> If it does, your Lesson 9 answer was too hot —
+      reduces.<span class="cite"><a href="#r1">1</a></span> If it does, your Lesson 10 answer was too hot —
       go back and fix it there, not here.</span></li>
     <li><span class="step-title">A dirty nozzle</span>
       <span class="step-detail">Printing a long time in one material, PETG especially, leaves a film on the
@@ -135,6 +135,14 @@
   them, so a single short print gives you dozens of retraction events to judge. Adjust
   <b>length only</b>, in 0.1 mm steps, until the strings go. Do not touch speed until length has stopped
   improving things.</p>
+
+  <div class="callout build">
+    <div class="callout-label">⬇ Download · the spikes</div>
+    <p><a href="../downloads/retraction-spikes.stl" download><b>retraction-spikes.stl</b></a> — five tapered
+    spikes, 40 mm tall, centres 40 mm apart on a shared 1.5 mm rail so the slender towers stay stuck to the
+    bed. Every layer is four travel moves; twenty minutes of printing gives you hundreds of retraction events
+    to judge.</p>
+  </div>
 
   <p><b>Open your machine.</b> The starting values and, on the MK3S, the hard ceiling both differ.</p>
 
@@ -237,10 +245,10 @@
           data-fix="Dry the spool and reprint the same spike test. If the strings halve, you had a moisture problem and any retraction value you 'found' before drying is void.">Strings everywhere, with faint popping while printing<span class="ff-tag">Moisture</span></li>
       <li class="ff-item"
           data-cause="Probably not. Prusa's first suggestion for stringing is lowering the nozzle 5-10 °C. Hot plastic is less viscous, so it flows out of an unpressurised nozzle more readily and no retraction length fixes that cleanly."
-          data-fix="Drop 5 °C and reprint. If it improves, your Lesson 9 answer was too hot — fix it there and re-measure extrusion multiplier, because temperature is upstream of everything.">Fine hairs, and the surface is glossier than expected<span class="ff-tag">Temperature</span></li>
+          data-fix="Drop 5 °C and reprint. If it improves, your Lesson 10 answer was too hot — fix it there and re-measure extrusion multiplier, because temperature is upstream of everything.">Fine hairs, and the surface is glossier than expected<span class="ff-tag">Temperature</span></li>
       <li class="ff-item"
-          data-cause="No — that's advance, not retraction. A gap immediately after a travel restart is pressure taking time to rebuild, which is precisely what Lesson 11's value compensates for. Adding retraction makes it worse."
-          data-fix="Go back to L11 and check the band either side of your chosen value. A gap after restart with no strings present usually means advance is slightly too high.">A gap where printing restarts, but no strings at all<span class="ff-tag">Advance</span></li>
+          data-cause="No — that's advance, not retraction. A gap immediately after a travel restart is pressure taking time to rebuild, which is precisely what Lesson 12's value compensates for. Adding retraction makes it worse."
+          data-fix="Go back to L12 and check the band either side of your chosen value. A gap after restart with no strings present usually means advance is slightly too high.">A gap where printing restarts, but no strings at all<span class="ff-tag">Advance</span></li>
       <li class="ff-item"
           data-cause="No. That's the extruder grinding a flat onto the filament because it is being asked to pull back further or faster than the drive can manage. The gear then slips on every subsequent move."
           data-fix="Reduce retraction length in 0.1 mm steps until the clicking stops, then leave a margin. On the MK3S, Prusa cap length at 2 mm — but the practical limit is well below that.">Clicking from the extruder, and worsening under-extrusion<span class="ff-tag">Grinding</span></li>
@@ -253,7 +261,7 @@
 
   <!-- ===== QUIZ ===== -->
   <h2><span class="num">6</span>Check yourself</h2>
-  <p>From memory. Question 3 interleaves Lesson 11.</p>
+  <p>From memory. Question 3 interleaves Lesson 12.</p>
 
   <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read section 1.">
     <div class="q-kicker">Question 1 of 3</div>
@@ -283,7 +291,7 @@
     <div class="q-kicker">Question 3 of 3</div>
     <div class="q-text">A gap appears where extrusion restarts after travel, but there are no strings. Cause?</div>
     <div class="q-options">
-      <button class="opt" data-correct data-feedback="Right. No strings means the nozzle is depressurising fine. A gap on restart with pressure already dumped points at advance being slightly too high, not at retraction being too short.">Advance is a little too high — go back to Lesson 11</button>
+      <button class="opt" data-correct data-feedback="Right. No strings means the nozzle is depressurising fine. A gap on restart with pressure already dumped points at advance being slightly too high, not at retraction being too short.">Advance is a little too high — go back to Lesson 12</button>
       <button class="opt" data-feedback="Retraction length that's too long does produce restart gaps — but it would not simultaneously eliminate all stringing so cleanly. The absence of strings is the clue.">Retraction length is too long — reduce it in steps</button>
       <button class="opt" data-feedback="A low extrusion multiplier thins every line uniformly. A defect that appears only at restart points is a timing problem, not a quantity problem.">Extrusion multiplier is low — the whole wall is thin</button>
       <button class="opt" data-feedback="Minimum travel after retraction changes how often retraction happens, not what the restart looks like when it does. Raising it would add strings, not gaps.">Minimum travel is too low, so it retracts too often</button>
@@ -386,17 +394,17 @@
   </ol>
 
   <nav class="lesson-nav">
-    <a href="0011-pressure-and-linear-advance.html">
-      <div class="dir">← Previous · L11</div>
+    <a href="0012-pressure-and-linear-advance.html">
+      <div class="dir">← Previous · L12</div>
       <div class="ttl">Pressure / Linear Advance</div>
     </a>
-    <a class="next" href="0013-cooling.html">
-      <div class="dir">Next · L13</div>
+    <a class="next" href="0014-cooling.html">
+      <div class="dir">Next · L14</div>
       <div class="ttl">Cooling →</div>
     </a>
   </nav>
 
-  <p class="pagefoot">Lesson L12 of the prusa-profile-tuning course ·
+  <p class="pagefoot">Lesson L13 of the prusa-profile-tuning course ·
     <a href="../index.html">all lessons</a> ·
     <a href="../reference/calibration-card.html">The Calibration Card</a> ·
     <a href="../reference/glossary.html">glossary</a></p>

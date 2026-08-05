@@ -2,7 +2,7 @@
 
 > **Revised 2026-08-05.** The fleet is MK3S / **MK4S** / Core One. The `@MK4` presets in the bundle
 > have been renamed `@MK4S`. Their `compatible_printers_condition` still matches on `/.*MK4.*/`,
-> which also matches an MK4S — see Lesson 16 for how to verify the real `printer_model` and tighten
+> which also matches an MK4S — see Lesson 17 for how to verify the real `printer_model` and tighten
 > it. Note also that the MK4S hotend is the same class as the Core One's, so their flow ceilings
 > match (~22–28 mm³/s) even though their motion systems do not.
 

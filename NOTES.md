@@ -61,8 +61,8 @@
       up with *similar filament profiles* but *different speed/accel profiles* — the MK4S is still a
       bedslinger. `CONTEXT.md` and `reference/source-material/` still carry the old MK4 row; they are
       preserved as the original brief, with a correction note in `CONTEXT.md`.
-- [x] **Phase 2 (lessons 9–15) written 2026-08-05.** All 18 lessons now exist; the course has no gaps.
-      L16's prev nav repointed to `0015-*.html`. Written from `prusaslicer-profile-tuning.md` §2 and §4,
+- [x] **Phase 2 (lessons 10–16, plus the L9 bundle import) written 2026-08-05.** All 19 lessons now exist; the course has no gaps.
+      L17's prev nav repointed to `0016-*.html`. Written from `prusaslicer-profile-tuning.md` §2 and §4,
       but every claim re-grounded against a live KB fetch — which turned up several places where the
       guide and the KB diverge (recorded in `RESOURCES.md § Gaps` and stated in-lesson).
 - [x] Phase 3 (lessons 16–18) written 2026-08-05, ahead of Phase 2 at the learner's request. It stands
@@ -77,16 +77,16 @@
       PETG 0.08) against the MK4S family's ~0.03–0.04 for PLA. This makes the danger sharper — a copied
       value is accepted silently rather than rejected.
 - [ ] Find a better source for drying temperatures/times (see RESOURCES.md § Gaps).
-- [ ] **Open question raised by L11:** the Pressure Advance KB article does not list the Core One among
+- [ ] **Open question raised by L12:** the Pressure Advance KB article does not list the Core One among
       supported printers. Almost certainly stale documentation, but the lesson has the learner verify by
       finding `M572` in sliced Core One G-code. Follow up on their answer.
-- [ ] **Open question raised by L14:** what is the Core One's *measured* flow ceiling with the door closed
-      versus vented? Warmer intake air helps melting; a warmer heatsink hurts. No public source. L14's task
+- [ ] **Open question raised by L15:** what is the Core One's *measured* flow ceiling with the door closed
+      versus vented? Warmer intake air helps melting; a warmer heatsink hurts. No public source. L15's task
       asks for both runs — this is genuinely new data for the log.
 - [ ] Next natural additions, if the course ever grows: a Phase 4 on multi-material / MMU, and a lesson on
-      dimensional accuracy and shrinkage compensation (currently only touched at L17's elephant-foot step).
+      dimensional accuracy and shrinkage compensation (currently only touched at L18's elephant-foot step).
 
 - [ ] Profile naming was corrected 2026-08-05: bundle presets renamed `@MK4` → `@MK4S`. The
-      `compatible_printers_condition` was deliberately **left** as `/.*MK4.*/` — L16's task has the
+      `compatible_printers_condition` was deliberately **left** as `/.*MK4.*/` — L17's task has the
       learner read the real `printer_model` off each machine before tightening it. Follow up on their
       answer; tighten the bundle only once the strings are confirmed.

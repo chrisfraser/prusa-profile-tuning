@@ -46,7 +46,7 @@
     that makes those numbers mean something physical instead of being knobs. Get the extrusion equation and
     you can predict, before you press print, whether a speed you just set is inside your machine's melting
     capacity — which is the difference between tuning and guessing. It's also how you'll read the results of
-    the max volumetric speed test in Lesson 14 rather than eyeballing them.</p>
+    the max volumetric speed test in Lesson 15 rather than eyeballing them.</p>
   </div>
 
   <p>PrusaSlicer's job is narrow. It takes a solid model and produces a text file of movement instructions.
@@ -122,7 +122,7 @@
   <p><b>First: extrusion width is not nozzle diameter.</b> A 0.4 mm nozzle typically lays a ~0.45 mm wide
   line, because the plastic is squashed against the layer below. PrusaSlicer sets it per feature type and
   you read the real value at <code>Print Settings → Advanced → Extrusion width</code>. You'll need that
-  exact number in Lesson 10 — using 0.4 there will hand you a wrong extrusion multiplier that <em>looks</em>
+  exact number in Lesson 11 — using 0.4 there will hand you a wrong extrusion multiplier that <em>looks</em>
   right.</p>
 
   <p><b>Second: mm/s is a dishonest unit for speed.</b> Consider two prints:</p>
@@ -157,7 +157,7 @@
 
   <div class="callout key">
     <div class="callout-label">▲ The order this forces</div>
-    <p>MVS is measured <em>before</em> speeds are set, in Lesson 14, not after. Set speeds first and you're
+    <p>MVS is measured <em>before</em> speeds are set, in Lesson 15, not after. Set speeds first and you're
     tuning numbers that a cap you haven't measured yet may already be overriding. This is the first concrete
     example of the <a href="../reference/glossary.html#calibration-order">calibration order</a> — and Lesson
     4 is entirely about why that order is not negotiable.</p>
@@ -190,7 +190,7 @@
     </div>
     <p class="calc-lede" style="margin:.6rem 0 0">Working ceilings from Lesson 1, until you measure your own:
     <b>MK3S ~11–13</b> · <b>MK4S ~22–28</b> · <b>Core One ~22–28</b> mm³/s. After
-    <a href="0014-max-volumetric-speed.html">Lesson 14</a> you type your measured MVS in here instead, and
+    <a href="0015-max-volumetric-speed.html">Lesson 15</a> you type your measured MVS in here instead, and
     this becomes a calculator about <em>your</em> machine rather than a table.</p>
     <div class="calc-outs">
       <div class="calc-out primary"><span class="lab">Volumetric flow</span>

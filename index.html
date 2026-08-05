@@ -149,56 +149,64 @@
     <div class="phase-head">
       <span class="ph-n">Phase 2</span>
       <h2>The filament</h2>
-      <span class="ph-tag">seven steps, in dependency order, per spool</span>
+      <span class="ph-tag">import a baseline, then seven steps in dependency order</span>
     </div>
-    <p class="phase-intro">Now the machine is a constant and the filament is the variable. Seven
-    measurements, always in this order, because each one assumes the ones before it are fixed. Re-run an
-    early step and every later number is void. One legitimate exception, in L15.</p>
+    <p class="phase-intro">Now the machine is a constant and the filament is the variable. First import the
+    starter presets so every number has somewhere to live — then seven measurements, always in this order,
+    because each one assumes the ones before it are fixed. Re-run an early step and every later number is
+    void. One legitimate exception, in L16.</p>
     <ul class="lesson-list">
-      <a class="lesson-card" href="lessons/0009-the-temperature-tower.html">
+      <a class="lesson-card" href="lessons/0009-import-the-starter-profiles.html">
         <span class="code">L9</span>
+        <span><span class="t">Import the starter profiles</span>
+        <span class="d">Download the eSun bundle — six presets, two materials × three printers — import it,
+        and know exactly how much to trust it: every value inherited, none measured. Yet.</span></span>
+        <span class="status-pill ready">Ready</span>
+      </a>
+      <a class="lesson-card" href="lessons/0010-the-temperature-tower.html">
+        <span class="code">L10</span>
         <span><span class="t">The temperature tower</span>
         <span class="d">Find the lowest temperature that still bonds layers. Custom G-code per band, and
         the snap test that tells you the truth.</span></span>
         <span class="status-pill ready">Ready</span>
       </a>
-      <a class="lesson-card" href="lessons/0010-extrusion-multiplier.html">
-        <span class="code">L10</span>
+      <a class="lesson-card" href="lessons/0011-extrusion-multiplier.html">
+        <span class="code">L11</span>
         <span><span class="t">Extrusion multiplier</span>
         <span class="d">Single-wall box, twelve caliper readings, one formula. Plus the <code>M221</code>
         trap that makes people correct the same error twice.</span></span>
         <span class="status-pill ready">Ready</span>
       </a>
-      <a class="lesson-card" href="lessons/0011-pressure-and-linear-advance.html">
-        <span class="code">L11</span>
+      <a class="lesson-card" href="lessons/0012-pressure-and-linear-advance.html">
+        <span class="code">L12</span>
         <span><span class="t">Pressure / Linear Advance</span>
         <span class="d">The single biggest quality win — and the one place where MK3S and MK4S numbers must
         never touch. Tuned at production speed or not at all.</span></span>
         <span class="status-pill ready">Ready</span>
       </a>
-      <a class="lesson-card" href="lessons/0012-retraction.html">
-        <span class="code">L12</span>
+      <a class="lesson-card" href="lessons/0013-retraction.html">
+        <span class="code">L13</span>
         <span><span class="t">Retraction</span>
         <span class="d">Rule out the other three causes of stringing first. Then spike towers, filament
         overrides, and why more is not a free win on direct drive.</span></span>
         <span class="status-pill ready">Ready</span>
       </a>
-      <a class="lesson-card" href="lessons/0013-cooling.html">
-        <span class="code">L13</span>
+      <a class="lesson-card" href="lessons/0014-cooling.html">
+        <span class="code">L14</span>
         <span><span class="t">Cooling</span>
         <span class="d">Not one fan speed — two time thresholds, an interpolation and a speed brake. Fan
         bands per material, and what an enclosure changes.</span></span>
         <span class="status-pill ready">Ready</span>
       </a>
-      <a class="lesson-card" href="lessons/0014-max-volumetric-speed.html">
-        <span class="code">L14</span>
+      <a class="lesson-card" href="lessons/0015-max-volumetric-speed.html">
+        <span class="code">L15</span>
         <span><span class="t">Max volumetric speed</span>
         <span class="d">Your real speed limit. Find where the wall goes matte, take 85 % of it, and read
         the flow-rate preview to see it working.</span></span>
         <span class="status-pill ready">Ready</span>
       </a>
-      <a class="lesson-card" href="lessons/0015-speeds-and-accelerations.html">
-        <span class="code">L15</span>
+      <a class="lesson-card" href="lessons/0016-speeds-and-accelerations.html">
+        <span class="code">L16</span>
         <span><span class="t">Speeds and accelerations</span>
         <span class="d">Only now. External perimeters low, travel high, dynamic overhang speed on — then
         sign Phase 2 off.</span></span>
@@ -219,25 +227,25 @@
     of Phase 2's seven numbers now has somewhere to live, a test that says whether it worked, and a record
     that says whether you measured it or inherited it.</p>
     <ul class="lesson-list">
-      <a class="lesson-card" href="lessons/0016-profile-structure-and-naming.html">
-        <span class="code">L16</span>
+      <a class="lesson-card" href="lessons/0017-profile-structure-and-naming.html">
+        <span class="code">L17</span>
         <span><span class="t">Profile structure and naming</span>
         <span class="d">One profile per printer family, compatible-printer conditions that make a
         mis-selection impossible, and never overwriting a system profile.</span></span>
         <span class="status-pill ready">Ready</span>
       </a>
-      <a class="lesson-card" href="lessons/0017-the-validation-set.html">
-        <span class="code">L17</span>
+      <a class="lesson-card" href="lessons/0018-the-validation-set.html">
+        <span class="code">L18</span>
         <span><span class="t">The validation set</span>
         <span class="d">Three prints and five acceptance criteria — each failure naming the step to go back
         to. Sign-off, with a scope.</span></span>
         <span class="status-pill ready">Ready</span>
       </a>
-      <a class="lesson-card" href="lessons/0018-the-tuning-log.html">
-        <span class="code">L18</span>
+      <a class="lesson-card" href="lessons/0019-the-tuning-log.html">
+        <span class="code">L19</span>
         <span><span class="t">The tuning log</span>
         <span class="d">Per spool, per printer, per date — and every value marked measured or inherited.
-        The habit that makes the other seventeen lessons compound.</span></span>
+        The habit that makes the other eighteen lessons compound.</span></span>
         <span class="status-pill ready">Ready</span>
       </a>
     </ul>

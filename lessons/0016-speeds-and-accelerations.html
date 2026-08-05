@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>L15 · Speeds and accelerations</title>
+<title>L16 · Speeds and accelerations</title>
 <link rel="stylesheet" href="../assets/styles.css">
 <script defer src="../assets/widgets.js"></script>
 </head>
@@ -23,7 +23,7 @@
 <!-- NAV:END -->
 
 <main class="wrap">
-  <p class="kicker">Phase 2 · The filament · L15</p>
+  <p class="kicker">Phase 2 · The filament · L16</p>
   <h1 class="lesson-title">Speeds and accelerations</h1>
   <p class="lesson-sub">Last, deliberately. Everything above has already decided how fast you may go — this
   lesson is about spending that budget in the right places.</p>
@@ -36,9 +36,9 @@
   <div class="callout mission">
     <div class="callout-label">◎ Why this lesson</div>
     <p>Speed is the setting everyone reaches for first and it belongs eighth. By now the hotend's ceiling is
-    measured (<a href="0014-max-volumetric-speed.html">Lesson 14</a>), the cooling brake is configured
-    (<a href="0013-cooling.html">Lesson 13</a>), and the pressure compensation is tuned for a specific
-    acceleration (<a href="0011-pressure-and-linear-advance.html">Lesson 11</a>). Those three between them have
+    measured (<a href="0015-max-volumetric-speed.html">Lesson 15</a>), the cooling brake is configured
+    (<a href="0014-cooling.html">Lesson 14</a>), and the pressure compensation is tuned for a specific
+    acceleration (<a href="0012-pressure-and-linear-advance.html">Lesson 12</a>). Those three between them have
     already set the envelope. What is left is a distribution problem: given a fixed budget, which features do
     you spend it on? The answer is not "all of them equally", and getting it right is the difference between a
     fast print and a fast print that looks fast.</p>
@@ -85,7 +85,7 @@
     <li><span class="step-title">Use the Speed preview, not the profile, to know what you've built</span>
       <span class="step-detail">Switch the preview mode to <b>Speed</b> to inspect the actual print speeds
       after all accelerations are applied.<span class="cite"><a href="#r2">2</a></span> This is the companion to
-      the Volumetric flow rate view from Lesson 14 — same habit, different question.</span></li>
+      the Volumetric flow rate view from Lesson 15 — same habit, different question.</span></li>
     <li><span class="step-title">Benchmark on a real part, not a cube</span>
       <span class="step-detail">A calibration cube's speeds bear almost no relation to a 150 mm bracket's.
       Judge a speed profile on geometry you actually print.</span></li>
@@ -96,7 +96,7 @@
     <p>Set travel high. It costs nothing in quality once retraction and advance are right, and on parts with
     many small islands it is a large fraction of wall-clock time.<span class="cite"><a href="#r4">4</a></span>
     If raising travel speed <em>does</em> hurt quality, that is a retraction or advance problem showing itself
-    (Lessons 11 and 12), not a reason to slow travel down.</p>
+    (Lessons 12 and 13), not a reason to slow travel down.</p>
   </div>
 
   <!-- ===== SECTION 3 ===== -->
@@ -112,7 +112,7 @@
   <p><b>Turn it on.</b> Without it, the only way to make overhangs survive is to slow the entire print down to
   the speed the worst overhang needs — which means paying for the hardest 2 % of the geometry across
   100 % of it.<span class="cite"><a href="#r4">4</a></span> Note the shared vocabulary with dynamic fan speeds
-  in Lesson 13: both are functions of overlap percentage, both use four points, both interpolate linearly. They
+  in Lesson 14: both are functions of overlap percentage, both use four points, both interpolate linearly. They
   are the same idea applied to two different actuators, and they should agree with each other.</p>
 
   <h3 style="font-family:var(--sans);font-size:1rem;margin-top:1.8rem">Pressure equalizer</h3>
@@ -146,7 +146,7 @@
     speed</b>.<span class="cite"><a href="#r3">3</a></span></p>
     <p>They work together, and Prusa note the equalizer "can make the job of Linear Advance easier … by
     reducing the number of sudden fast movements".<span class="cite"><a href="#r3">3</a></span> So if you enable
-    it now, after tuning advance in Lesson 11, you have changed the conditions your advance value was measured
+    it now, after tuning advance in Lesson 12, you have changed the conditions your advance value was measured
     under. Enable it, then look at your corners again.</p>
   </div>
 
@@ -180,7 +180,7 @@
       90.</p>
       <p><b>Bridges:</b> 25–30 mm/s, with bridge flow ratio ~0.95 for PLA and ~0.9 for
       PETG.<span class="cite"><a href="#r4">4</a></span></p>
-      <p>And remember from Lesson 14: at 0.2 × 0.45, this machine's flow ceiling corresponds to roughly
+      <p>And remember from Lesson 15: at 0.2 × 0.45, this machine's flow ceiling corresponds to roughly
       140 mm/s. You will hit the motion limit long before the flow limit. On this printer,
       <a href="../reference/glossary.html#max-volumetric-speed">MVS</a> is a safety net rather than the binding
       constraint.</p>
@@ -242,9 +242,9 @@
   <h2><span class="num">5</span>The one legitimate loop back</h2>
 
   <div class="callout warning">
-    <div class="callout-label">⚠ If you changed acceleration meaningfully, Lesson 11 is now stale</div>
+    <div class="callout-label">⚠ If you changed acceleration meaningfully, Lesson 12 is now stale</div>
     <p>Advance compensates for a pressure lag whose magnitude scales with how hard the machine accelerates.
-    You tuned it in Lesson 11 <em>at production accelerations</em> precisely so this wouldn't happen — but if
+    You tuned it in Lesson 12 <em>at production accelerations</em> precisely so this wouldn't happen — but if
     this lesson has moved your accelerations substantially, that assumption has broken.</p>
     <p><b>Re-run the advance tower.</b> It is the only step in the
     <a href="../reference/glossary.html#calibration-order">calibration order</a> that is allowed to loop, and
@@ -265,19 +265,19 @@
       <li data-check>Phase 1 signed off on this machine, and nothing has changed since</li>
       <li data-check>Spool drying temperature, duration and date recorded</li>
       <li data-check>Spool brand, material, <b>colour</b> and batch recorded</li>
-      <li data-check>L9 · Nozzle temperature measured by tower and confirmed by snap test</li>
-      <li data-check>L9 · First-layer temperature set 5 °C above the measured value</li>
-      <li data-check>L10 · Firmware <code>M221</code> state known and recorded</li>
-      <li data-check>L10 · Extrusion multiplier measured from twelve caliper readings, inside 0.9–1.1</li>
-      <li data-check>L11 · Advance measured at production accelerations, with the right command for this firmware</li>
-      <li data-check>L11 · Advance value written into the <b>filament</b> profile's start G-code, nozzle-aware</li>
-      <li data-check>L12 · Other stringing causes ruled out before retraction was touched</li>
-      <li data-check>L12 · Retraction length measured; the grinding threshold also known</li>
-      <li data-check>L13 · Fan bands and the two time thresholds set, and the live description read</li>
-      <li data-check>L14 · MVS measured to failure, set at 85 % of it, in the filament profile</li>
-      <li data-check>L14 · Hotend ceiling set in the print profile, separately</li>
-      <li data-check>L15 · External perimeter speed and acceleration kept below everything else</li>
-      <li data-check>L15 · Dynamic overhang speed enabled</li>
+      <li data-check>L10 · Nozzle temperature measured by tower and confirmed by snap test</li>
+      <li data-check>L10 · First-layer temperature set 5 °C above the measured value</li>
+      <li data-check>L11 · Firmware <code>M221</code> state known and recorded</li>
+      <li data-check>L11 · Extrusion multiplier measured from twelve caliper readings, inside 0.9–1.1</li>
+      <li data-check>L12 · Advance measured at production accelerations, with the right command for this firmware</li>
+      <li data-check>L12 · Advance value written into the <b>filament</b> profile's start G-code, nozzle-aware</li>
+      <li data-check>L13 · Other stringing causes ruled out before retraction was touched</li>
+      <li data-check>L13 · Retraction length measured; the grinding threshold also known</li>
+      <li data-check>L14 · Fan bands and the two time thresholds set, and the live description read</li>
+      <li data-check>L15 · MVS measured to failure, set at 85 % of it, in the filament profile</li>
+      <li data-check>L15 · Hotend ceiling set in the print profile, separately</li>
+      <li data-check>L16 · External perimeter speed and acceleration kept below everything else</li>
+      <li data-check>L16 · Dynamic overhang speed enabled</li>
       <li data-check>Volumetric flow rate preview checked on a real part</li>
       <li data-check>Speed preview checked on the same real part</li>
       <li data-check>All test G-code deleted from the printer profile</li>
@@ -287,7 +287,7 @@
   </div>
 
   <p>That last item is the one that matters most in six months, and it is what
-  <a href="0018-the-tuning-log.html">Lesson 18</a> is about. A profile full of numbers where you can't tell
+  <a href="0019-the-tuning-log.html">Lesson 19</a> is about. A profile full of numbers where you can't tell
   which were measured and which came from a table is a profile you cannot debug.</p>
 
   <p><b>Phase 2 ends here.</b> Next comes turning this pile of measurements into something durable: a named,
@@ -344,8 +344,8 @@
       than 20 %</b>, with your reason for each.</li>
       <li>Slice a real part you actually print. Screenshot both the <b>Speed</b> preview and the
       <b>Volumetric flow rate</b> preview.</li>
-      <li>Tell me which of the four limits from Lesson 14 is binding, and where.</li>
-      <li>Print one corner-test object at your new accelerations. Is the advance value from Lesson 11 still
+      <li>Tell me which of the four limits from Lesson 15 is binding, and where.</li>
+      <li>Print one corner-test object at your new accelerations. Is the advance value from Lesson 12 still
       right? Show me a corner.</li>
       <li>Complete the sign-off checklist above and paste the finished Phase 2 block from your log.</li>
     </ol>
@@ -376,7 +376,7 @@
       <div class="label">Primary source · read this next</div>
       <div class="title"><a href="https://help.prusa3d.com/article/pressure-equalizer_331504" target="_blank" rel="noopener">Pressure equalizer — Prusa Knowledge Base</a></div>
       <div class="desc">Short, and it contains the clearest statement anywhere in Prusa's documentation of what
-      advance actually does versus what a speed-smoothing feature does. If Lesson 11 left you fuzzy on the
+      advance actually does versus what a speed-smoothing feature does. If Lesson 12 left you fuzzy on the
       mechanism, this article is the one that fixes it — read the "Linear Advance vs Pressure Equalizer"
       section twice.</div>
     </div>
@@ -440,17 +440,17 @@
   </ol>
 
   <nav class="lesson-nav">
-    <a href="0014-max-volumetric-speed.html">
-      <div class="dir">← Previous · L14</div>
+    <a href="0015-max-volumetric-speed.html">
+      <div class="dir">← Previous · L15</div>
       <div class="ttl">Max volumetric speed</div>
     </a>
-    <a class="next" href="0016-profile-structure-and-naming.html">
-      <div class="dir">Next · L16</div>
+    <a class="next" href="0017-profile-structure-and-naming.html">
+      <div class="dir">Next · L17</div>
       <div class="ttl">Profile structure and naming →</div>
     </a>
   </nav>
 
-  <p class="pagefoot">Lesson L15 of the prusa-profile-tuning course ·
+  <p class="pagefoot">Lesson L16 of the prusa-profile-tuning course ·
     <a href="../index.html">all lessons</a> ·
     <a href="../reference/calibration-card.html">The Calibration Card</a> ·
     <a href="../reference/glossary.html">glossary</a></p>

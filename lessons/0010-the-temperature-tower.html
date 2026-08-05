@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>L9 · The temperature tower</title>
+<title>L10 · The temperature tower</title>
 <link rel="stylesheet" href="../assets/styles.css">
 <script defer src="../assets/widgets.js"></script>
 </head>
@@ -23,7 +23,7 @@
 <!-- NAV:END -->
 
 <main class="wrap">
-  <p class="kicker">Phase 2 · The filament · L9</p>
+  <p class="kicker">Phase 2 · The filament · L10</p>
   <h1 class="lesson-title">The temperature tower</h1>
   <p class="lesson-sub">One print, seven temperatures, one number. The first measurement of Phase 2, and the
   one every other measurement is standing on.</p>
@@ -96,6 +96,16 @@
   around it. With a <a href="../reference/glossary.html#layer-height">layer height</a> of 0.2 mm, 50 layers
   is exactly 10 mm — so a band change every 50 layers gives you 10 mm of each temperature.</p>
 
+  <div class="callout build">
+    <div class="callout-label">⬇ Download · the tower</div>
+    <p><a href="../downloads/temp-tower.stl" download><b>temp-tower.stl</b></a> — built for this lesson:
+    seven 10 mm bands, each with a smooth outer wall, an 18 mm bridge and a 45° overhang, plus a detached
+    pillar 40 mm away so every layer shows stringing too. Seven bands fit the suggested 30 °C ranges exactly
+    (one band per 5 °C step, changes at layers 50–300); for a shorter range just leave the top conditional
+    lines out and the last bands repeat your final temperature. Slice at 0.2 mm layers or the band maths
+    breaks.</p>
+  </div>
+
   <p>Set the filament profile's nozzle temperature to the <b>highest</b> value in your sequence, then step
   <em>down</em>. Stepping down means the machine is never asked to heat up mid-print and wait, which would
   stall in place and leave a blob.</p>
@@ -150,7 +160,7 @@
         and Prusa themselves note that bigger flow wants more heat.<span class="cite"><a href="#r3">3</a></span>
         So run your tower's range <em>higher</em> on this machine than you would on the MK3S, and expect the
         answer to land higher too. If you later push <a href="../reference/glossary.html#max-volumetric-speed">MVS</a>
-        up in Lesson 14, you may have to come back and add heat.</p>
+        up in Lesson 15, you may have to come back and add heat.</p>
       </div>
       <p><b>Suggested ranges:</b> PLA <b>240 → 210</b> · PETG <b>260 → 230</b> · TPU 95A <b>245 → 215</b>.</p>
     </div>
@@ -209,13 +219,13 @@
 
   <p>Write the winner into <code>Filament Settings → Filament → Nozzle</code>, both fields. Then log it —
   with the machine, the spool, the colour and the date, per
-  <a href="0018-the-tuning-log.html">Lesson 18</a>. <b>Colour matters:</b> pigment loads change flow and
+  <a href="0019-the-tuning-log.html">Lesson 19</a>. <b>Colour matters:</b> pigment loads change flow and
   thermal behaviour within the same brand and material, so "eSun PETG" is not a spool identity, and
   "eSun PETG, black, batch on the label" is.</p>
 
   <div class="callout key">
     <div class="callout-label">▲ What re-running this invalidates</div>
-    <p><b>Everything below it.</b> Temperature is step one of eight. If you come back and change this number
+    <p><b>Everything below it.</b> Temperature is the first of Phase 2's seven measurements. If you come back and change this number
     by more than a couple of degrees, your extrusion multiplier, advance value, retraction length, cooling
     bands and MVS were all measured on a different material state and are now guesses. That is not a reason
     never to re-run it — it is a reason to get it right once, at the start, with a dry spool.</p>
@@ -323,7 +333,7 @@
     <div>
       <div class="label">Primary source · read this next</div>
       <div class="title"><a href="https://help.prusa3d.com/article/stringing-and-oozing_1805" target="_blank" rel="noopener">Stringing and oozing — Prusa Knowledge Base</a></div>
-      <div class="desc">Read it now rather than in Lesson 12, because it makes the case that stringing is a
+      <div class="desc">Read it now rather than in Lesson 13, because it makes the case that stringing is a
       <em>temperature</em> symptom before it is a retraction symptom — Prusa's first suggestion is dropping the
       nozzle 5–10 °C. That ordering is exactly why temperature comes before retraction in this course.</div>
     </div>
@@ -372,17 +382,17 @@
   </ol>
 
   <nav class="lesson-nav">
-    <a href="0008-thermal-and-motion-trust.html">
-      <div class="dir">← Previous · L8</div>
-      <div class="ttl">Thermal and motion trust</div>
+    <a href="0009-import-the-starter-profiles.html">
+      <div class="dir">← Previous · L9</div>
+      <div class="ttl">Import the starter profiles</div>
     </a>
-    <a class="next" href="0010-extrusion-multiplier.html">
-      <div class="dir">Next · L10</div>
+    <a class="next" href="0011-extrusion-multiplier.html">
+      <div class="dir">Next · L11</div>
       <div class="ttl">Extrusion multiplier →</div>
     </a>
   </nav>
 
-  <p class="pagefoot">Lesson L9 of the prusa-profile-tuning course ·
+  <p class="pagefoot">Lesson L10 of the prusa-profile-tuning course ·
     <a href="../index.html">all lessons</a> ·
     <a href="../reference/calibration-card.html">The Calibration Card</a> ·
     <a href="../reference/glossary.html">glossary</a></p>

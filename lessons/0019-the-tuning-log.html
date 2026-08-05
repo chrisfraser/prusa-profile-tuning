@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>L18 · The tuning log</title>
+<title>L19 · The tuning log</title>
 <link rel="stylesheet" href="../assets/styles.css">
 <script defer src="../assets/widgets.js"></script>
 </head>
@@ -23,7 +23,7 @@
 <!-- NAV:END -->
 
 <main class="wrap">
-  <p class="kicker">Phase 3 · Ship it · L18</p>
+  <p class="kicker">Phase 3 · Ship it · L19</p>
   <h1 class="lesson-title">The tuning log</h1>
   <p class="lesson-sub">In six months you will look at a number and have exactly one question: did I measure
   this, or did I copy it? This is how you answer.</p>
@@ -39,7 +39,7 @@
     nobody had measured — and no way, from the file alone, to tell which were which. That is the exact
     failure a log prevents. It's also what makes a three-printer fleet maintainable rather than three
     separate hobbies: a shared record means a measurement on one machine informs the others instead of being
-    lost. This is the last habit, and it's the one that makes the other seventeen lessons compound.</p>
+    lost. This is the last habit, and it's the one that makes the other eighteen lessons compound.</p>
   </div>
 
   <p>Two places to write, and they do different jobs.</p>
@@ -138,7 +138,7 @@ NB: black runs ~0.02 lower EM than the green spool</code></pre>
     firmware, or moving the printer. A machine that hasn't been re-verified is a suspect again, and the log
     is what tells you when it was last verified.</li>
     <li><b>Periodically diff your self-contained profiles against the current system profile.</b> This is the
-    price of the self-contained choice from Lesson 16: you don't get Prusa's fixes automatically, so you
+    price of the self-contained choice from Lesson 17: you don't get Prusa's fixes automatically, so you
     have to go and look. Once a couple of firmware releases is plenty. Adopt deliberately, and log what you
     adopted and why.</li>
   </ul>
@@ -148,7 +148,7 @@ NB: black runs ~0.02 lower EM than the green spool</code></pre>
     <p>Your mission asked for a specific thing: go from a newly opened spool to a signed-off profile in one
     evening, without re-reading the guide. That is now a concrete procedure — dry it, confirm the machine's
     sign-off is current, run the seven Phase 2 steps in order, name and scope the profile, validate against
-    five criteria, log it with measured/inherited marks, export the bundle. Eighteen lessons compress to one
+    five criteria, log it with measured/inherited marks, export the bundle. Nineteen lessons compress to one
     checklist, and the checklist is on
     <a href="../reference/calibration-card.html">The Calibration Card</a>.</p>
   </div>
@@ -218,7 +218,7 @@ NB: black runs ~0.02 lower EM than the green spool</code></pre>
       — and the builder below has labelled it for you. That letter is the whole point: an
       <code>M572 S</code> number copied here would still print, just plausibly wrong forever. If this value
       came off the MK4S, it is <code>(i)</code> at best. There is no conversion between the two; the only
-      honest fix is to re-run <a href="0011-pressure-and-linear-advance.html">Lesson 11</a> on the MK3S.</div>
+      honest fix is to re-run <a href="0012-pressure-and-linear-advance.html">Lesson 12</a> on the MK3S.</div>
     <div class="calc-flag warn" data-when="printer != 'MK3S' && adv != ''">
       Buddy firmware, so this is <code>M572 S</code> — labelled <code>S</code> in the row below. Your MK4S
       and Core One values should land close to each other; if they agree within a step, that agreement is
@@ -274,7 +274,7 @@ validated ${val}"></div>
       different range entirely. Marked <code>(m)</code>, so somebody believes they measured it.</p>
       <p>Most likely what happened: the value was measured on the MK4S and copied across, then re-marked as
       measured. That's the single most expensive mistake available in this course, and here it is preserved
-      in the log — which is the log doing its job. Re-run L11 on the MK3S and record a <code>K</code>
+      in the log — which is the log doing its job. Re-run L12 on the MK3S and record a <code>K</code>
       value.</p>
     </div>
   </details>
@@ -295,7 +295,7 @@ validated ${val}"></div>
   <details class="panel">
     <summary>A row with full measurements and <code>Validated: ✅</code>, but no scope recorded</summary>
     <div class="panel-body">
-      <p><b>Validated at what?</b> Lesson 17 ended with the claim's scope: material, machine, speeds,
+      <p><b>Validated at what?</b> Lesson 18 ended with the claim's scope: material, machine, speeds,
       enclosure state, date. A tick without those is not a falsifiable claim — you can't later determine
       whether a failure is inside or outside what you certified.</p>
       <p>Concretely: if this was a Core One row validated with the door open and you now print with it shut,
@@ -326,7 +326,7 @@ validated ${val}"></div>
       <button class="opt" data-correct data-feedback="Right. It tells you how much confidence a value deserves when a print goes wrong — which is where to start looking.">It says how much to trust each value when something fails</button>
       <button class="opt" data-feedback="Inherited values aren't wrong — you can't measure everything for every spool. The mark distinguishes them, it doesn't condemn them.">It flags the values that are wrong and need replacing</button>
       <button class="opt" data-feedback="Ordering is what the calibration order gives you, and it's fixed regardless of how any individual value was arrived at.">It records the order the measurements were taken in</button>
-      <button class="opt" data-feedback="Compatibility scoping is the job of the compatible printers condition from Lesson 16, not of anything in the log.">It stops a value being applied to the wrong printer</button>
+      <button class="opt" data-feedback="Compatibility scoping is the job of the compatible printers condition from Lesson 17, not of anything in the log.">It stops a value being applied to the wrong printer</button>
     </div>
     <div class="q-feedback"></div>
   </div>
@@ -355,7 +355,7 @@ validated ${val}"></div>
       including the ones you haven't tuned yet. Mark every single value <code>(m)</code> or <code>(i)</code>.
       Most of the starter bundle will be <code>(i)</code>. That's the correct answer and the point of the
       exercise.</li>
-      <li>A <b>Fleet</b> section: the three <code>printer_model</code> strings from Lesson 16, current
+      <li>A <b>Fleet</b> section: the three <code>printer_model</code> strings from Lesson 17, current
       firmware versions, and the date of each machine's last hardware change.</li>
       <li>Export a config bundle into the repo and commit it alongside the log.</li>
       <li>Finally, one paragraph: <em>"The value in my current profiles I trust least is ___, because ___,
@@ -427,8 +427,8 @@ validated ${val}"></div>
   </ol>
 
   <nav class="lesson-nav">
-    <a href="0017-the-validation-set.html">
-      <div class="dir">← Previous · L17</div>
+    <a href="0018-the-validation-set.html">
+      <div class="dir">← Previous · L18</div>
       <div class="ttl">The validation set</div>
     </a>
     <a class="next" href="../index.html">
@@ -437,7 +437,7 @@ validated ${val}"></div>
     </a>
   </nav>
 
-  <p class="pagefoot">Lesson L18 of the prusa-profile-tuning course ·
+  <p class="pagefoot">Lesson L19 of the prusa-profile-tuning course ·
     <a href="../index.html">all lessons</a> ·
     <a href="../reference/calibration-card.html">The Calibration Card</a> ·
     <a href="../reference/glossary.html">glossary</a></p>

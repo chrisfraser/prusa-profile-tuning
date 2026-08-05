@@ -31,6 +31,43 @@
   var PROGRESS_KEY = 'dialledIn.progress.v1';
   var CHECKLIST_KEY = 'dialledIn.checklist.v1';
 
+  /* One-time remap: 2026-08 inserted L9 (import the starter profiles), shifting
+     the old lessons 9–18 to 10–19. Saved progress and checklist ticks are keyed
+     by lesson number, so stored marks from before the insert must shift with
+     them or they light up the wrong lessons. */
+  function migrateL9Insert() {
+    if (!store.ok) return;
+    var FLAG = 'dialledIn.migrated.2026-08-l9insert';
+    try {
+      if (localStorage.getItem(FLAG)) return;
+      var pad = function (n) { return ('000' + n).slice(-4); };
+      var p = store.get(PROGRESS_KEY, {}) || {};
+      var np = {};
+      Object.keys(p).forEach(function (id) {
+        var n = parseInt(id, 10);
+        np[n >= 9 && n <= 18 ? pad(n + 1) : id] = p[id];
+      });
+      if (Object.keys(np).length) store.set(PROGRESS_KEY, np);
+      var moves = [];
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (!k || k.indexOf(CHECKLIST_KEY + '.') !== 0) continue;
+        var m = k.match(/^(.*\.)(\d{4})(-[a-z0-9-]+\.html#\d+)$/);
+        if (m) {
+          var n = parseInt(m[2], 10);
+          if (n >= 9 && n <= 18) moves.push({ key: k, n: n, pre: m[1], post: m[3] });
+        }
+      }
+      moves.sort(function (a, b) { return b.n - a.n; });
+      moves.forEach(function (mv) {
+        var v = localStorage.getItem(mv.key);
+        localStorage.removeItem(mv.key);
+        if (v !== null) localStorage.setItem(mv.pre + pad(mv.n + 1) + mv.post, v);
+      });
+      localStorage.setItem(FLAG, '1');
+    } catch (e) {}
+  }
+
   function pageName() {
     var p = location.pathname.split('/').pop();
     return p || 'index.html';
@@ -464,7 +501,7 @@
     bar.querySelector('.rz-count').textContent = doneCount + ' of ' + all.length + ' lessons complete';
     bar.querySelector('.rz-cta').textContent = firstOpen
       ? (doneCount ? 'Continue · ' : 'Start · ') + code + ' ' + title + ' →'
-      : 'All eighteen done — revisit ' + code + ' →';
+      : 'All nineteen done — revisit ' + code + ' →';
 
     if (doneCount && store.ok) {
       var reset = document.createElement('button');
@@ -484,6 +521,7 @@
 
   /* ---- init -------------------------------------------------------------- */
   function init() {
+    migrateL9Insert();
     document.querySelectorAll('.quiz').forEach(wireQuiz);
     document.querySelectorAll('input[type=range][data-output]').forEach(wireRange);
     document.querySelectorAll('.checklist-widget').forEach(wireChecklist);
