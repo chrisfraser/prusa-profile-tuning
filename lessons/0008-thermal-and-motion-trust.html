@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L8 · Thermal and motion trust</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 1 · The machine · L8</p>
+  <h1 class="lesson-title">Thermal and motion trust</h1>
+  <p class="lesson-sub">The last two things that have to stop moving: the temperature the nozzle actually
+  holds, and the resonance the frame actually has.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~30 minutes, mostly waiting</span><span class="sep">•</span>
+    <span>✅ Closes Phase 1</span><span class="sep">•</span>
+    <span class="tag accent">Phase 1</span>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>Lesson 9 opens Phase 2 with a temperature tower — a test that assumes the number you asked for is the
+    number the nozzle held. If the hotend is oscillating ±8 °C, your tower's bands aren't 5 °C apart, they're
+    smeared, and you will pick a value that is roughly right for a machine that never sits still. The same
+    goes for motion: Pressure Advance in Lesson 11 must be tuned at production accelerations, which means the
+    machine's resonance behaviour has to already be settled. This lesson closes both, and with it Phase 1.
+    After this, the machine is a constant.</p>
+  </div>
+
+  <p>Two independent things, one goal. <b>Thermal trust</b>: when the profile says 240 °C, the plastic sees
+  something very close to 240 °C, consistently, for hours. <b>Motion trust</b>: when the profile commands an
+  acceleration, the toolhead performs it without the frame ringing.</p>
+
+  <p>Which of these you can actually calibrate depends entirely on your firmware family — and here the split
+  is sharper than in any previous lesson.</p>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>Thermal trust</h2>
+
+  <p>The thermistor sits in the heater block, not in the plastic. It reads how hot the <em>metal</em> is. The
+  control loop's job is to hold that steady against everything trying to disturb it: the part-cooling fan
+  blasting the nozzle, cold filament arriving at speed, ambient air moving through the room or the chamber.</p>
+
+  <p>A wobbling hotend temperature produces something genuinely nasty — <b>variation you cannot see and
+  cannot attribute</b>. Viscosity changes with temperature, so flow, ooze and pressure lag all drift with the
+  wobble. Two identical sections of the same print behave differently. That is exactly the corruption
+  described in Lesson 4: results that look like data.</p>
+
+  <details class="panel">
+    <summary>MK3S · PID calibration, then thermal model calibration</summary>
+    <div class="panel-body">
+      <p><b>PID tuning</b> calibrates the control loop that holds the hotend at target.</p>
+      <p><b>Path:</b> <code>LCD → Calibration → PID calibration</code>.<span class="cite"><a href="#r1">1</a></span>
+      Set the temperature the calibration should run at — <b>choose the temperature you print at most
+      often</b>, because the loop is tuned around that operating point.<span class="cite"><a href="#r1">1</a></span></p>
+      <div class="callout key">
+        <div class="callout-label">▲ The ±5 °C rule</div>
+        <p>Run PID tuning when you see <b>small</b> fluctuations, around ±5 °C. Fluctuations
+        <b>larger</b> than ±5 °C are not a tuning problem — Prusa point at a fan fault or a thermistor
+        wire/connector problem instead.<span class="cite"><a href="#r1">1</a></span> Tuning past a hardware
+        fault just calibrates around the fault.</p>
+      </div>
+      <p><b>Thermal model calibration</b> is a separate, MK3-family feature from firmware 3.12.0 onward. It
+      builds a model of expected temperatures and compares measured against expected during printing; a
+      mismatch gives a beep and a <code>THERMAL ANOMALY</code> warning, and a persistent one shuts heating
+      down.<span class="cite"><a href="#r2">2</a></span></p>
+      <ul>
+        <li><b>Path:</b> <code>Calibration → Temp Model cal</code>. Takes about 12 minutes and saves the
+        profile automatically.<span class="cite"><a href="#r2">2</a></span></li>
+        <li><b>Run it</b> after changing hotend components (third-party parts can trigger false warnings),
+        and after PID tuning if thermal anomaly errors persist.<span class="cite"><a href="#r2">2</a></span></li>
+      </ul>
+      <p><b>And one MK3S-only extra:</b> <b>extruder linearity correction</b>. The Trinamic drivers on the
+      Einsy RAMBo assume a sine-wave motor current; real motors distort it, worst near the zero crossing,
+      which shows up as <b>diagonal moiré lines</b> on printed surfaces.<span class="cite"><a href="#r3">3</a></span>
+      Requires firmware 3.2.0 or newer, and works only on the MK3 and MK3S.<span class="cite"><a href="#r3">3</a></span></p>
+      <ol>
+        <li><code>LCD → Settings → Lin.Correction → E correct</code> — disable E-correction.<span class="cite"><a href="#r3">3</a></span></li>
+        <li>Print the calibration G-code tower.</li>
+        <li>Find the band with the smoothest surface — usually near the vertical centre — and note its value.</li>
+        <li>Re-enable E-correction, enter that value, and reprint to verify.<span class="cite"><a href="#r3">3</a></span></li>
+      </ol>
+      <p>On firmware 3.13.0+ the menu shows values 0–200, where 1.03 appears as <code>030</code> and 1.11 as
+      <code>110</code>.<span class="cite"><a href="#r3">3</a></span> Only chase this if you actually see
+      diagonal moiré; it is not a routine step.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>MK4 / MK4S · nothing to tune, something to watch</summary>
+    <div class="panel-body">
+      <p><b>There is no user-run PID or thermal model calibration here.</b> Prusa's PID tuning and thermal
+      model calibration articles are written for the MK3 family;<span class="cite"><a href="#r1">1</a><a href="#r2">2</a></span>
+      on Buddy firmware, heater behaviour is validated by the heater checks inside the selftest (Lesson 5)
+      and surfaced as numbered error codes rather than exposed as a calibration you run.</p>
+      <p><b>So what you do instead is observe.</b> Heat the nozzle to your intended print temperature, let it
+      settle for five minutes, then watch the reading on the display for a full minute — with the
+      part-cooling fan forced to 100 %, because that is the disturbance that matters and an idle hotend never
+      sees it.</p>
+      <ul>
+        <li><b>Steady, within a degree or two:</b> thermal trust established. Log it and move on.</li>
+        <li><b>Wandering more than a few degrees:</b> that is a hardware question — fan, thermistor,
+        connector, or a sock that has gone. Re-run the selftest and search the exact error code if one
+        appears.</li>
+      </ul>
+      <p>The observation takes two minutes and gives you a logged baseline. When something goes strange in
+      six months, you'll want a number to compare against.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Core One · as MK4, but the chamber is a thermal variable</summary>
+    <div class="panel-body">
+      <p><b>Same as the MK4 family</b> — no user-run PID or thermal model calibration; watch and log
+      instead.</p>
+      <p><b>The addition is the chamber.</b> On an open-frame printer, ambient is the room. On the Core One,
+      ambient is whatever the enclosure has accumulated, and it climbs through a long print. That makes the
+      chamber a genuine thermal variable in a way it isn't on the other two machines.</p>
+      <p>So take your observation <b>twice</b>: once from cold, and once after the machine has been printing
+      for half an hour in the door and vent state you use for that material. Log both, and log which state.
+      If the two differ significantly, that difference is a real property of this machine that you'll want to
+      remember when a Phase 2 measurement drifts between the start and end of a print.</p>
+      <p>Remember the PLA case from Lesson 2: PLA's <a href="../reference/glossary.html#glass-transition">glass
+      transition</a> is close enough to achievable chamber temperatures that a hot chamber softens the part
+      and the filament path above it. Vent open for PLA. The community-consensus targets — ≤ 30 °C for PLA,
+      35–40 °C for PETG — are a starting point to test, not a Prusa specification.</p>
+    </div>
+  </details>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>Motion trust — Input Shaper</h2>
+
+  <p><a href="../reference/glossary.html#input-shaper">Input Shaper</a> cancels the resonances that cause
+  <a href="../reference/glossary.html#ghosting">ghosting</a>, by analysing the printer's movements and
+  filtering the input signal so it doesn't excite them — which is what lets the machine run high
+  acceleration without wrecking surface finish. It is coordinated with pressure advance
+  compensation.<span class="cite"><a href="#r4">4</a></span></p>
+
+  <details class="panel">
+    <summary>MK3S · doesn't have it, and that's fine</summary>
+    <div class="panel-body">
+      <p>The MK3S has no Input Shaper. Its motion trust comes from belts being in spec (Lesson 6), a solid
+      frame, and <b>accepting that it is the slow machine of the three</b>.</p>
+      <p>The practical consequence for Phase 2: don't try to make the MK3S hit MK4 numbers. Around 45–60 mm/s
+      perimeters is the sensible operating region, and quality comes from staying there rather than from
+      fighting ringing at 120 mm/s. Its <a href="../reference/glossary.html#bedslinger">bedslinger</a> Y axis
+      is carrying your part; there is no filter for mass.</p>
+      <p>The MK3S's motion-quality lever is instead the <b>extruder linearity correction</b> in section 1 —
+      the one genuinely MK3S-specific surface-finish calibration, and the one to reach for if you see
+      diagonal moiré that belt tension didn't fix.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>MK4 / MK4S and Core One · verify rather than calibrate</summary>
+    <div class="panel-body">
+      <p><b>Calibration is usually unnecessary on a stock printer.</b><span class="cite"><a href="#r4">4</a></span>
+      The shipped values are correct for the shipped hardware. Prusa offer an optional accelerometer set for
+      recalibration after hardware modifications;<span class="cite"><a href="#r4">4</a></span> if your
+      machines are stock, you don't need it.</p>
+      <div class="callout key">
+        <div class="callout-label">▲ Read the frequency as a diagnostic</div>
+        <p>Input Shaper frequency values should sit between <b>35 Hz and 70 Hz</b>. A value too low or too
+        high is Prusa's signal to go back and <b>check belt tightness and the assembly</b>.<span class="cite"><a href="#r4">4</a></span>
+        In other words, this number is a second, independent check on Lesson 6 — and it costs nothing to
+        read. If it's outside the band, you have a mechanical problem masquerading as a motion setting.</p>
+      </div>
+      <p><b>One limitation worth knowing:</b> crash detection is not compatible with Input Shaper, because of
+      the high accelerations involved.<span class="cite"><a href="#r4">4</a></span> Don't go looking for a
+      crash-detection feature that isn't there.</p>
+      <p><b>What to verify, practically:</b> print a tall thin object with a sharp feature — the same 40 mm
+      cube with ribs from Lesson 6 works — at your intended production acceleration, and look downstream of
+      the feature. Clean means motion trust is established at that acceleration. Ghosting means: belts first
+      (Lesson 6), assembly second, and only then Input Shaper.</p>
+    </div>
+  </details>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>Sign Phase 1 off</h2>
+
+  <p>The point of a sign-off isn't ceremony. It is that from here on, when a Phase 2 measurement comes out
+  strange, you can say with evidence <em>"the machine was in this state, on this date, and these were its
+  numbers"</em> — instead of re-opening the machine as a suspect every time.</p>
+
+  <div class="checklist-widget">
+    <div class="cl-title">✓ Phase 1 sign-off — one printer, all of it logged with today's date</div>
+    <ul class="checklist">
+      <li data-check>Firmware version current and recorded</li>
+      <li data-check>Selftest passed (MK3S: Calibration → Selftest · MK4/Core One: Control → Calibrations &amp; tests)</li>
+      <li data-check>MK3S: Calibrate XYZ run, skew result recorded from Support → XYZ cal. details</li>
+      <li data-check>MK4 / Core One: loadcell selftest step completed</li>
+      <li data-check>Belt tension measured, in spec, and the numbers written down</li>
+      <li data-check>Core One: the two belt frequencies are within 8 Hz of each other</li>
+      <li data-check>First layer calibrated and judged — per sheet, not per machine</li>
+      <li data-check>MK3S: PID calibration run at my usual print temperature</li>
+      <li data-check>MK3S: thermal model calibration run if anomalies were appearing</li>
+      <li data-check>MK4 / Core One: hotend temperature observed steady for a minute at 100 % fan</li>
+      <li data-check>Core One: chamber state decided, recorded, and observed hot as well as cold</li>
+      <li data-check>MK4 / Core One: Input Shaper frequency read and inside 35–70 Hz</li>
+      <li data-check>Nozzle size and rough age recorded</li>
+      <li data-check>A test cube printed at production acceleration and judged clean</li>
+    </ul>
+    <div class="checklist-bar"><span>Tick as you go</span><span data-checklist-progress></span></div>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-label">⌁ When to come back here</div>
+    <p>Re-run this sign-off after <b>any</b> of: a nozzle change, a belt adjustment, a sheet change, a
+    firmware update, moving the printer, or a run of prints that went wrong for reasons you couldn't name. A
+    machine that has been re-verified is a machine you can keep treating as a constant. One that hasn't is a
+    suspect again.</p>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">4</span>Check yourself</h2>
+  <p>From memory. These interleave the whole of Phase 1.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read the ±5 °C rule.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">Your MK3S nozzle swings ±12 °C at target. Should you run PID calibration?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Prusa scope PID tuning to small fluctuations around ±5 °C; anything larger points at a fan or a thermistor wire or connector.">No — that size of swing points at a hardware fault</button>
+      <button class="opt" data-feedback="PID tuning is the right tool for small wobble, but running it against a hardware fault just calibrates the loop around the fault and hides it.">Yes — that is exactly what PID tuning is for</button>
+      <button class="opt" data-feedback="Thermal model calibration builds a model of expected temperatures, but it won't stabilise a heater whose fan or thermistor is faulty — it will warn you about it.">Yes — but run thermal model calibration first</button>
+      <button class="opt" data-feedback="A swing that large will visibly smear the bands of a temperature tower, which is precisely why it has to be resolved before Phase 2 rather than after.">No — temperature swings don't affect calibration</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read the Input Shaper panel.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">Your Core One reports an Input Shaper frequency of 28 Hz. What does that tell you?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Prusa give 35–70 Hz as the expected band, and a value outside it is their cue to check belt tightness and assembly.">Something mechanical is off — go back and check belts</button>
+      <button class="opt" data-feedback="A lower frequency does mean a softer structure, but that isn't a property to work around — it's a signal that the machine isn't assembled or tensioned as designed.">The frame is softer, so use lower acceleration values</button>
+      <button class="opt" data-feedback="There's no user-facing frequency to enter on a stock machine. The number is a measurement to read, not a setting to correct.">The value needs correcting to bring it into range</button>
+      <button class="opt" data-feedback="Enclosed machines aren't expected to sit outside the band. The 35–70 Hz range is given for the Core One alongside the other Input Shaper printers.">Enclosed printers normally read below the stated band</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read section 1's opening.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">Why must thermal stability be settled before the Lesson 9 temperature tower?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. The tower's whole method is comparing bands 5 °C apart. If the hotend wanders more than that, the bands overlap and the comparison is meaningless.">A wandering hotend smears the tower's bands together</button>
+      <button class="opt" data-feedback="An unstable heater can trip a thermal anomaly and abort, which is annoying — but the real damage is to the validity of the result, not to the print finishing.">An unstable heater will abort the print partway up</button>
+      <button class="opt" data-feedback="Extrusion multiplier is measured after temperature and would indeed be affected — but the tower itself is corrupted first, and it's upstream.">An unstable heater changes the extrusion multiplier</button>
+      <button class="opt" data-feedback="Custom G-code temperature changes work fine on an unstable machine — the commands are issued regardless. What fails is your ability to tell the bands apart.">The custom G-code cannot set temperature reliably</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Sign off Phase 1 on one printer</h3>
+    <p>Finish the checklist above for the machine you've carried through Lessons 5–7, and write the whole
+    thing into <code>tuning-log.md</code> under a dated <code>## Phase 1 sign-off</code> heading. Include:</p>
+    <ol>
+      <li>Every number you measured, with its target next to it.</li>
+      <li><b>MK3S:</b> the PID calibration temperature you chose, and <em>why</em> that temperature.
+      <b>MK4 / Core One:</b> your one-minute temperature observation at 100 % fan, and the Input Shaper
+      frequency.</li>
+      <li>A photo of a 40 mm cube printed at your intended production acceleration.</li>
+      <li>One sentence: <em>"This machine is now a constant with respect to ___, and still a variable with
+      respect to ___."</em></li>
+    </ol>
+    <p class="go">→ Paste it back to me. That last sentence is the real assessment — if you can name what
+    Phase 1 <em>didn't</em> pin down, you understand what Phase 2 is actually measuring.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>An unstable hotend produces unattributable variation</strong> — the worst kind, because it
+      still looks like data.</li>
+      <li><strong>PID tuning is for ±5 °C wobble.</strong> Bigger swings are a fan, thermistor or connector
+      fault, and tuning around them hides them.</li>
+      <li><strong>PID and thermal model calibration are MK3-family features</strong>; on the MK4 and Core One
+      you observe and log rather than calibrate.</li>
+      <li><strong>Input Shaper on a stock machine is verified, not calibrated</strong> — and its frequency
+      landing outside 35–70 Hz sends you back to belts.</li>
+      <li><strong>Phase 1 is a repeatable sign-off, not a one-off.</strong> Any hardware change makes the
+      machine a suspect again.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/article/pid-tuning_2265" target="_blank" rel="noopener">PID tuning — Prusa Knowledge Base</a></div>
+      <div class="desc">Two minutes to read, and it contains the single most useful diagnostic threshold in
+      this lesson: ±5 °C is a tuning problem, more than that is hardware. MK4 and Core One owners should read
+      it anyway, to understand what the selftest's heater checks are standing in for.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> Phase 1 ends here, so this is the natural moment to ask
+    whether you're actually ready for Phase 2 — paste me the sign-off and I'll tell you honestly. If your
+    firmware exposes a calibration I haven't mentioned, tell me and we'll work out what it does before you
+    run it. Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#pid-tuning">PID tuning</a>,
+    <a href="../reference/glossary.html#input-shaper">Input Shaper</a>,
+    <a href="../reference/glossary.html#ghosting">ghosting</a>,
+    <a href="../reference/glossary.html#belt-tension">belt tension</a>,
+    <a href="../reference/glossary.html#bedslinger">bedslinger</a>,
+    <a href="../reference/glossary.html#hotend">hotend</a>,
+    <a href="../reference/glossary.html#glass-transition">glass transition temperature</a>,
+    <a href="../reference/glossary.html#selftest">selftest</a>,
+    <a href="../reference/glossary.html#calibration-order">calibration order</a>,
+    <a href="../reference/glossary.html#tuning-log">tuning log</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>PID tuning</i>. The <code>Calibration → PID calibration</code> path, the
+    instruction to calibrate at the temperature you print at most often, and the ±5 °C threshold above which
+    the cause is a fan or thermistor wire/connector fault rather than tuning.
+    <a href="https://help.prusa3d.com/article/pid-tuning_2265" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">Prusa Research. <i>Thermal model calibration</i>. Applies to the MK3, MK3S and MK3S+ from
+    firmware 3.12.0; the <code>Calibration → Temp Model cal</code> path; ~12 minutes; when to re-run it.
+    <a href="https://help.prusa3d.com/article/thermal-model-calibration_382488" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r3">Prusa Research. <i>Extruder linearity correction calibration</i>. MK3 and MK3S only, firmware
+    3.2.0+, Trinamic drivers on the Einsy RAMBo; diagonal moiré from current-waveform distortion; the
+    <code>Settings → Lin.Correction → E correct</code> path and the tower procedure.
+    <a href="https://help.prusa3d.com/article/extruder-linearity-correction-calibration_2254" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r4">Prusa Research. <i>Input Shaper</i>. What it cancels, that calibration is usually unnecessary
+    on a stock printer, the optional accelerometer set for post-modification recalibration, the 35–70 Hz
+    expected band and what a value outside it means, and the incompatibility with crash detection.
+    <a href="https://help.prusa3d.com/article/input-shaper-core-one-mk4-s-mk3-9-s-mk3-5-s-xl-mini_451816" target="_blank" rel="noopener">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0007-first-layer-and-z-offset.html">
+      <div class="dir">← Previous · L7</div>
+      <div class="ttl">First layer and Z-offset</div>
+    </a>
+    <a class="next" href="../index.html#phase-2">
+      <div class="dir">Next · Phase 2</div>
+      <div class="ttl">The filament →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L8 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

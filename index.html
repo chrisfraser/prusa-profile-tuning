@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dialled In · Prusa machine &amp; profile tuning</title>
+<meta name="description" content="Take a Prusa MK3S, MK4, or Core One from out-of-the-box to a print profile you actually trust.">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="index.html#phase-0">Lessons</a>
+      <a href="reference/calibration-card.html">The Calibration Card</a>
+      <a href="reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<section class="hero">
+  <div class="wrap-wide">
+    <p class="kicker">Machine first, then filament, then profile — in that order.</p>
+    <h1>Dialled In</h1>
+    <p>Take a Prusa <strong>MK3S</strong>, <strong>MK4</strong>, or <strong>Core One</strong> from
+    out-of-the-box to a print profile you actually trust. Every number in this course is one you
+    <em>measure</em>, on your machine, with your spool — not one you copy. Menu paths and target values are
+    split per printer throughout, because <code>M900 K</code> and <code>M572 S</code> are not the same
+    thing and never will be.</p>
+  </div>
+</section>
+
+<main class="wrap-wide">
+
+  <div class="callout mission" style="margin-top:2rem">
+    <div class="callout-label">◎ The mission</div>
+    <p>Three Prusa printers, three materials, one humid island. The goal is repeatable quality at a sane
+    speed: hit print, walk away, get a part that's dimensionally right and doesn't delaminate — and when
+    something does go wrong, be able to name the single setting that caused it. Not maximum speed.
+    Trust.<br>
+    <a href="reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="reference/glossary.html">Glossary</a> ·
+    <a href="RESOURCES.md">Resources</a> ·
+    <a href="MISSION.md">Mission</a> ·
+    <a href="reference/source-material/prusaslicer-profile-tuning.md">The original guide</a></p>
+  </div>
+
+  <div class="callout key">
+    <div class="callout-label">▲ The one rule that outranks everything</div>
+    <p>This fleet runs <b>two firmware families</b>. The MK3S is Marlin: Linear Advance, <code>M900 K</code>.
+    The MK4 and Core One are Buddy: Pressure Advance, <code>M572 S</code>. The values live on different
+    scales, the menus live in different places, and copying a number from one to the other will quietly
+    ruin a profile. Every lesson that touches a menu path or a G-code command splits into three panels —
+    <b>open only your machine.</b></p>
+  </div>
+
+  <!-- ===================== PHASE 0 ===================== -->
+  <div class="phase" id="phase-0">
+    <div class="phase-head">
+      <span class="ph-n">Phase 0</span>
+      <h2>Fundamentals</h2>
+      <span class="ph-tag">what's actually happening, before you change anything</span>
+    </div>
+    <p class="phase-intro">Four short lessons on how a printer turns a spool into a part, and what the word
+    "calibration" actually buys you. Every later number in the course is downstream of these ideas — but if
+    you already have them, each lesson carries a link straight to Phase 1.</p>
+    <ul class="lesson-list">
+      <a class="lesson-card" href="lessons/0001-the-machine-in-four-parts.html">
+        <span class="code">L1</span>
+        <span><span class="t">The machine in four parts</span>
+        <span class="d">Motion, hotend, extruder, bed — and why a bedslinger and a CoreXY fail in different
+        ways. Ends with you writing down what your three machines actually are.</span></span>
+        <span class="status-pill ready">Ready</span>
+      </a>
+      <a class="lesson-card" href="lessons/0002-filament-is-a-material.html">
+        <span class="code">L2</span>
+        <span><span class="t">Filament is a material, not a supply</span>
+        <span class="d">Glass transition, melt zone, and moisture. Why a wet spool doesn't just print
+        badly — it invalidates every measurement you're about to take.</span></span>
+        <span class="status-pill ready">Ready</span>
+      </a>
+      <a class="lesson-card" href="lessons/0003-what-the-slicer-decides.html">
+        <span class="code">L3</span>
+        <span><span class="t">What the slicer actually decides</span>
+        <span class="d">The extrusion equation — flow = height × width × speed — and reading it straight
+        off your own G-code. The one bit of arithmetic the whole course rests on.</span></span>
+        <span class="status-pill ready">Ready</span>
+      </a>
+      <a class="lesson-card" href="lessons/0004-the-calibration-mindset.html">
+        <span class="code">L4</span>
+        <span><span class="t">The calibration mindset</span>
+        <span class="d">One variable, in dependency order, written down. Why the order is fixed and what
+        breaks when you jump ahead. You'll start your tuning log here.</span></span>
+        <span class="status-pill ready">Ready</span>
+      </a>
+    </ul>
+  </div>
+
+  <!-- ===================== PHASE 1 ===================== -->
+  <div class="phase" id="phase-1">
+    <div class="phase-head">
+      <span class="ph-n">Phase 1</span>
+      <h2>The machine</h2>
+      <span class="ph-tag">earn a trustworthy printer before you tune a profile</span>
+    </div>
+    <p class="phase-intro">Every filament calibration measures <em>filament plus machine</em>. If the machine
+    is loose, warm-drifting or out of square, you will spend an evening carefully measuring your printer's
+    faults and writing them into a filament profile. These four lessons close that door. Do them once per
+    printer — and again after any hardware change.</p>
+    <ul class="lesson-list">
+      <a class="lesson-card" href="lessons/0005-selftest-and-health-check.html">
+        <span class="code">L5</span>
+        <span><span class="t">Selftest and the health check</span>
+        <span class="d">Run your printer's own hardware check and read the result properly. Separate MK3S,
+        MK4/S and Core One paths, plus what each test actually proves.</span></span>
+        <span class="status-pill ready">Ready</span>
+      </a>
+      <a class="lesson-card" href="lessons/0006-belt-tension-and-squareness.html">
+        <span class="code">L6</span>
+        <span><span class="t">Belt tension and squareness</span>
+        <span class="d">MK3S belt-status numbers, MK4 tensioner screws, Core One belt frequencies in Hz.
+        The measurement that has to be right before Input Shaper means anything.</span></span>
+        <span class="status-pill ready">Ready</span>
+      </a>
+      <a class="lesson-card" href="lessons/0007-first-layer-and-z-offset.html">
+        <span class="code">L7</span>
+        <span><span class="t">First layer and Z-offset</span>
+        <span class="d">PINDA versus loadcell — two genuinely different procedures. Getting a first layer
+        you can judge, and knowing which knob moved it.</span></span>
+        <span class="status-pill ready">Ready</span>
+      </a>
+      <a class="lesson-card" href="lessons/0008-thermal-and-motion-trust.html">
+        <span class="code">L8</span>
+        <span><span class="t">Thermal and motion trust</span>
+        <span class="d">PID tuning, thermal model calibration, Input Shaper, and the MK3S-only linearity
+        correction. The last things to fix before the machine stops being a variable.</span></span>
+        <span class="status-pill ready">Ready</span>
+      </a>
+    </ul>
+  </div>
+
+  <!-- ===================== PHASE 2 ===================== -->
+  <div class="phase" id="phase-2">
+    <div class="phase-head">
+      <span class="ph-n">Phase 2</span>
+      <h2>The filament</h2>
+      <span class="ph-tag">seven steps, in dependency order, per spool</span>
+    </div>
+    <p class="phase-intro">Now the machine is a constant and the filament is the variable. Seven
+    measurements, always in this order, because each one assumes the ones before it are fixed. Re-run an
+    early step and every later number is void.</p>
+    <ul class="lesson-list">
+      <a class="lesson-card todo">
+        <span class="code">L9</span>
+        <span><span class="t">Temperature tower</span>
+        <span class="d">Find the lowest temperature that still bonds layers. Custom G-code per band, and
+        the snap test that tells you the truth.</span></span>
+        <span class="status-pill soon">Soon</span>
+      </a>
+      <a class="lesson-card todo">
+        <span class="code">L10</span>
+        <span><span class="t">Extrusion multiplier (flow)</span>
+        <span class="d">Single-wall box, calipers, one formula. Plus the <code>M221</code> trap that makes
+        people correct the same error twice.</span></span>
+        <span class="status-pill soon">Soon</span>
+      </a>
+      <a class="lesson-card todo">
+        <span class="code">L11</span>
+        <span><span class="t">Pressure / Linear Advance</span>
+        <span class="d">The single biggest quality win — and the one place where MK3S and MK4 numbers must
+        never touch. Tuned at production speed or not at all.</span></span>
+        <span class="status-pill soon">Soon</span>
+      </a>
+      <a class="lesson-card todo">
+        <span class="code">L12</span>
+        <span><span class="t">Retraction</span>
+        <span class="d">Filament overrides, spike towers, and why more retraction is not a free win on a
+        direct-drive machine.</span></span>
+        <span class="status-pill soon">Soon</span>
+      </a>
+      <a class="lesson-card todo">
+        <span class="code">L13</span>
+        <span><span class="t">Cooling</span>
+        <span class="d">Fan bands per material, and what changes when the printer is enclosed.</span></span>
+        <span class="status-pill soon">Soon</span>
+      </a>
+      <a class="lesson-card todo">
+        <span class="code">L14</span>
+        <span><span class="t">Max volumetric speed</span>
+        <span class="d">Your real speed limit. Find where the wall goes matte, take 85 % of it, and let it
+        clamp everything else.</span></span>
+        <span class="status-pill soon">Soon</span>
+      </a>
+      <a class="lesson-card todo">
+        <span class="code">L15</span>
+        <span><span class="t">Speeds and accelerations</span>
+        <span class="d">Only now. External perimeters low, travel high, dynamic overhang speed on.</span></span>
+        <span class="status-pill soon">Soon</span>
+      </a>
+    </ul>
+  </div>
+
+  <!-- ===================== PHASE 3 ===================== -->
+  <div class="phase" id="phase-3">
+    <div class="phase-head">
+      <span class="ph-n">Phase 3</span>
+      <h2>Ship it</h2>
+      <span class="ph-tag">turn measurements into profiles you keep</span>
+    </div>
+    <p class="phase-intro">Measurements that live in a notebook are lost. These lessons turn them into named,
+    machine-scoped, backed-up PrusaSlicer profiles — and a log that keeps a three-printer fleet honest.</p>
+    <ul class="lesson-list">
+      <a class="lesson-card todo">
+        <span class="code">L16</span>
+        <span><span class="t">Profile structure and naming</span>
+        <span class="d">One profile per printer family, compatible-printer conditions, and never
+        overwriting a system profile.</span></span>
+        <span class="status-pill soon">Soon</span>
+      </a>
+      <a class="lesson-card todo">
+        <span class="code">L17</span>
+        <span><span class="t">The validation set</span>
+        <span class="d">Three prints and five acceptance criteria. Sign-off, or back to the step that
+        failed.</span></span>
+        <span class="status-pill soon">Soon</span>
+      </a>
+      <a class="lesson-card todo">
+        <span class="code">L18</span>
+        <span><span class="t">The tuning log</span>
+        <span class="d">Per spool, per printer, per date. The habit that stops the fleet drifting back into
+        guesswork.</span></span>
+        <span class="status-pill soon">Soon</span>
+      </a>
+    </ul>
+  </div>
+
+  <!-- ===================== THE REFERENCE CARD ===================== -->
+  <div class="phase" id="the-card">
+    <div class="phase-head">
+      <span class="ph-n">Keep it close</span>
+      <h2>The reference you keep open</h2>
+      <span class="ph-tag">print it · pin it by the printers</span>
+    </div>
+    <p class="phase-intro">Every target number in the course on one page: belt-status ranges, belt
+    frequencies, the calibration order, the acceptance criteria. Grows as each phase lands.</p>
+    <div class="feature">
+      <span class="big">🃏</span>
+      <div>
+        <h3>The Calibration Card</h3>
+        <p>The whole course as one page you can hold against a real machine, next to a real print.</p>
+      </div>
+      <a class="cta" href="reference/calibration-card.html">Open it →</a>
+    </div>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-label">⌁ How this works</div>
+    <p>Work through the lessons in order — each is short and ends with a task you paste back to me for
+    feedback. I'm your tutor: run Claude Code in this folder and say <em>"I'm on Lesson 1"</em>, ask anything,
+    or paste your measurements for a line-by-line critique. Stuck, curious, or want to jump ahead? Just say
+    so. Already fluent in the fundamentals? Each Phase 0 lesson has a
+    <a href="lessons/0005-selftest-and-health-check.html">skip straight to Phase 1</a> link at the top.</p>
+  </div>
+
+  <p class="pagefoot">
+    prusa-profile-tuning — a personal, hands-on course built with
+    <a href="https://claude.com/claude-code">Claude Code</a>.
+  </p>
+</main>
+</body>
+</html>

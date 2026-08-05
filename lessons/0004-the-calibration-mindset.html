@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L4 · The calibration mindset</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 0 · Fundamentals · L4</p>
+  <h1 class="lesson-title">The calibration mindset</h1>
+  <p class="lesson-sub">One variable, in a fixed order, written down. The three habits that separate tuning
+  from fiddling.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~12 minutes</span><span class="sep">•</span>
+    <span>🧠 Closes Phase 0</span><span class="sep">•</span>
+    <span class="tag accent">Fundamentals</span>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-label">⏩ Already know this?</div>
+    <p>This lesson covers the one-variable rule, the fixed calibration order and why it's a dependency chain
+    rather than a preference, and setting up a tuning log. Even if the ideas are familiar, the
+    <b>task at the end creates the log every later lesson writes into</b> — so do that part at minimum.
+    Otherwise, <a href="0005-selftest-and-health-check.html">skip straight to Phase 1 →</a></p>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>You already own a written tuning guide with a full set of numbers in it. Not one of those numbers was
+    measured on your machines. That's the exact gap this course exists to close, and the thing that closes
+    it isn't more knowledge — it's a method strict enough that the numbers you end up with are
+    <em>attributable</em>. Three habits do the work: change one thing, follow the dependency order, and
+    write it down. This lesson installs all three and sets up the log.</p>
+  </div>
+
+  <p>Calibration has a precise meaning here, and it isn't "making the printer better". It is:</p>
+
+  <p class="lead">Measuring a property you cannot look up, by constructing a print whose failure mode
+  isolates it.</p>
+
+  <p>Every step in Phases 1 and 2 fits that sentence. A temperature tower isolates layer bonding by varying
+  only temperature. A single-wall box isolates flow by removing every feature except one wall. The design of
+  each test <em>is</em> the argument that the number you read off it means what you think it means.</p>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>Change one thing</h2>
+
+  <p>The <a href="../reference/glossary.html#one-variable-rule">one-variable rule</a>: exactly one
+  difference between two test prints. Never two.</p>
+
+  <p>The reason isn't tidiness. Change temperature and retraction together, get a better print, and you now
+  have a result you cannot attribute. Worse — you'll <em>believe</em> you learned something, and carry the
+  belief into the next decision. A confused result that feels like data is worse than no result, because no
+  result at least prompts another test.</p>
+
+  <div class="compare">
+    <figure class="before">
+      <div class="difflabel">Fiddling</div>
+      <pre><code><span class="c"># evening one</span>
+temp   215 → 210
+retract 0.8 → 1.0
+fan     50% → 70%
+
+print looks better ✓
+
+<span class="hl">Which change did it?
+Unknown. Does it work
+on PETG? Unknown.</span></code></pre>
+    </figure>
+    <figure class="after">
+      <div class="difflabel">Calibrating</div>
+      <pre><code><span class="c"># evening one</span>
+temp tower: 215/210/205/200
+→ 205 is lowest that bonds
+
+<span class="c"># evening two, temp fixed</span>
+retract 0.8 / 0.9 / 1.0
+→ 0.9 kills strings
+
+<span class="ok">Two numbers, each
+attributable, each
+reusable.</span></code></pre>
+    </figure>
+  </div>
+
+  <p>The practical form of this rule in printing is the <b>banded test print</b>: one object where the
+  variable steps at known heights, so a single print gives you five or six comparisons under otherwise
+  identical conditions. Same nozzle, same spool, same hour, same ambient humidity. You'll build these with
+  <code>After layer change G-code</code> in Phase 2 — it's the one-variable rule made physical.</p>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>The order is a dependency chain, not a preference</h2>
+
+  <p>Here is the fixed <a href="../reference/glossary.html#calibration-order">calibration order</a> for this
+  course:</p>
+
+  <ul class="steps">
+    <li><span class="step-title">0 · The machine</span>
+      <span class="step-detail">Selftest, belts, first layer, thermal and motion. Phase 1. Everything below
+      measures filament <em>plus</em> machine, so the machine must stop being a variable first.</span></li>
+    <li><span class="step-title">1 · Temperature</span>
+      <span class="step-detail">Sets viscosity, which changes how much comes out at a given push, how much
+      pressure builds in the nozzle, and how much the print oozes. It moves every number below it.</span></li>
+    <li><span class="step-title">2 · Extrusion multiplier</span>
+      <span class="step-detail">How much plastic per commanded volume. Measured at the temperature you just
+      fixed — at a different temperature you'd measure a different value.</span></li>
+    <li><span class="step-title">3 · Pressure / Linear Advance</span>
+      <span class="step-detail">Compensates for pressure lag. Pressure depends on viscosity and on flow, so
+      it depends on both steps above.</span></li>
+    <li><span class="step-title">4 · Retraction</span>
+      <span class="step-detail">How much to pull back to stop ooze. Ooze depends on residual pressure —
+      which advance has just changed.</span></li>
+    <li><span class="step-title">5 · Cooling</span>
+      <span class="step-detail">Fan changes the effective temperature of the plastic <em>after</em> it
+      leaves the nozzle. Tuned after temperature, because it modifies temperature's effect rather than
+      replacing it.</span></li>
+    <li><span class="step-title">6 · Max volumetric speed</span>
+      <span class="step-detail">The hotend's real ceiling, which depends on the temperature you chose in
+      step 1. Measured before speeds, because it silently clamps them.</span></li>
+    <li><span class="step-title">7 · Speeds and accelerations</span>
+      <span class="step-detail">Last, because everything above bounds them — and because advance must be
+      tuned at the speeds you'll actually use, so this step can send you back to step 3.</span></li>
+  </ul>
+
+  <div class="callout key">
+    <div class="callout-label">▲ The invalidation rule</div>
+    <p>Changing any step <b>voids every measurement below it</b>. Raise your print temperature by 10 °C and
+    your extrusion multiplier, advance value, retraction length and MVS are all now guesses. This isn't
+    pedantry — it's the reason a profile that "was fine last month" can quietly stop being fine after one
+    innocent tweak. When you change a step, either re-run what's below it or write down that you
+    <em>didn't</em>.</p>
+  </div>
+
+  <p>One asymmetry worth flagging, because it catches everyone: <b>Pressure/Linear Advance must be tuned at
+  the accelerations and speeds you'll actually print at.</b> A value calibrated on a slow test print
+  over-compensates and starves corners at production speed. But speed is step 7 and advance is step 3. The
+  resolution: print the advance tower <em>with your real quality profile loaded</em>, not a slow one. The
+  order is a dependency chain, not a promise that you'll never loop back.</p>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>Write it down, or it didn't happen</h2>
+
+  <p>Three printers × three materials × several spools is more state than anyone holds in their head. The
+  <a href="../reference/glossary.html#tuning-log">tuning log</a> exists so that in six months you can answer
+  one question: <em>is this number something I measured, or something I copied?</em></p>
+
+  <p>PrusaSlicer gives you somewhere to put a short version — <code>Filament Settings → Notes</code> — and
+  that field travels with the profile when you export a config bundle, which makes it the right home for the
+  summary. But a per-printer Markdown log is easier to scan and to diff, so this course keeps both: the
+  fuller record in the repo, the essentials in the profile notes.</p>
+
+  <p>Colour matters more than people expect. Pigment loading changes flow behaviour within the same brand
+  and material, so a black and a white spool of the same eSUN PETG can legitimately want different extrusion
+  multipliers. Log the colour.</p>
+
+  <div class="checklist-widget">
+    <div class="cl-title">✓ A calibration session is only valid if all of these are true</div>
+    <ul class="checklist">
+      <li data-check>The filament was dried, and I know when</li>
+      <li data-check>The machine passed its health check (Phase 1) since the last hardware change</li>
+      <li data-check>Exactly one variable differs between the things I'm comparing</li>
+      <li data-check>Everything above this step in the order is already fixed and logged</li>
+      <li data-check>I'm testing at the speeds and accelerations I'll actually print at</li>
+      <li data-check>The result went into the log with printer, spool, colour and date</li>
+      <li data-check>Any test G-code I added to a printer profile has been deleted again</li>
+    </ul>
+    <div class="checklist-bar"><span>Tick as you go</span><span data-checklist-progress></span></div>
+  </div>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ That last item has bitten people badly</div>
+    <p>The banded test blocks in Phase 2 go into <code>Printer Settings → Custom G-code → After layer
+    change</code>. They live in the <em>printer</em> profile, not the filament profile — so they will keep
+    firing on every unrelated print you slice on that machine until you delete them. A forgotten temperature
+    tower block means every print silently drops 20 °C at layer 250. Delete the block the moment the test is
+    read.</p>
+  </div>
+
+  <!-- ===== INTERACTIVE WIDGET ===== -->
+  <h2><span class="num">4</span>What does this invalidate?</h2>
+  <p>Click each scenario. Before you read the answer, decide which measurements just became guesses.</p>
+  <div class="faultfinder">
+    <div class="ff-q">Someone changed something. What has to be re-run?</div>
+    <ul class="ff-list">
+      <li class="ff-item"
+          data-cause="Temperature is step 1, so everything from step 2 down was measured under conditions that no longer hold. Viscosity changed, which changes flow, pressure, ooze and melting capacity."
+          data-fix="Re-run extrusion multiplier, advance, retraction, cooling and MVS. In practice: start the material over. This is why you fix temperature first and resist the urge to nudge it later.">Bumped the nozzle temperature up 10 °C for better bonding<span class="ff-tag">Step 1</span></li>
+      <li class="ff-item"
+          data-cause="A new nozzle changes the orifice, and often the hotend's melting capacity with it. That is a machine change, upstream of the entire filament chain — it sits above step 1."
+          data-fix="Re-run the Phase 1 health check for that printer, then the whole filament chain for every material you use on it. New nozzle, new machine.">Swapped in a new 0.4 mm nozzle mid-project<span class="ff-tag">Machine</span></li>
+      <li class="ff-item"
+          data-cause="Cooling is step 5, so only steps 6 and 7 sit below it. But fan changes the effective temperature of the plastic after extrusion, which does shift where the hotend's practical ceiling lands."
+          data-fix="Re-check MVS and then speeds. You do not need to re-run temperature, flow or advance — those happen inside the nozzle, upstream of the fan.">Raised the fan from 40 % to 70 % on PETG<span class="ff-tag">Step 5</span></li>
+      <li class="ff-item"
+          data-cause="Nothing below it, in principle — speeds are step 7, the bottom of the chain. Except for the one asymmetry: advance was tuned at the old accelerations, and it is sensitive to them."
+          data-fix="Re-check advance at the new speed. This is the one legitimate loop backwards in the order, and it's why you print the advance tower with your real profile loaded.">Doubled infill speed after everything else was signed off<span class="ff-tag">Step 7</span></li>
+      <li class="ff-item"
+          data-cause="Different colour means different pigment loading, which genuinely changes flow behaviour — and a different spool means different moisture history regardless. It's a new material for calibration purposes."
+          data-fix="Dry it, then re-run extrusion multiplier at minimum. Temperature and advance usually transfer within a brand and material; flow often doesn't. Log the colour so you can tell later.">Opened a new spool — same brand and material, different colour<span class="ff-tag">Spool</span></li>
+    </ul>
+    <div class="ff-panel"><div class="ff-cause"></div><div class="ff-fix"></div></div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">5</span>Check yourself</h2>
+  <p>From memory. These interleave all of Phase 0.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read section 2.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">Why is max volumetric speed measured before print speeds rather than after?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. MVS caps every speed silently, so speeds tuned first may never have been the speeds actually used.">Because it silently clamps any speed you set above it</button>
+      <button class="opt" data-feedback="It is quicker to test than a full speed sweep, but convenience isn't why it's ordered first — dependency is.">Because its test print takes far less time to run</button>
+      <button class="opt" data-feedback="It is per-filament while speeds are per-print-profile, but that's a fact about where they live, not about which constrains which.">Because it belongs to the filament rather than print</button>
+      <button class="opt" data-feedback="Temperature does set the hotend's capacity, and MVS depends on it — but that explains why MVS comes after temperature, not why it comes before speeds.">Because temperature has to be fixed before either one</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read the invalidation rule.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">A profile worked perfectly. You raised the temperature 10 °C. What is now true?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Temperature is step 1, so flow, advance, retraction, cooling and MVS were all measured under conditions that no longer hold.">Every measurement below temperature is now a guess</button>
+      <button class="opt" data-feedback="Layer bonding will likely improve, yes — but the question is what you can still trust, and the answer is: only the things above temperature in the chain.">Layer bonding improves and nothing else is affected</button>
+      <button class="opt" data-feedback="Flow does shift with viscosity, but so do pressure lag, ooze and melting capacity. Stopping at extrusion multiplier leaves three more stale numbers.">Only the extrusion multiplier needs measuring again</button>
+      <button class="opt" data-feedback="Nothing about the machine changed, so Phase 1 still stands. The damage is confined to the filament chain — but all of it, not part.">The machine health check has to be repeated first</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read section 1.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">Why is a banded test print better than four separate prints of the same object?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. One print holds spool, nozzle, ambient conditions and machine state constant, so the only difference between bands is the variable itself.">Everything except the tested variable is held constant</button>
+      <button class="opt" data-feedback="It is faster and uses less filament, which is a real benefit — but four prints back to back would be valid too, just noisier. The isolation is the point.">It uses much less filament and finishes far sooner</button>
+      <button class="opt" data-feedback="Comparing regions of one object is easier on the eye, but you could line four prints up on a bench. What you can't do is give them identical conditions.">It puts every result side by side on one object</button>
+      <button class="opt" data-feedback="Custom G-code is how bands are built, but writing the block is a cost of the method, not the reason to use it.">It exercises the custom G-code you'll need later</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Start the tuning log</h3>
+    <p>Create <code>tuning-log.md</code> in this folder. One section per printer, one table row per
+    calibration result. Leave it mostly empty — Phase 1 starts filling it next lesson.</p>
+    <pre><code><span class="c"># Tuning log</span>
+
+<span class="c">## MK3S</span>
+<span class="c">### Machine (Phase 1)</span>
+| Date | Check | Value measured | Target | Pass? |
+|---|---|---|---|---|
+|  | belt status X |  | 235–265 |  |
+|  | belt status Y |  | 260–290 |  |
+
+<span class="c">### Filament (Phase 2)</span>
+| Date | Spool (brand/material/colour) | Dried | Temp | EM | K/S | Retract | MVS |
+|---|---|---|---|---|---|---|---|
+|  |  |  |  |  |  |  |  |</code></pre>
+    <p>Then, in your own words and without looking back at the lesson, write two things underneath it:</p>
+    <ol>
+      <li>The calibration order, from memory, with a one-clause reason for each step's position.</li>
+      <li>One number in your existing <code>esun-starter-profiles-bundle.ini</code> that you now believe you
+      cannot trust, and exactly which measurement would earn it.</li>
+    </ol>
+    <p class="go">→ Paste both back to me. I'll check the order against the dependency chain and tell you
+    whether your reasons are the real ones or plausible-sounding substitutes.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>Calibration is measuring a property by constructing a print that isolates it</strong> —
+      not "making the printer better".</li>
+      <li><strong>One variable at a time</strong>, and a banded test print is that rule made physical.</li>
+      <li><strong>The order is a dependency chain.</strong> Changing a step voids every measurement below
+      it.</li>
+      <li><strong>Advance is the one legitimate loop backwards</strong>, because it must be tuned at
+      production speeds.</li>
+      <li><strong>An unlogged measurement is indistinguishable from a guess</strong> six months later — and
+      test G-code left in a printer profile keeps firing forever.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/category/advanced-calibration_229" target="_blank" rel="noopener">Advanced calibration — Prusa Knowledge Base</a></div>
+      <div class="desc">The index page for every calibration Phases 1 and 2 will use. Skim the titles now so
+      you recognise them later, and notice how many are split per printer model — that split is the reason
+      this course keeps its per-machine panels.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> If a step's position in the order doesn't feel obviously right
+    to you, say so — the reasoning matters more than the sequence, and arguing with me about why retraction
+    comes after advance will fix it in your head better than reading it again. Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#calibration-order">calibration order</a>,
+    <a href="../reference/glossary.html#one-variable-rule">one-variable rule</a>,
+    <a href="../reference/glossary.html#tuning-log">tuning log</a>,
+    <a href="../reference/glossary.html#extrusion-multiplier">extrusion multiplier</a>,
+    <a href="../reference/glossary.html#max-volumetric-speed">max volumetric speed</a>,
+    <a href="../reference/glossary.html#pressure-advance">Pressure Advance</a>,
+    <a href="../reference/glossary.html#retraction">retraction</a>,
+    <a href="../reference/glossary.html#drying">drying</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>Advanced calibration</i>. The index of Prusa's own calibration
+    procedures, split per printer model.
+    <a href="https://help.prusa3d.com/category/advanced-calibration_229" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">This course. <i>Master tuning guide</i>, §2 — the fixed calibration order, and the caveat
+    that advance must be tuned at production accelerations and speeds.
+    <a href="../reference/source-material/prusaslicer-profile-tuning.md">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0003-what-the-slicer-decides.html">
+      <div class="dir">← Previous · L3</div>
+      <div class="ttl">What the slicer decides</div>
+    </a>
+    <a class="next" href="0005-selftest-and-health-check.html">
+      <div class="dir">Next · L5 · Phase 1</div>
+      <div class="ttl">Selftest and the health check →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L4 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Calibration Card · prusa-profile-tuning</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Reference · print it · pin it by the printers</p>
+  <h1 class="lesson-title">The Calibration Card</h1>
+  <p class="lesson-sub">Every target number in the course on one page. Phase 1 is complete; Phases 2 and 3
+  fill in as those lessons land.</p>
+  <div class="lesson-meta">
+    <span>🖨 Designed to print</span><span class="sep">•</span>
+    <span>↻ Grows with each phase</span><span class="sep">•</span>
+    <span class="tag accent">Reference</span>
+  </div>
+
+  <div class="callout key">
+    <div class="callout-label">▲ Never mix these two</div>
+    <p><b>MK3S = Marlin.</b> Linear Advance, <code>M900 K</code>, values ~0.02–0.08 for a 0.4 nozzle.<br>
+    <b>MK4 / Core One = Buddy.</b> Pressure Advance, <code>M572 S</code>.<br>
+    Different features, different scales, no conversion between them. One profile per printer family.</p>
+  </div>
+
+  <h2><span class="num">1</span>The order — never out of sequence</h2>
+
+  <table>
+    <caption>Changing any step voids every measurement below it.</caption>
+    <thead><tr><th class="num">#</th><th>Step</th><th>Why it sits here</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td><b>The machine</b> (Phase 1)</td><td>Everything below measures filament <em>plus</em> machine</td></tr>
+      <tr><td class="num">1</td><td>Temperature</td><td>Sets viscosity — moves every number below it</td></tr>
+      <tr><td class="num">2</td><td>Extrusion multiplier</td><td>Measured at the temperature just fixed</td></tr>
+      <tr><td class="num">3</td><td>Pressure / Linear Advance</td><td>Pressure depends on viscosity and flow</td></tr>
+      <tr><td class="num">4</td><td>Retraction</td><td>Ooze depends on residual pressure, which advance changed</td></tr>
+      <tr><td class="num">5</td><td>Cooling</td><td>Modifies temperature's effect after the nozzle</td></tr>
+      <tr><td class="num">6</td><td>Max volumetric speed</td><td>Depends on temperature; silently clamps speeds</td></tr>
+      <tr><td class="num">7</td><td>Speeds and accelerations</td><td>Bounded by all of the above — and can send you back to 3</td></tr>
+    </tbody>
+  </table>
+
+  <p><b>The one legitimate loop back:</b> advance must be tuned at production accelerations. Print the
+  advance tower with your real quality profile loaded, not a slow one.</p>
+
+  <h2><span class="num">2</span>Phase 1 targets, per machine</h2>
+
+  <table>
+    <caption>Belt tension. Three machines, three units — the numbers do not transfer.</caption>
+    <thead><tr><th>&nbsp;</th><th>MK3S</th><th>MK4 / MK4S</th><th>Core One</th></tr></thead>
+    <tbody>
+      <tr><td>Measure</td><td><code>Calibration → Belt test</code><br>read at <code>Support → Belt status</code></td><td>by feel — no number reported</td><td><code>Settings → Manual Belt Tuning</code> (fw 6.4.0+)<br>or strum + phone tuner</td></tr>
+      <tr><td>Target</td><td>X ≈ <b>250</b> · Y ≈ <b>275</b> (±15)</td><td>low bass string when plucked</td><td>both belts <b>90–98 Hz</b></td></tr>
+      <tr><td>Tolerance</td><td>under 240 → <b>loosen</b><br>over 290 → <b>tighten</b></td><td>pinchable, with resistance</td><td>the two within <b>8 Hz</b> of each other</td></tr>
+      <tr><td>Direction</td><td><b>lower = tighter</b></td><td>—</td><td>tighten bolts <b>evenly and alternately</b></td></tr>
+      <tr><td>Verify</td><td>re-run <code>Calibrate XYZ</code>, read skew</td><td>cube at high accel, look for ghosting</td><td>circles round, not oval</td></tr>
+    </tbody>
+  </table>
+
+  <table>
+    <caption>Selftest, first layer, thermal and motion.</caption>
+    <thead><tr><th>&nbsp;</th><th>MK3S</th><th>MK4 / MK4S</th><th>Core One</th></tr></thead>
+    <tbody>
+      <tr><td>Selftest</td><td><code>Calibration → Selftest</code></td><td colspan="2"><code>Control → Calibrations &amp; tests</code></td></tr>
+      <tr><td>Probe</td><td>PINDA — senses the sheet</td><td colspan="2">Loadcell — senses the nozzle</td></tr>
+      <tr><td>First layer</td><td><code>Calibration → First layer calibration</code><br><b>manual, per sheet</b></td><td colspan="2"><b>automatic before every print</b><br>(loadcell selftest step must be done)</td></tr>
+      <tr><td>Z adjust</td><td><code>Settings → Live adjust Z</code><br>range −1.500 … −0.200<br>CCW = closer · <b>persists</b></td><td colspan="2">long-press knob during first layer<br><b>does not persist</b><br>persistent: <code>Printer Settings → General → Z offset</code></td></tr>
+      <tr><td>Thermal</td><td><code>Calibration → PID calibration</code><br><code>Calibration → Temp Model cal</code></td><td colspan="2">no user calibration — observe 1 min at 100 % fan and log</td></tr>
+      <tr><td>Input Shaper</td><td>none</td><td colspan="2">stock values fine; frequency must read <b>35–70 Hz</b></td></tr>
+      <tr><td>Extras</td><td>linearity correction:<br><code>Settings → Lin.Correction → E correct</code><br>(only if you see diagonal moiré)</td><td>—</td><td>record door + vent state<br>observe thermals hot <em>and</em> cold</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout note">
+    <div class="callout-label">⌁ Diagnostic thresholds worth memorising</div>
+    <p><b>Hotend swing ≤ ±5 °C</b> → PID tuning. <b>&gt; ±5 °C</b> → fan, thermistor or connector fault, not
+    tuning.<br>
+    <b>Input Shaper frequency outside 35–70 Hz</b> → go back to belts and assembly.<br>
+    <b>MK3S axis-length error</b> → suspect belt tension before suspecting the axis.<br>
+    <b>Defect varies by position on the plate</b> → bed shape, not Z offset.<br>
+    <b>Defect appears partway up the print</b> → not belts; look at chamber heat or accumulated mass.</p>
+  </div>
+
+  <h2><span class="num">3</span>The health check</h2>
+  <div class="checklist-widget">
+    <div class="cl-title">✓ Per printer — now, and after any hardware change</div>
+    <ul class="checklist">
+      <li data-check>Firmware current and version recorded</li>
+      <li data-check>Selftest passed</li>
+      <li data-check>MK3S: Calibrate XYZ run, skew recorded · MK4/Core One: loadcell step done</li>
+      <li data-check>Belt tension measured and in spec</li>
+      <li data-check>First layer calibrated — per sheet</li>
+      <li data-check>Thermal stability confirmed</li>
+      <li data-check>MK4/Core One: Input Shaper frequency inside 35–70 Hz</li>
+      <li data-check>Nozzle size and rough age recorded</li>
+      <li data-check>Test cube printed at production acceleration and judged</li>
+      <li data-check>Everything above written into <code>tuning-log.md</code> with a date</li>
+    </ul>
+    <div class="checklist-bar"><span>Tick as you go</span><span data-checklist-progress></span></div>
+  </div>
+
+  <h2><span class="num">4</span>The arithmetic</h2>
+  <div class="codefig">
+    <div class="difflabel">The extrusion equation</div>
+    <pre><code>volumetric flow (mm³/s) = layer height × extrusion width × print speed
+
+<span class="c"># rearranged, to find the speed that saturates a given flow</span>
+speed = flow ÷ (layer height × extrusion width)
+
+<span class="c"># extrusion multiplier, from a measured single wall</span>
+new EM = current EM × (nominal wall width ÷ measured wall width)
+
+<span class="c"># total flow is the product of two independent scalars</span>
+total flow = M221 (firmware, %) × extrusion multiplier (slicer)</code></pre>
+  </div>
+
+  <table>
+    <caption>Practical flow ceilings, 0.4 mm nozzle — starting figures, to be replaced by measurements.</caption>
+    <thead><tr><th>Machine</th><th class="num">mm³/s</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>MK3S</td><td class="num">~11–13</td><td>the slow machine — accept 45–60 mm/s perimeters</td></tr>
+      <tr><td>MK4</td><td class="num">~15–20</td><td>MK4S / high-flow nozzle: 22–28</td></tr>
+      <tr><td>Core One</td><td class="num">~22–28</td><td>MK4S-class hotend</td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="num">5</span>Method rules</h2>
+  <table>
+    <caption>The habits, compressed.</caption>
+    <thead><tr><th>Rule</th><th>Because</th></tr></thead>
+    <tbody>
+      <tr><td><b>One variable</b> between two test prints</td><td>Two changes give a result you can't attribute — worse than none, because it feels like data</td></tr>
+      <tr><td><b>Banded test prints</b> over separate prints</td><td>Same spool, nozzle, hour and humidity — only the variable differs</td></tr>
+      <tr><td><b>Dry the filament first</b></td><td>Moisture makes prints non-reproducible, which corrupts temp, flow and retraction at once</td></tr>
+      <tr><td><b>Tune advance at production speed</b></td><td>A slow-test value over-compensates and starves corners at real speed</td></tr>
+      <tr><td><b>Delete test G-code afterwards</b></td><td>It lives in the <em>printer</em> profile and keeps firing on unrelated prints forever</td></tr>
+      <tr><td><b>Log printer, spool, colour, date</b></td><td>Pigment changes flow within a brand; an unlogged number is indistinguishable from a guess</td></tr>
+      <tr><td><b>Snap the part to judge bonding</b></td><td>Granular fracture = fused. Clean plane along a layer = laminated. Surface tells you nothing</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout note">
+    <div class="callout-label">⌁ Still to come</div>
+    <p>Phase 2 will add the per-material starting tables and the custom G-code blocks for temperature, PA/LA
+    and MVS towers. Phase 3 will add profile naming, <code>compatible_printers_condition</code> patterns and
+    the sign-off criteria. Until then, the Phase 2 numbers live in
+    <a href="source-material/prusaslicer-profile-tuning.md">the original guide</a> §4.</p>
+  </div>
+
+  <p class="pagefoot">The Calibration Card · <a href="../index.html">all lessons</a> ·
+    <a href="glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

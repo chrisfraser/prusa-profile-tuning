@@ -1,0 +1,9 @@
+.claude/
+.DS_Store
+.AppleDouble
+.LSOverride
+*.log
+*~
+.idea/
+.vscode/
+Thumbs.db

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L7 · First layer and Z-offset</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 1 · The machine · L7</p>
+  <h1 class="lesson-title">First layer and Z-offset</h1>
+  <p class="lesson-sub">The one measurement where your MK3S and your MK4 are not doing remotely the same
+  thing — one senses metal, the other senses touch.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~25 minutes on the machine</span><span class="sep">•</span>
+    <span>🖨 One calibration print per sheet</span><span class="sep">•</span>
+    <span class="tag accent">Phase 1</span>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>The first layer is the reference every subsequent layer is stacked on. Get it wrong and you get
+    adhesion failures, elephant foot, and dimensional error in Z on every part — none of which any filament
+    setting can rescue. It is also the last thing standing between you and Phase 2 that varies <em>per
+    sheet</em> rather than per machine, so it is the item on the health check most likely to drift without
+    you noticing. And it is the clearest example in this whole course of why the per-machine split exists:
+    your three printers use two genuinely different sensing technologies with two different procedures.</p>
+  </div>
+
+  <p>Two independent things have to be right, and conflating them is the usual source of confusion:</p>
+
+  <ul class="steps">
+    <li><span class="step-title">Shape — <a href="../reference/glossary.html#mesh-bed-levelling">mesh bed levelling</a></span>
+      <span class="step-detail">The bed is never perfectly flat. The printer probes a grid of points before
+      each print and warps the first layer to follow the surface. This is automatic on all three of your
+      machines and it compensates for <em>shape</em>.</span></li>
+    <li><span class="step-title">Height — the Z offset</span>
+      <span class="step-detail">How far the nozzle sits above the sheet, everywhere. Mesh levelling cannot
+      fix this, because a surface offset by a constant is still the same shape. This is the number you set,
+      and how you set it depends entirely on your probe.</span></li>
+  </ul>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>Two probes, two philosophies</h2>
+
+  <table>
+    <caption>Why the procedure is not shared.</caption>
+    <thead><tr><th>&nbsp;</th><th><a href="../reference/glossary.html#pinda">PINDA</a> — MK3S</th><th><a href="../reference/glossary.html#loadcell">Loadcell</a> — MK4, Core One</th></tr></thead>
+    <tbody>
+      <tr><td>Senses</td><td>metal, inductively, from a distance</td><td>force — the nozzle physically touching</td></tr>
+      <tr><td>Knows where the nozzle is?</td><td><b>No.</b> It knows where the probe is</td><td><b>Yes.</b> The nozzle is the sensor</td></tr>
+      <tr><td>Nozzle-to-sheet distance</td><td>set manually, stored, reused</td><td>measured automatically before every print</td></tr>
+      <tr><td>Drifts with temperature</td><td>yes — the probe body expands</td><td>no</td></tr>
+      <tr><td>Manual calibration needed</td><td><b>yes, per sheet</b></td><td>no<span class="cite"><a href="#r1">1</a></span></td></tr>
+    </tbody>
+  </table>
+
+  <p>That third row is the whole difference. The PINDA tells the MK3S how far the <em>probe</em> is from the
+  steel sheet. Nobody has told it how far the <em>nozzle tip</em> is below the probe — that gap is what
+  <a href="../reference/glossary.html#live-adjust-z">Live Adjust Z</a> stores, and it changes when you swap
+  sheets, swap nozzles, or knock the probe.</p>
+
+  <p>The loadcell sidesteps the problem entirely by making the nozzle its own sensor. Prusa are explicit:
+  with the loadcell, manual first layer calibration is not necessary, because the value is checked
+  automatically before every print; the only adjustment it needs is during the
+  selftest.<span class="cite"><a href="#r1">1</a></span></p>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>Do it — on your machine</h2>
+
+  <p><b>Open your machine — only yours.</b></p>
+
+  <details class="panel">
+    <summary>MK3S · Live Adjust Z, per sheet, stored</summary>
+    <div class="panel-body">
+      <p><b>Run the calibration print:</b> <code>LCD → Calibration → First layer calibration</code>. It prints
+      a zig-zag pattern and lets you adjust live while it runs.</p>
+      <p><b>To adjust:</b> <code>LCD → Live adjust Z</code> while printing, or
+      <code>LCD → Settings → Live adjust Z</code> beforehand. Long-pressing the knob during the first layers
+      is the quick route.<span class="cite"><a href="#r2">2</a></span></p>
+      <div class="callout key">
+        <div class="callout-label">▲ Which way is which</div>
+        <p><b>Counter-clockwise → more negative → nozzle closer to the sheet.</b><br>
+        <b>Clockwise → less negative → nozzle further away.</b><br>
+        Typical values land between <b>−1.500 and −0.200</b>.<span class="cite"><a href="#r2">2</a></span>
+        Adjustments made during a print are saved and persist after power-down — so if you nudge it to
+        rescue one print, you have changed it for every future print on that sheet.<span class="cite"><a href="#r2">2</a></span></p>
+      </div>
+      <p><b>Do this once per sheet.</b> A textured sheet, a satin sheet and a smooth sheet have different
+      thicknesses and different surfaces; the offset is not shared between them. Log a value per sheet in
+      <code>tuning-log.md</code>, and re-check after any nozzle change.</p>
+      <p><b>PINDA temperature drift is real.</b> The probe reads slightly differently cold versus fully
+      heat-soaked. Calibrate on a printer that has been up to temperature for a few minutes, not on one you
+      just switched on.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>MK4 / MK4S · automatic, with a temporary override</summary>
+    <div class="panel-body">
+      <p><b>The short version: there is nothing to calibrate.</b> Provided the loadcell step of the selftest
+      completed (Lesson 5), first layer height is measured automatically during mesh bed levelling before
+      every print.<span class="cite"><a href="#r1">1</a></span></p>
+      <p><b>To nudge it during a print:</b> long-press the knob while the first layer is printing. Note the
+      important asymmetry with the MK3S — on a loadcell machine <b>this adjustment is not saved for the next
+      print</b>.<span class="cite"><a href="#r2">2</a></span> It rescues the print in front of you and
+      nothing more.</p>
+      <p><b>To change it persistently:</b> PrusaSlicer, <code>Printer Settings → General → Z
+      offset</code>.<span class="cite"><a href="#r2">2</a></span> Reach for this only when you have a
+      consistent reason — a sheet you always want slightly different, for instance — and log it, because it
+      is now a per-profile value that will silently follow that printer profile around.</p>
+      <p><b>If the automatic result is consistently wrong</b>, that is a loadcell problem, not an offset
+      problem. Re-run the loadcell step of the selftest, check the nozzle is clean and cold-wiped, and see
+      Prusa's <a href="https://help.prusa3d.com/article/loadcell-troubleshooting_815397" target="_blank" rel="noopener">Loadcell troubleshooting</a>.
+      Don't paper over it with a Z offset.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Core One · as MK4, plus the enclosure</summary>
+    <div class="panel-body">
+      <p><b>Identical to the MK4 family</b> — loadcell, automatic per-print measurement, long-press to nudge
+      the current print only, <code>Printer Settings → General → Z offset</code> for a persistent
+      change.<span class="cite"><a href="#r1">1</a><a href="#r2">2</a></span></p>
+      <p><b>What differs is the thermal environment.</b> A first layer calibrated in a cold chamber and a
+      first layer laid down in a chamber that has been running PETG for an hour are not the same
+      measurement — the bed, the sheet and the frame have all grown. Two consequences:</p>
+      <ul>
+        <li>Calibrate and judge under the door/vent state you actually print that material in. Record which
+        state, as you did in Lesson 5.</li>
+        <li>If a Core One first layer looks right at the start of a print and changes character by the time
+        it reaches the far corner, suspect thermal expansion in the enclosure before suspecting the
+        offset.</li>
+      </ul>
+    </div>
+  </details>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>Judging it — the only skill that transfers</h2>
+
+  <p>Whichever machine you're on, the judgement is the same and it is worth more than any of the procedures
+  above. Look at the calibration square with a bright light at a low angle.</p>
+
+  <div class="compare">
+    <figure class="before">
+      <div class="difflabel">Too high — nozzle far</div>
+      <pre><code><span class="c"># what you see</span>
+lines round in section
+visible gaps between them
+you can pick at an edge
+corners lift as it cools
+
+<span class="c"># what it causes</span>
+<span class="hl">adhesion failure
+weak bottom layers</span></code></pre>
+    </figure>
+    <figure class="after">
+      <div class="difflabel">Too low — nozzle close</div>
+      <pre><code><span class="c"># what you see</span>
+ridged, ploughed surface
+lines squeezed wide, uneven
+translucent thin patches
+material piling at turns
+
+<span class="c"># what it causes</span>
+<span class="hl">elephant foot
+clogs, Z dimension error</span></code></pre>
+    </figure>
+  </div>
+
+  <p><b>Right</b> is between them: a smooth, continuous, slightly glossy surface with no gaps and no ridges,
+  where individual lines have merged into a single sheet but you can still just make out where they are. It
+  should come off the sheet as one piece, and the underside should be uniform.</p>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ PETG needs a different first layer to PLA</div>
+    <p>Two things change, and both come from your own guide rather than a Prusa KB article. First,
+    <b>PETG bonds to bare smooth PEI hard enough to tear the coating off the sheet</b> — use a glue-stick
+    separator, or print it on satin/textured. Second, <b>reduce the squish</b> relative to PLA: on the MK3S,
+    Live Z one or two notches <em>further away</em>. Because Live Adjust Z is a per-sheet machine setting
+    rather than a per-filament one, this is a note in your log and a manual step, not something the profile
+    can do for you.</p>
+  </div>
+
+  <!-- ===== INTERACTIVE WIDGET ===== -->
+  <h2><span class="num">4</span>Read the first layer</h2>
+  <p>Click each observation. Decide first whether it's height, shape, adhesion or something else entirely.</p>
+  <div class="faultfinder">
+    <div class="ff-q">Height, shape, or not the first layer at all?</div>
+    <ul class="ff-list">
+      <li class="ff-item"
+          data-cause="Height, and too high. The lines never got squashed into each other, so they stayed round in cross-section and never fused side to side."
+          data-fix="MK3S: Live Adjust Z counter-clockwise, a notch at a time, while the calibration print runs. MK4/Core One: this shouldn't happen — re-run the loadcell selftest step rather than dialling in an offset.">Round separated lines you can pick apart with a fingernail<span class="ff-tag">Too high</span></li>
+      <li class="ff-item"
+          data-cause="Height, and too low. Excess material has nowhere to go, so it piles into ridges and the nozzle ploughs through what it just laid down. Thin translucent patches are where it scraped material away."
+          data-fix="Back off — clockwise on the MK3S. Left alone this also produces elephant foot and a part that is short in Z by a measurable amount.">Ridged surface with thin translucent patches<span class="ff-tag">Too low</span></li>
+      <li class="ff-item"
+          data-cause="Shape, not height. A constant offset can't be right in the middle and wrong at the edges — that's the bed's surface profile, which is mesh bed levelling's job, not the Z offset's."
+          data-fix="Re-run mesh bed levelling, check the sheet is clean and seated flat with nothing under it, and check the bed mounting screws. Chasing this with Live Adjust Z will only trade one bad region for another.">Perfect in the centre, too high at the front-left corner<span class="ff-tag">Shape</span></li>
+      <li class="ff-item"
+          data-cause="Neither — that's PETG doing what PETG does on bare smooth PEI. It bonds to the coating hard enough to take some of it with the part."
+          data-fix="Use a glue-stick separator or switch to a satin or textured sheet, and reduce the squish slightly versus PLA. Do this before you damage the sheet further; the coating doesn't grow back.">PETG print won't release, and the sheet coating is marked<span class="ff-tag">Material</span></li>
+      <li class="ff-item"
+          data-cause="Thermal. On the MK3S the PINDA reads differently as it heat-soaks, so a cold-start calibration doesn't describe a warm machine. On the Core One, chamber heat expands the bed, sheet and frame."
+          data-fix="Calibrate on a machine that has been at temperature for a few minutes, in the door and vent state you actually print that material in — and record which state that was.">First layer is fine cold, different after 20 minutes<span class="ff-tag">Thermal</span></li>
+    </ul>
+    <div class="ff-panel"><div class="ff-cause"></div><div class="ff-fix"></div></div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">5</span>Check yourself</h2>
+  <p>From memory. Question 2 catches almost everyone once.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read section 1.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">Why does the MK3S need a manual Z offset when the MK4 doesn't?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. PINDA senses the sheet, not the nozzle, so the probe-to-nozzle gap has to be supplied by hand. The loadcell is the nozzle, so there's no gap to supply.">Its probe senses the sheet rather than the nozzle</button>
+      <button class="opt" data-feedback="Its bed is no less flat than the MK4's, and both machines run mesh bed levelling to handle shape. The difference is height sensing, not flatness.">Its bed is less flat and needs more compensation</button>
+      <button class="opt" data-feedback="Marlin versus Buddy changes which commands the printer accepts, but the reason for the manual step is the probe hardware, not the firmware running it.">Its firmware cannot store an offset automatically</button>
+      <button class="opt" data-feedback="It is an older machine, but age isn't the mechanism — an inductive probe simply cannot know where the nozzle tip is, at any age.">Its design predates automatic first-layer measurement</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes — and that catches people out." data-explain-wrong="Re-read the MK4 panel.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">You long-press the knob and nudge Z during a print. On which machines does that stick?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. On the MK3S it's saved and persists after power-down; on loadcell machines it applies to the current print only.">MK3S only — the loadcell machines forget it</button>
+      <button class="opt" data-feedback="It's the same gesture on all three, which is exactly why the difference in what it does is easy to miss. On the MK4 and Core One the nudge is temporary.">All three — the gesture is identical on each</button>
+      <button class="opt" data-feedback="That's backwards. The loadcell machines re-measure before every print, so an in-print nudge has nothing persistent to write itself into.">MK4 and Core One — the MK3S forgets it</button>
+      <button class="opt" data-feedback="None would mean the MK3S's Live Adjust Z did nothing lasting, which would make per-sheet calibration impossible. It does persist there.">None — the value resets on the next power cycle</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read the two-things list at the top.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">Your first layer is perfect centrally and too high in one corner. What's wrong?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. A single offset applies everywhere equally, so it cannot be right in one place and wrong in another. That's a surface-shape problem.">The bed's shape, which mesh levelling should handle</button>
+      <button class="opt" data-feedback="The offset is a constant — it shifts the whole layer up or down together. Adjusting it would fix the corner and break the centre.">The Z offset, which needs a small adjustment down</button>
+      <button class="opt" data-feedback="A worn nozzle changes extrusion width and flow everywhere at once, not in one corner. Geometry that varies by position points at the bed.">The nozzle, which is worn and extruding unevenly</button>
+      <button class="opt" data-feedback="Filament affects how a first layer looks, but not how it varies across the plate. Position-dependent defects are almost always mechanical.">The filament, which is absorbing moisture unevenly</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Calibrate and photograph a first layer</h3>
+    <p>On the machine you've been working through Phase 1 with, print a first-layer test — the MK3S's built-in
+    calibration, or a 60 × 60 mm single-layer square on the MK4 and Core One. Then:</p>
+    <ol>
+      <li>Photograph it under a bright light at a low angle. Low angle matters — flat lighting hides
+      everything.</li>
+      <li>Write down your verdict <b>before</b> you send it: too high, too low, or right — and which specific
+      feature in the photo you're basing that on.</li>
+      <li>Log the values. <b>MK3S:</b> the Live Adjust Z value <em>and which sheet</em>. <b>MK4 / Core
+      One:</b> confirmation that it was automatic, plus any Z offset you've set in PrusaSlicer and why.</li>
+      <li>Repeat for each sheet you own. This is the only Phase 1 item that is per-sheet rather than per
+      machine.</li>
+    </ol>
+    <p class="go">→ Paste the photo and your verdict. I'll tell you whether I agree — and more usefully,
+    whether the feature you based it on is the one I'd have used.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>Shape and height are separate problems.</strong> Mesh levelling fixes shape; the Z offset
+      fixes height; neither substitutes for the other.</li>
+      <li><strong>PINDA senses the sheet, the loadcell senses the nozzle</strong> — which is why one needs a
+      manual offset and the other doesn't.</li>
+      <li><strong>An in-print nudge persists on the MK3S and evaporates on the MK4 and Core One.</strong></li>
+      <li><strong>Too high gives round separated lines; too low gives ridges and thin patches.</strong>
+      Judge under a low-angle light.</li>
+      <li><strong>The offset is per sheet, not per machine</strong> — and PETG wants less squish than PLA,
+      plus a separator on smooth PEI.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/article/live-adjust-z_112427" target="_blank" rel="noopener">Live adjust Z — Prusa Knowledge Base</a></div>
+      <div class="desc">Short, with the photographs of good and bad first layers that no written description
+      replaces. Read the PINDA and loadcell sections both, even though only one applies to you — knowing what
+      the other machine does is how you avoid applying its procedure by accident.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> First layer is the most photograph-able thing in this course,
+    so send pictures. If you're between two verdicts, send it anyway and say which two — being uncertain
+    about the right things is more useful than being confidently wrong. Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#live-adjust-z">Live Adjust Z</a>,
+    <a href="../reference/glossary.html#pinda">PINDA</a>,
+    <a href="../reference/glossary.html#loadcell">loadcell</a>,
+    <a href="../reference/glossary.html#mesh-bed-levelling">mesh bed levelling</a>,
+    <a href="../reference/glossary.html#build-plate">build plate</a>,
+    <a href="../reference/glossary.html#selftest">selftest</a>,
+    <a href="../reference/glossary.html#tuning-log">tuning log</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>Loadcell (MK4/S, MK3.9/S, XL)</i>. Manual first layer calibration is not
+    necessary with the loadcell — values are checked automatically before each print, and the only
+    adjustment needed is during the selftest.
+    <a href="https://help.prusa3d.com/article/loadcell-mk4-s-mk3-9-s-xl_401253" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">Prusa Research. <i>Live adjust Z</i>. The MK3/S/+ and MK4/S menu paths, the −1.500 to −0.200
+    typical range, the counter-clockwise-is-closer convention, that adjustments made during printing persist
+    after power-down on PINDA machines, that the loadcell equivalent is not saved for the next print, and the
+    PrusaSlicer <code>Printers → General → Z offset</code> route.
+    <a href="https://help.prusa3d.com/article/live-adjust-z_112427" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r3">This course. <i>Master tuning guide</i>, §4 — PETG on smooth PEI needs a separator, and wants
+    slightly less first-layer squish than PLA. Community-derived; see <code>RESOURCES.md § Gaps</code>.
+    <a href="../reference/source-material/prusaslicer-profile-tuning.md">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0006-belt-tension-and-squareness.html">
+      <div class="dir">← Previous · L6</div>
+      <div class="ttl">Belt tension and squareness</div>
+    </a>
+    <a class="next" href="0008-thermal-and-motion-trust.html">
+      <div class="dir">Next · L8</div>
+      <div class="ttl">Thermal and motion trust →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L7 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

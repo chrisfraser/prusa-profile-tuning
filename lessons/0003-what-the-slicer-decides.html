@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L3 · What the slicer actually decides</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 0 · Fundamentals · L3</p>
+  <h1 class="lesson-title">What the slicer actually decides</h1>
+  <p class="lesson-sub">One equation with three terms, and the reason "print faster" quietly becomes "melt
+  more per second".</p>
+  <div class="lesson-meta">
+    <span>⏱ ~15 minutes</span><span class="sep">•</span>
+    <span>🧠 Builds on L1–L2</span><span class="sep">•</span>
+    <span class="tag accent">Fundamentals</span>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-label">⏩ Already know this?</div>
+    <p>This lesson covers what a slicer produces, reading G-code, the extrusion equation
+    <code>flow = height × width × speed</code>, and why max volumetric speed clamps everything else. If
+    that's already yours, <a href="0005-selftest-and-health-check.html">skip straight to Phase 1 →</a></p>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>Every remaining lesson in this course is a number you will type into PrusaSlicer. This is the lesson
+    that makes those numbers mean something physical instead of being knobs. Get the extrusion equation and
+    you can predict, before you press print, whether a speed you just set is inside your machine's melting
+    capacity — which is the difference between tuning and guessing. It's also how you'll read the results of
+    the max volumetric speed test in Lesson 14 rather than eyeballing them.</p>
+  </div>
+
+  <p>PrusaSlicer's job is narrow. It takes a solid model and produces a text file of movement instructions.
+  It decides <em>where</em> the nozzle goes, <em>how fast</em>, and <em>how much filament to push while it
+  gets there</em>. Everything you tune is one of those three.</p>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>G-code is a list of moves, and you can read it</h2>
+
+  <p>Slice anything and look at the output. Almost all of it is one command:</p>
+
+  <div class="codefig">
+    <div class="difflabel">A single extruding move</div>
+    <pre><code><span class="k">G1</span> <span class="f">X</span><span class="n">120.5</span> <span class="f">Y</span><span class="n">98.2</span> <span class="f">E</span><span class="n">1.842</span> <span class="f">F</span><span class="n">2700</span>
+<span class="c">;      ^ go here     ^ push this much  ^ at this speed</span></code></pre>
+  </div>
+
+  <p>Four things worth internalising:</p>
+
+  <ul>
+    <li><code>X</code>/<code>Y</code>/<code>Z</code> are millimetres of <em>position</em>.</li>
+    <li><code>E</code> is millimetres of <em>filament consumed</em> — length of 1.75 mm stock, not length of
+    deposited line. This is what the <a href="../reference/glossary.html#extrusion-multiplier">extrusion
+    multiplier</a> scales.</li>
+    <li><code>F</code> is feedrate in <b>mm per minute</b>, not per second. The slicer says 45 mm/s; the
+    G-code says <code>F2700</code>. Divide by 60.</li>
+    <li>A move with no <code>E</code> is a <b>travel</b> — the nozzle is moving without extruding, which is
+    exactly when it wants to ooze. That's what <a href="../reference/glossary.html#retraction">retraction</a>
+    exists for.</li>
+  </ul>
+
+  <p>Some commands are settings rather than moves, and these are the ones this course will have you writing
+  by hand in Phase 2:</p>
+
+  <table>
+    <caption>The G-code you'll actually type. Note the split by firmware family.</caption>
+    <thead><tr><th>Command</th><th>Does</th><th>Where</th></tr></thead>
+    <tbody>
+      <tr><td><code>M104 S220</code></td><td>set nozzle temperature, don't wait</td><td>all three printers</td></tr>
+      <tr><td><code>M221 S95</code></td><td>firmware flow multiplier, in %</td><td>all three printers</td></tr>
+      <tr><td><code>M220 S150</code></td><td>feedrate override, in %</td><td>all three printers</td></tr>
+      <tr><td><code>M900 K0.04</code></td><td>set <a href="../reference/glossary.html#linear-advance">Linear Advance</a></td><td><b>MK3S only</b> (Marlin)</td></tr>
+      <tr><td><code>M572 S0.045</code></td><td>set <a href="../reference/glossary.html#pressure-advance">Pressure Advance</a></td><td><b>MK4 / Core One only</b> (Buddy)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ K and S are not the same scale</div>
+    <p>An MK3S <code>M900 K</code> value and an MK4 <code>M572 S</code> value both compensate for melt-zone
+    pressure, and they are <em>not interchangeable numbers</em>. Pressure Advance replaced Linear Advance on
+    the MK4 family from firmware 5.0.0.<span class="cite"><a href="#r1">1</a></span> Copying 0.05 from one to
+    the other is the single most expensive mistake available in this course, because the print will still
+    <em>work</em> — just slightly wrong, everywhere, forever.</p>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>The extrusion equation</h2>
+
+  <p>The slicer computes each <code>E</code> value from a simple physical picture. An extruded line is
+  approximately a rectangle in cross-section: as tall as the
+  <a href="../reference/glossary.html#layer-height">layer height</a>, as wide as the
+  <a href="../reference/glossary.html#extrusion-width">extrusion width</a>. Move that cross-section along at
+  some speed and you get a volume per second:</p>
+
+  <div class="codefig">
+    <div class="difflabel">The whole course, in one line</div>
+    <pre><code>volumetric flow (mm³/s)  =  layer height  ×  extrusion width  ×  print speed
+                              <span class="c">(mm)</span>              <span class="c">(mm)</span>            <span class="c">(mm/s)</span></code></pre>
+  </div>
+
+  <p>Two things follow immediately, and both are counter-intuitive enough to be worth stating out loud.</p>
+
+  <p><b>First: extrusion width is not nozzle diameter.</b> A 0.4 mm nozzle typically lays a ~0.45 mm wide
+  line, because the plastic is squashed against the layer below. PrusaSlicer sets it per feature type and
+  you read the real value at <code>Print Settings → Advanced → Extrusion width</code>. You'll need that
+  exact number in Lesson 10 — using 0.4 there will hand you a wrong extrusion multiplier that <em>looks</em>
+  right.</p>
+
+  <p><b>Second: mm/s is a dishonest unit for speed.</b> Consider two prints:</p>
+
+  <table>
+    <caption>Same speed. Nearly double the demand on the hotend.</caption>
+    <thead><tr><th>&nbsp;</th><th class="num">Layer</th><th class="num">Width</th><th class="num">Speed</th><th class="num">Flow</th></tr></thead>
+    <tbody>
+      <tr><td>Fine detail print</td><td class="num">0.15</td><td class="num">0.45</td><td class="num">100</td><td class="num">6.75 mm³/s</td></tr>
+      <tr><td>Draft print</td><td class="num">0.25</td><td class="num">0.45</td><td class="num">100</td><td class="num">11.25 mm³/s</td></tr>
+    </tbody>
+  </table>
+
+  <p>Both say "100 mm/s". One asks the hotend for two-thirds more plastic per second than the other. The
+  MK3S, with its ~11–13 mm³/s ceiling, is comfortable in the first row and at its limit in the second — same
+  number on the slider. This is why the honest unit for "how fast is this printing" is
+  <a href="../reference/glossary.html#volumetric-flow-rate">mm³/s</a>, and why every hotend comparison in
+  this course is quoted that way.</p>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>The ceiling, and what happens when you hit it</h2>
+
+  <p><a href="../reference/glossary.html#max-volumetric-speed">Max volumetric speed</a> (MVS) is a
+  per-filament setting at <code>Filament Settings → Advanced → Max volumetric speed</code>. It is a hard cap:
+  PrusaSlicer will silently slow any move whose speed would exceed it.</p>
+
+  <p>That word <em>silently</em> is the trap. If you set 150 mm/s perimeters and MVS is 8 mm³/s, you do not
+  get an error. You get 150 in the settings box, something much slower in the G-code, and a print time that
+  makes no sense. And in the opposite case — MVS left at a permissive default while you raise speeds — you
+  get the failure from Lesson 1: plastic arriving faster than the melt zone can heat it, walls going matte,
+  thin and weak, with no warning at all.</p>
+
+  <div class="callout key">
+    <div class="callout-label">▲ The order this forces</div>
+    <p>MVS is measured <em>before</em> speeds are set, in Lesson 14, not after. Set speeds first and you're
+    tuning numbers that a cap you haven't measured yet may already be overriding. This is the first concrete
+    example of the <a href="../reference/glossary.html#calibration-order">calibration order</a> — and Lesson
+    4 is entirely about why that order is not negotiable.</p>
+  </div>
+
+  <p>Finally, the equation cuts the other way too, and this is the practical trick worth remembering: to
+  print faster without asking more of the hotend, <b>raise layer height rather than speed</b>. Going from
+  0.15 mm to 0.25 mm layers at the same speed prints a given object in roughly 40 % less time — but it also
+  raises flow by two-thirds, so you have to check the equation, not just the clock.</p>
+
+  <!-- ===== INTERACTIVE WIDGET ===== -->
+  <h2><span class="num">4</span>Do the arithmetic before you look</h2>
+  <p>Work each one out on paper first — actually compute it. Retrieval is the point; reading the answer
+  teaches nothing.</p>
+
+  <details class="panel">
+    <summary>Your MK3S at 0.20 mm layers, 0.45 mm width, 45 mm/s perimeters. What flow, and is it safe?</summary>
+    <div class="panel-body">
+      <p><code>0.20 × 0.45 × 45 = <b>4.05 mm³/s</b></code></p>
+      <p>Comfortably inside the MK3S's ~11–13 mm³/s ceiling — roughly a third of it. Perimeter speed is
+      almost never what saturates a hotend; infill is. Which is exactly why external perimeter speed is free
+      to be slow: you're spending time you weren't going to spend melting anyway.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Same machine, 0.20 mm, 0.45 mm, but infill at 200 mm/s. Now what?</summary>
+    <div class="panel-body">
+      <p><code>0.20 × 0.45 × 200 = <b>18 mm³/s</b></code></p>
+      <p>Over the MK3S's ceiling by a wide margin. If MVS is set correctly at ~13, PrusaSlicer clamps this
+      move down to about 145 mm/s and your print takes longer than the settings suggest. If MVS is left
+      permissive, the machine tries it and under-extrudes. Neither outcome matches the "200" you typed —
+      which is the whole lesson.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Core One, 0.25 mm layers, 0.45 mm width. What speed exactly saturates 24 mm³/s?</summary>
+    <div class="panel-body">
+      <p>Rearrange: <code>speed = flow ÷ (height × width) = 24 ÷ (0.25 × 0.45) = <b>213 mm/s</b></code></p>
+      <p>So a Core One at 0.25 mm layers can genuinely sustain ~213 mm/s of solid extrusion — and the same
+      machine at 0.15 mm layers could sustain 355 mm/s for the same demand on the hotend. Thinner layers buy
+      speed headroom; they just spend it on more layers.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Why does a PETG profile cap out around 8–13 mm³/s when the same machine does 24 with PLA?</summary>
+    <div class="panel-body">
+      <p>Because MVS is a property of <em>plastic and hotend together</em>, not of the hotend alone. PETG is
+      more viscous and needs more heat per mm³ to reach a printable state, so the same heater block delivers
+      fewer mm³/s of usable melt. It's a per-filament setting for exactly this reason — and it's why you'll
+      measure it once per material per machine, not once per machine.</p>
+    </div>
+  </details>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">5</span>Check yourself</h2>
+  <p>From memory. Question 3 reaches back to Lesson 1.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read section 2.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">You halve your layer height and keep print speed the same. What happens to volumetric flow?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Flow is height × width × speed, so halving one term halves the product — and buys you headroom on the hotend.">It halves, because layer height is a direct term</button>
+      <button class="opt" data-feedback="Print time roughly doubles, since you need twice as many layers — but the flow per second, which is what the hotend feels, goes down not up.">It doubles, because there are twice as many</button>
+      <button class="opt" data-feedback="Only if you also changed speed to compensate. At constant speed, halving height genuinely halves the demand on the hotend.">It stays the same, since the speed is unchanged</button>
+      <button class="opt" data-feedback="Extrusion width is the term that doesn't change here — it's set independently in Print Settings and isn't derived from layer height.">It depends only on the extrusion width used</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read section 3.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">You set perimeters to 150 mm/s but the sliced print time barely changes. Most likely cause?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. MVS is a hard cap applied silently — the speed box keeps your number while the G-code gets a slower one.">Max volumetric speed is clamping the move down</button>
+      <button class="opt" data-feedback="Acceleration limits do stop short moves reaching top speed, but they'd show up as a partial gain, not as almost none on long perimeters.">Acceleration limits stop it reaching that speed</button>
+      <button class="opt" data-feedback="Perimeters usually are a minority of print time on a solid part — but on a tall thin-walled one they dominate, and the time still wouldn't move if MVS were capping.">Perimeters are a small share of total print time</button>
+      <button class="opt" data-feedback="Input Shaper raises the acceleration you can usefully run; it doesn't override a speed you set, and the MK3S doesn't have it at all.">Input Shaper is overriding the speed you set</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read the warning in section 1.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">You measure <code>M900 K0.045</code> on the MK3S. What should you put on the Core One?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Different firmware, different feature, different scale — the Core One's M572 value has to be measured on the Core One.">Nothing yet — measure <code>M572 S</code> separately</button>
+      <button class="opt" data-feedback="Same digits, wrong command family. That the print would still look roughly OK is what makes this mistake so persistent.">The same value, written as <code>M572 S0.045</code></button>
+      <button class="opt" data-feedback="There's no conversion factor to apply, because these aren't the same quantity in different units — they're different compensation models.">A scaled value, converted for the faster machine</button>
+      <button class="opt" data-feedback="The Core One's stock profile does ship a sensible default, but leaving it is skipping the measurement, not making one.">Whatever its stock filament profile already ships</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Read your own G-code</h3>
+    <p>Slice anything — a calibration cube is ideal — with the stock <code>0.20</code> profile for one of
+    your printers. Then:</p>
+    <ol>
+      <li>Export the G-code and open it in a text editor. Find one <code>G1</code> line with an
+      <code>E</code> value in it. Write down its <code>F</code> value and convert it to mm/s.</li>
+      <li>Look up the real extrusion width at <code>Print Settings → Advanced → Extrusion width →
+      Perimeters</code>. Write down the actual number, not 0.4.</li>
+      <li>Compute the volumetric flow for that move. Compare it to your machine's ceiling from Lesson 1.</li>
+      <li>Find the <code>M572</code> or <code>M900</code> line near the top of the file and write down what
+      value your stock profile is currently using. That's your Phase 2 starting point.</li>
+    </ol>
+    <p class="go">→ Paste the four numbers back to me, with the machine you used. I'll tell you whether that
+    profile is leaving throughput on the table or already at the edge.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>G-code is mostly <code>G1</code> moves</strong>: position, filament consumed, feedrate in
+      mm/<em>minute</em>.</li>
+      <li><strong>Flow = layer height × extrusion width × speed.</strong> Three terms, and speed is only
+      one of them.</li>
+      <li><strong>mm/s is a dishonest unit</strong> — the same number is a different demand at a different
+      layer height.</li>
+      <li><strong>Max volumetric speed clamps silently</strong>, which is why it gets measured before
+      speeds are set, not after.</li>
+      <li><strong><code>M900 K</code> and <code>M572 S</code> are different features on different
+      scales</strong>, and neither converts to the other.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/article/buddy-firmware-specific-g-code-commands_633112" target="_blank" rel="noopener">Buddy firmware-specific G-code commands — Prusa Knowledge Base</a></div>
+      <div class="desc">The authoritative list of what <code>M572</code> and its neighbours accept on the MK4
+      family and Core One. Worth skimming now so that when Phase 2 asks you to write a custom G-code block,
+      you're checking a reference rather than guessing.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> Paste me a chunk of your own G-code and I'll walk you through
+    it line by line, including the bits at the top that look like noise. Reading your own sliced output is
+    the fastest way to stop treating the slicer as a black box. Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#extrusion-equation">extrusion equation</a>,
+    <a href="../reference/glossary.html#layer-height">layer height</a>,
+    <a href="../reference/glossary.html#extrusion-width">extrusion width</a>,
+    <a href="../reference/glossary.html#volumetric-flow-rate">volumetric flow rate</a>,
+    <a href="../reference/glossary.html#max-volumetric-speed">max volumetric speed</a>,
+    <a href="../reference/glossary.html#extrusion-multiplier">extrusion multiplier</a>,
+    <a href="../reference/glossary.html#linear-advance">Linear Advance</a>,
+    <a href="../reference/glossary.html#pressure-advance">Pressure Advance</a>,
+    <a href="../reference/glossary.html#calibration-order">calibration order</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>Pressure Advance</i>. Pressure Advance (<code>M572 S</code>) replaces
+    Linear Advance on the MK4 family, XL and MINI/+ from firmware 5.0.0.
+    <a href="https://help.prusa3d.com/article/pressure-advance_814986" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">Prusa Research. <i>Buddy firmware-specific G-code commands</i>. Reference for the commands
+    accepted by MK4-family and Core One firmware.
+    <a href="https://help.prusa3d.com/article/buddy-firmware-specific-g-code-commands_633112" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r3">Prusa Research. <i>Extrusion multiplier calibration</i>. Total flow rate is the firmware
+    multiplier (<code>M221</code>) multiplied by the slicer's extrusion multiplier.
+    <a href="https://help.prusa3d.com/article/extrusion-multiplier-calibration_2257" target="_blank" rel="noopener">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0002-filament-is-a-material.html">
+      <div class="dir">← Previous · L2</div>
+      <div class="ttl">Filament is a material</div>
+    </a>
+    <a class="next" href="0004-the-calibration-mindset.html">
+      <div class="dir">Next · L4</div>
+      <div class="ttl">The calibration mindset →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L3 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

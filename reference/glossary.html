@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glossary · prusa-profile-tuning</title>
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Reference · the course vocabulary</p>
+  <h1 class="lesson-title">Glossary</h1>
+  <p class="lesson-sub">The canonical language of this course. Mirrors <code>GLOSSARY.md</code> — edit the
+  Markdown first, then mirror it here.</p>
+  <div class="lesson-meta">
+    <span>📖 Reference</span><span class="sep">•</span>
+    <span>🖨 Prints clean</span><span class="sep">•</span>
+    <span class="tag accent">Living document</span>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-label">⌁ How to use this</div>
+    <p>Every lesson links here for the terms it uses. A term appears only once you can use it correctly —
+    so this page doubles as a record of what you've actually learned.</p>
+  </div>
+
+  <h2><span class="num">A</span>The machine</h2>
+
+  <h3 id="bedslinger">bedslinger</h3>
+  <p>A printer whose bed moves on the Y axis while the toolhead moves on X and Z. The MK3S and MK4 are
+  bedslingers. The moving mass grows with the part, which is why acceleration and external-perimeter
+  speed are the first things to give. <small><em>Avoid</em>: "i3-style" — that describes the frame, not
+  the constraint that matters.</small></p>
+
+  <h3 id="corexy">CoreXY</h3>
+  <p>A motion system where two fixed motors drive both X and Y through a crossed belt path, so only the
+  lightweight <a href="#toolhead">toolhead</a> accelerates. The Core One is CoreXY. Higher usable
+  acceleration, but gantry squareness now depends on the two belts being tensioned equally.</p>
+
+  <h3 id="toolhead">toolhead</h3>
+  <p>The moving assembly that carries the <a href="#hotend">hotend</a> and, on direct-drive printers, the
+  <a href="#extruder">extruder</a>. Everything about print quality is decided by where the toolhead is
+  and how much plastic is coming out of it at that instant.</p>
+
+  <h3 id="hotend">hotend</h3>
+  <p>The heated end of the machine: heater block, thermistor, nozzle, and above them a
+  <a href="#heatbreak">heatbreak</a> and heatsink. Its job is to hold a controlled melt zone. Its
+  capacity — how fast it can melt plastic — sets the machine's real speed ceiling, expressed as
+  <a href="#max-volumetric-speed">max volumetric speed</a>.</p>
+
+  <h3 id="heatbreak">heatbreak</h3>
+  <p>The thin-walled section between heatsink and heater block that keeps the melt zone short and
+  well-defined. When it fails to do that, softened filament creeps upward and jams — <em>heat creep</em>.</p>
+
+  <h3 id="extruder">extruder</h3>
+  <p>The geared motor assembly that pushes filament into the <a href="#hotend">hotend</a>. On all three
+  printers in this fleet it is <em>direct drive</em> — mounted on the toolhead, a few centimetres of
+  filament path to the melt zone. Prusa's MK4-family extruder is the <b>Nextruder</b>; the MK3S uses a
+  Bondtech-style dual-drive extruder.
+  <small><em>Avoid</em>: using "extruder" to mean the whole toolhead.</small></p>
+
+  <h3 id="build-plate">build plate</h3>
+  <p>The heated bed plus its removable spring-steel sheet. The sheet's texture (smooth PEI, satin,
+  textured) changes both adhesion and the first-layer offset you need.</p>
+
+  <h2><span class="num">B</span>What comes out of the nozzle</h2>
+
+  <h3 id="extrusion-width">extrusion width</h3>
+  <p>How wide a single deposited line is, set by the slicer — not simply the nozzle diameter. Typically
+  ~0.45 mm for a 0.4 mm nozzle. One of the three terms in the
+  <a href="#extrusion-equation">extrusion equation</a>.</p>
+
+  <h3 id="layer-height">layer height</h3>
+  <p>The vertical distance the Z axis rises between layers, and therefore the height of every extruded
+  line. The second term in the <a href="#extrusion-equation">extrusion equation</a>.</p>
+
+  <h3 id="extrusion-equation">extrusion equation</h3>
+  <p><code>volumetric flow (mm³/s) = layer height × extrusion width × print speed</code>. The one piece of
+  arithmetic the whole course rests on: it converts a speed you set into a demand on the
+  <a href="#hotend">hotend</a>, and it is why raising speed without checking
+  <a href="#max-volumetric-speed">max volumetric speed</a> silently under-extrudes.</p>
+
+  <h3 id="volumetric-flow-rate">volumetric flow rate</h3>
+  <p>Plastic delivered per second, in mm³/s. The honest unit for "how fast is this printing", because it
+  is independent of layer height and width — unlike mm/s.</p>
+
+  <h3 id="max-volumetric-speed">max volumetric speed (MVS)</h3>
+  <p>A per-filament ceiling in mm³/s that clamps every speed in the profile. It represents what the hotend
+  can actually melt. Set correctly it is a safety net; left at a default it is the reason fast prints come
+  out matte and weak. <small><em>Avoid</em>: "flow rate" — ambiguous, that also names
+  <a href="#extrusion-multiplier">extrusion multiplier</a>.</small></p>
+
+  <h3 id="extrusion-multiplier">extrusion multiplier (EM)</h3>
+  <p>A per-filament scalar on how much filament is pushed for a given commanded volume, where 1.0 = 100 %.
+  Corrects for real filament diameter and material behaviour. Total flow is firmware <code>M221</code> ×
+  slicer EM, and the two are independent — changing one does not update the other.
+  <small><em>Avoid</em>: "flow", "flow rate" — used for both this and MVS in the wild.</small></p>
+
+  <h3 id="retraction">retraction</h3>
+  <p>Pulling filament back a short distance before a travel move, so the nozzle stops oozing. A printer
+  setting whose correct value is material-dependent, so it is overridden per filament.</p>
+
+  <h2><span class="num">C</span>Compensating for physics</h2>
+
+  <h3 id="linear-advance">Linear Advance (LA)</h3>
+  <p>The Marlin feature that varies extruder speed ahead of acceleration changes, so pressure in the melt
+  zone stays matched to the commanded flow. On the MK3S it is set with <code>M900 K&lt;value&gt;</code>;
+  typical values for a 0.4 mm nozzle are small, around 0.02–0.08.</p>
+
+  <h3 id="pressure-advance">Pressure Advance (PA)</h3>
+  <p>The Buddy-firmware equivalent of <a href="#linear-advance">Linear Advance</a>, used on the MK4 family
+  and Core One from firmware 5.0.0. Set with <code>M572 S&lt;value&gt;</code>. <b>The scale is not the same
+  as LA's</b> — an MK3S K value and an MK4 S value are not interchangeable, and copying one to the other is
+  the most expensive mistake available in this course.</p>
+
+  <h3 id="input-shaper">Input Shaper (IS)</h3>
+  <p>A Buddy-firmware feature that cancels the frame resonances which cause <a href="#ghosting">ghosting</a>,
+  letting the printer run much higher acceleration for the same surface quality. Present on Core One, MK4/S
+  and MK3.9/3.5. It compensates for resonance; it does not fix a loose belt, so belts come first.</p>
+
+  <h3 id="ghosting">ghosting</h3>
+  <p>Faint repeated echoes of a feature on the surface downstream of it, caused by the frame or gantry
+  ringing after a direction change. Symptom of resonance, loose belts, or too much acceleration.
+  <small><em>Avoid</em>: "ringing" — same thing; this course says ghosting.</small></p>
+
+  <h2><span class="num">D</span>Getting the machine honest</h2>
+
+  <h3 id="selftest">selftest</h3>
+  <p>The printer's own guided hardware check — motors, endstops, fans, heaters, and on the MK4 family the
+  <a href="#loadcell">loadcell</a>. It is the floor: nothing measured afterwards means anything if the
+  selftest fails.</p>
+
+  <h3 id="belt-tension">belt tension</h3>
+  <p>How tightly the X and Y belts are strung. Too loose gives <a href="#ghosting">ghosting</a>, layer
+  shifts and out-of-round circles; too tight loads the bearings and skews axis-length measurements.
+  Measured as a <em>belt-status number</em> on the MK3S (X ≈ 250, Y ≈ 275) and as a <em>frequency in
+  Hz</em> on the Core One (90–98 Hz, the two belts within 8 Hz of each other).</p>
+
+  <h3 id="pinda">PINDA</h3>
+  <p>The inductive probe on the MK3S that finds the steel sheet. It senses metal, not the nozzle, so its
+  reading drifts with temperature and the nozzle-to-sheet distance must be set separately by
+  <a href="#live-adjust-z">Live Adjust Z</a>.</p>
+
+  <h3 id="loadcell">loadcell</h3>
+  <p>The force sensor in the MK4-family heatsink that detects the nozzle physically touching the sheet.
+  Because it senses the nozzle itself, first-layer height is measured automatically before every print and
+  no manual Live Adjust Z is needed.</p>
+
+  <h3 id="live-adjust-z">Live Adjust Z</h3>
+  <p>The stored nozzle-to-sheet offset for the first layer, adjusted while the first layer prints. Typical
+  values run from −1.500 to −0.200; turning the knob counter-clockwise moves the nozzle <em>closer</em>. On
+  <a href="#loadcell">loadcell</a> machines it exists only as a temporary nudge — the persistent value is
+  the printer's Z offset.</p>
+
+  <h3 id="mesh-bed-levelling">mesh bed levelling</h3>
+  <p>Probing a grid of points across the sheet before a print and warping the first layer to match, so a
+  bed that isn't perfectly flat still gets an even first layer. It compensates for shape, not for height —
+  height is <a href="#live-adjust-z">Live Adjust Z</a>.</p>
+
+  <h3 id="pid-tuning">PID tuning</h3>
+  <p>Calibrating the control loop that holds a heater at target. Worth running when the nozzle temperature
+  wanders by roughly ±5 °C; a bigger swing than that is a hardware fault, not a tuning problem. The
+  Buddy-firmware equivalent on the MK4 family is <b>thermal model calibration</b>.</p>
+
+  <h3 id="skew">skew</h3>
+  <p>The deviation of the machine's X and Y axes from a true right angle, measured by the MK3S's XYZ
+  calibration and corrected in firmware. Uncorrected skew turns squares into parallelograms no profile
+  setting can fix.</p>
+
+  <h2><span class="num">E</span>Materials</h2>
+
+  <h3 id="glass-transition">glass transition temperature (Tg)</h3>
+  <p>The temperature at which a solid polymer stops being rigid and starts to soften — well below its
+  melting point. Tg is why a PLA part left in a hot car deforms, and why the Core One's enclosure has to be
+  <em>vented</em> for PLA.</p>
+
+  <h3 id="hygroscopic">hygroscopic</h3>
+  <p>Readily absorbing moisture from the air. PETG is hygroscopic and TPU badly so. Absorbed water flashes
+  to steam in the melt zone, producing popping, stringing and weak layers — and it invalidates every
+  temperature, flow and retraction measurement taken with that spool.</p>
+
+  <h3 id="drying">drying</h3>
+  <p>Baking moisture out of filament before use. Not an optimisation in a humid climate — a prerequisite,
+  because a wet spool makes the whole calibration chain measure the water rather than the plastic.</p>
+
+  <h2><span class="num">F</span>Method</h2>
+
+  <h3 id="calibration-order">calibration order</h3>
+  <p>The fixed dependency chain this course follows: <b>machine → temperature → extrusion multiplier →
+  pressure/linear advance → retraction → cooling → max volumetric speed → speeds and accelerations</b>.
+  Each step assumes everything before it is fixed, so changing an earlier one invalidates every later
+  measurement.</p>
+
+  <h3 id="one-variable-rule">one-variable rule</h3>
+  <p>Change exactly one thing between two test prints. Two changes give you a result you cannot attribute,
+  which is worse than no result because it feels like data.</p>
+
+  <h3 id="tuning-log">tuning log</h3>
+  <p>The written record of what was measured, on which machine, with which spool, on what date. Without it
+  the fleet drifts and nobody can say which number came from a measurement and which from a guess.</p>
+
+  <p class="pagefoot">Glossary · <a href="../index.html">all lessons</a> ·
+    <a href="calibration-card.html">The Calibration Card</a></p>
+</main>
+</body>
+</html>

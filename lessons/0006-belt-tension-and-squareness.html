@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L6 · Belt tension and squareness</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 1 · The machine · L6</p>
+  <h1 class="lesson-title">Belt tension and squareness</h1>
+  <p class="lesson-sub">Three printers, three completely different measurements — a number on a screen, a
+  feel in your fingers, and a frequency in Hertz.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~25 minutes on the machine</span><span class="sep">•</span>
+    <span>🔧 Tools: 2.5 mm Allen key, phone</span><span class="sep">•</span>
+    <span class="tag accent">Phase 1</span>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>Belt tension is the single mechanical fault most likely to end up encoded in a filament profile. A
+    slack belt produces <a href="../reference/glossary.html#ghosting">ghosting</a>, out-of-round circles and
+    dimensional error — all of which look like things you could tune away with speed, acceleration or
+    advance settings, and none of which you can. It also has to be right before
+    <a href="../reference/glossary.html#input-shaper">Input Shaper</a> means anything: Prusa are explicit
+    that belt adjustment and maintenance are prerequisites for it, not
+    alternatives.<span class="cite"><a href="#r1">1</a></span> This is the lesson where you turn the
+    machine into a constant.</p>
+  </div>
+
+  <p>A belt is a spring. Too slack and the toolhead lags behind the motor on every direction change, then
+  overshoots — motion error that scales with acceleration. Too tight and you load the bearings and pulleys,
+  add friction, and skew the printer's own axis-length measurements. There is a window, and each of your
+  three machines expresses it in a different unit.</p>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>Measure it — on your machine</h2>
+
+  <p><b>Open your machine — only yours.</b> These procedures are not interchangeable and the numbers are on
+  three different scales.</p>
+
+  <details class="panel">
+    <summary>MK3S · read a number off the screen</summary>
+    <div class="panel-body">
+      <p>The MK3S is the easy one: the firmware measures belt tension for you and reports it as a number.</p>
+      <p><b>To take a fresh measurement:</b> <code>LCD → Calibration → Belt test</code>. The values also
+      update every time you run the Selftest.<span class="cite"><a href="#r2">2</a></span></p>
+      <p><b>To read it:</b> <code>LCD → Support → Belt status</code>.<span class="cite"><a href="#r2">2</a></span></p>
+      <table>
+        <caption>Targets. The value is inversely proportional to motor load — <b>higher means looser</b>.<span class="cite"><a href="#r2">2</a></span></caption>
+        <thead><tr><th>Axis</th><th class="num">Target</th><th class="num">Acceptable</th><th>Out of range</th></tr></thead>
+        <tbody>
+          <tr><td>X</td><td class="num">~250</td><td class="num">±15</td><td rowspan="2">Under (or close to) <b>240</b> → <b>loosen</b>.<br>Over (or close to) <b>290</b> → <b>tighten</b>.<span class="cite"><a href="#r2">2</a></span></td></tr>
+          <tr><td>Y</td><td class="num">~275</td><td class="num">±15</td></tr>
+        </tbody>
+      </table>
+      <p>Read the direction rule twice — it inverts what intuition expects. A <em>small</em> number is a
+      <em>tight</em> belt, because a tight belt loads the motor more.</p>
+      <p><b>The physical adjustment</b> is at the belt tensioner on the X-carriage and the Y-belt idler. Make
+      small changes, then re-run the belt test — don't adjust twice before measuring. The one-variable rule
+      applies to hardware too.</p>
+      <p><b>Cross-check with axis length.</b> If <code>Calibrate XYZ</code> reports an axis-length error,
+      suspect belt tension before suspecting a broken axis — Prusa note that slightly too tight or too loose
+      tension is a common cause.<span class="cite"><a href="#r3">3</a></span> Fix the belt, then re-run
+      <code>Calibrate XYZ</code>, then re-read <code>Support → XYZ cal. details</code> for the
+      <a href="../reference/glossary.html#skew">skew</a> result.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>MK4 / MK4S · adjust by feel, verify by print</summary>
+    <div class="panel-body">
+      <p>The MK4 does <b>not</b> report a belt-status number. There is no screen to read; you adjust the
+      hardware and verify in a print. That makes this the least satisfying of the three procedures and the
+      one most worth doing carefully.</p>
+      <p><b>The feel target:</b> plucked at its midpoint, the belt should sound like a low bass string. You
+      should be able to pinch the two runs together between thumb and forefinger, but with noticeable
+      resistance.</p>
+      <p><b>X axis — small adjustment</b><span class="cite"><a href="#r4">4</a></span>:</p>
+      <ol>
+        <li>Loosen all the motor-holding screws slightly, just enough to allow movement.</li>
+        <li>Using the <b>ball end of a 2.5 mm Allen key</b>, tighten the rear screw on the X-end-motor.</li>
+        <li>Check tension after every turn or two — not after ten.</li>
+        <li>Re-tighten the motor screws when you're satisfied.</li>
+      </ol>
+      <p><b>X axis — large adjustment</b>: remove the three screws on the X-carriage cover, then move the
+      belt mount by one or two teeth.<span class="cite"><a href="#r4">4</a></span></p>
+      <p><b>Y axis — small adjustment</b>: behind the LCD module, turn the two M3x10 screws clockwise to
+      close the gaps between the idler and the frame.<span class="cite"><a href="#r4">4</a></span></p>
+      <p><b>Y axis — large adjustment</b>: lay the printer on its side, loosen the right screw
+      counter-clockwise, turn the centre screw clockwise to tighten the belt, then re-secure the right
+      screw.<span class="cite"><a href="#r4">4</a></span></p>
+      <p><b>Verify with a print, not with your fingers.</b> Print something with a sharp direction change —
+      a 40 mm cube with a couple of raised ribs is enough — at a deliberately high acceleration. Ghosting
+      downstream of the ribs is your signal. Change one belt, re-print, compare. If ghosting survives
+      correct tension, that's an Input Shaper question, and it belongs to Lesson 8.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Core One · measure a frequency, and keep the gantry square</summary>
+    <div class="panel-body">
+      <p>This is the most precise of the three, and on a <a href="../reference/glossary.html#corexy">CoreXY</a>
+      machine it is also the most consequential — both belts drive both axes, so unequal tension racks the
+      gantry out of square and circles come out oval.</p>
+      <p><b>Path:</b> <code>LCD → Settings → Manual Belt Tuning</code> on firmware
+      6.4.0+.<span class="cite"><a href="#r5">5</a></span> Newer firmware adds a guided wizard that excites
+      the belt and gives stroboscopic feedback so you can see the resonance; if your machine doesn't offer
+      it, use the manual strum-and-measure method below.<span class="cite"><a href="#r6">6</a></span></p>
+      <table>
+        <caption>Targets for the Core One / Core One+.<span class="cite"><a href="#r5">5</a></span></caption>
+        <thead><tr><th>&nbsp;</th><th class="num">Target</th></tr></thead>
+        <tbody>
+          <tr><td>Both belts within</td><td class="num">90–98 Hz</td></tr>
+          <tr><td>Upper belt</td><td class="num">max 98 Hz</td></tr>
+          <tr><td>Lower belt</td><td class="num">min 92 Hz</td></tr>
+          <tr><td><b>Difference between the two</b></td><td class="num"><b>≤ 8 Hz</b></td></tr>
+        </tbody>
+      </table>
+      <p>(The Core One <b>L</b> is a different machine with different targets — 85–95 Hz. Check which variant
+      you have before using a number.)</p>
+      <p><b>Procedure</b><span class="cite"><a href="#r5">5</a></span>:</p>
+      <ol>
+        <li>Disable the motors from the LCD, or power the printer off.</li>
+        <li>Move the print head to the frontmost position on Y and centre it on X.</li>
+        <li>Strum the <b>upper</b> belt at its midpoint and measure the frequency with a phone tuner or
+        spectrum-analyser app.</li>
+        <li>Strum the <b>lower</b> belt and record its frequency.</li>
+        <li>Adjust the tensioner screws in <b>half-turn increments</b>, alternating between the left screw
+        (upper belt) and the right screw (lower belt).</li>
+        <li>Measure again after every adjustment.</li>
+      </ol>
+      <div class="callout warning">
+        <div class="callout-label">⚠ The rule that makes this CoreXY-specific</div>
+        <p>Always tighten both tensioner bolts <b>evenly and alternately</b>. This is what keeps the gantry
+        square while you adjust.<span class="cite"><a href="#r5">5</a></span> Tighten one fully and then the
+        other and you will hit your target frequencies with a racked gantry — every number in spec, every
+        circle still oval.</p>
+      </div>
+      <p>A free phone tuner app works. Strum the belt like a guitar string, mid-span, with the head parked
+      as above — position changes the free length and therefore the frequency, which is why the procedure
+      specifies where to park it.</p>
+    </div>
+  </details>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>Reading the machine from the print</h2>
+
+  <p>Once belts are in spec, print a test and read it. Different defects point at different mechanical
+  causes, and knowing which is which stops you attributing motion faults to filament.</p>
+
+  <div class="compare">
+    <figure class="before">
+      <div class="difflabel">Belt too loose</div>
+      <pre><code><span class="c"># the signature</span>
+ghosting after corners
+  → worse at high accel
+  → worse on tall parts
+circles slightly oval
+layer shifts under load
+<span class="hl">dimensions run small
+in one axis only</span></code></pre>
+    </figure>
+    <figure class="after">
+      <div class="difflabel">Belt too tight</div>
+      <pre><code><span class="c"># the signature</span>
+audible motor whine
+bearings run warm
+axis-length errors
+  → in XYZ calibration
+stepper skipping steps
+<span class="hl">quality fine until it
+suddenly isn't</span></code></pre>
+    </figure>
+  </div>
+
+  <p>The asymmetry is worth noticing: <b>too loose degrades gracefully and visibly; too tight fails
+  abruptly and quietly.</b> People overtighten because loose is the failure they've been taught to look for.
+  On the MK3S the belt-status number protects you from this — under 240 means <em>loosen</em>. On the MK4,
+  where you're going by feel, err towards the low-bass-string end rather than the high one.</p>
+
+  <div class="callout key">
+    <div class="callout-label">▲ Why this must precede Input Shaper</div>
+    <p>Input Shaper works by cancelling the frame's resonant frequencies. It measures those frequencies and
+    filters the motion commands to avoid exciting them. A loose belt doesn't shift a resonance — it adds
+    <em>slop</em>, a mechanical dead zone that no filtering can compensate for. Prusa's own guidance puts
+    belt adjustment, nozzle inspection and debris removal ahead of Input Shaper for exactly this
+    reason.<span class="cite"><a href="#r1">1</a></span> And the Input Shaper frequency values themselves
+    are a diagnostic: they should land between <b>35 and 70 Hz</b>, and a value outside that band is Prusa's
+    signal to go back and check belt tightness and
+    assembly.<span class="cite"><a href="#r1">1</a></span> You'll read that number in Lesson 8.</p>
+  </div>
+
+  <!-- ===== INTERACTIVE WIDGET ===== -->
+  <h2><span class="num">3</span>Diagnose the machine</h2>
+  <p>Click each symptom. Decide first whether it's slack, over-tension, or something that isn't belts at
+  all.</p>
+  <div class="faultfinder">
+    <div class="ff-q">Slack, over-tight, or not a belt problem?</div>
+    <ul class="ff-list">
+      <li class="ff-item"
+          data-cause="Slack. The toolhead lags then overshoots on each direction change, and the error scales with acceleration — so it shows up worst exactly where you were pushing speed."
+          data-fix="Tension to spec first. If the machine has Input Shaper, only then re-run it — filtering cannot remove mechanical dead zone.">Ghosting that gets dramatically worse at higher acceleration<span class="ff-tag">Slack</span></li>
+      <li class="ff-item"
+          data-cause="Over-tension. Excess belt load makes the axis measure short during calibration, and Prusa specifically name tension as a common cause of axis-length errors on the MK3S."
+          data-fix="Loosen slightly, re-run Calibrate XYZ, re-read the belt status. Remember the inversion: on the MK3S a value under 240 means too tight, not too loose.">MK3S reports an axis-length error, belt status reads 232<span class="ff-tag">Over-tight</span></li>
+      <li class="ff-item"
+          data-cause="On CoreXY, unequal tension between the two belts racks the gantry out of square. Both belts can be individually inside 90–98 Hz and still be more than 8 Hz apart."
+          data-fix="Match the two frequencies to within 8 Hz, adjusting the tensioners evenly and alternately so the gantry stays square while you work."
+          >Core One: both belts inside spec, circles still consistently oval<span class="ff-tag">Squareness</span></li>
+      <li class="ff-item"
+          data-cause="Not a belt problem. A belt fault is present from layer one; a defect that appears only partway up points at something that changes with height — chamber heat, part mass on a bedslinger, or cooling on a narrowing cross-section."
+          data-fix="Note the height it starts at and what the geometry is doing there. On the Core One with PLA, suspect chamber temperature; on a bedslinger with a heavy part, suspect accumulated moving mass."
+          >Quality is perfect for 40 mm, then degrades steadily upward<span class="ff-tag">Not belts</span></li>
+      <li class="ff-item"
+          data-cause="Over-tension, and this one is dangerous because it's silent until it isn't. Loaded bearings and pulleys run warm and eventually the stepper skips a step under load, giving a layer shift with no warning."
+          data-fix="Back the tension off towards the low end of the range. When in doubt on the MK4, where there's no number to read, aim for the low-bass-string feel rather than the higher, tighter one.">Motors whine audibly, bearings warm to the touch<span class="ff-tag">Over-tight</span></li>
+    </ul>
+    <div class="ff-panel"><div class="ff-cause"></div><div class="ff-fix"></div></div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">4</span>Check yourself</h2>
+  <p>From memory. Question 1 is the one people get backwards.</p>
+
+  <div class="quiz" data-explain-right="Correct — and it's counter-intuitive." data-explain-wrong="Re-read the MK3S panel.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">Your MK3S reports belt status Y = 235. What does that mean and what do you do?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. The value is inversely proportional to motor load, so a low number means a tight belt. Under 240, Prusa say loosen.">The belt is too tight — loosen it slightly</button>
+      <button class="opt" data-feedback="That reads the number the wrong way round. Higher values mean looser belts, so 235 against a 275 target is tight, not slack.">The belt is too loose — tighten it slightly</button>
+      <button class="opt" data-feedback="235 would be near the middle of the X-axis range, but this is the Y axis, where the target is 275 ± 15. Check which axis before acting.">The belt is within spec — leave it alone</button>
+      <button class="opt" data-feedback="A single reading out of range is a tension result, not a sensor fault. Re-running the belt test is sensible, but the number is telling you something real.">The reading is unreliable — run the test again</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read the Core One panel.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">Core One: upper belt 97 Hz, lower belt 92 Hz. Both in range. Is this acceptable?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Both sit inside 90–98 Hz and the 5 Hz gap is within the 8 Hz tolerance, so the gantry should be square.">Yes — both in band and within 8 Hz of each other</button>
+      <button class="opt" data-feedback="A gap does matter on CoreXY, but 5 Hz is inside the 8 Hz tolerance Prusa give. This one passes.">No — any difference between belts racks the gantry</button>
+      <button class="opt" data-feedback="Both numbers are inside the 90–98 Hz band for the Core One. You may be thinking of the Core One L, which targets 85–95 Hz.">No — the lower belt sits under its minimum value</button>
+      <button class="opt" data-feedback="Frequency is the specified measurement on this machine, and it's a genuine proxy for tension. The print test is a verification step, not the measurement.">Only a print test can answer that reliably</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read the callout in section 2.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">Why can't Input Shaper compensate for a loose belt?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. It filters commands to avoid exciting resonances. Slack is mechanical dead zone — there's no command that removes it.">Slack is dead zone, and filtering can't remove it</button>
+      <button class="opt" data-feedback="It does measure resonant frequencies, and a loose belt does shift them — but the reason it can't help is the slop itself, not the measurement going stale.">A loose belt shifts the frequencies it measured</button>
+      <button class="opt" data-feedback="It runs continuously during printing rather than as a one-off correction. And the MK3S, which has no Input Shaper at all, still needs belts in spec.">It only applies during the first layers of a print</button>
+      <button class="opt" data-feedback="High acceleration is what makes belt slack visible, but Input Shaper exists precisely to permit high acceleration — the problem is what it can and can't correct.">It is disabled whenever acceleration is set high</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Measure and log belt tension on one printer</h3>
+    <p>Take the machine you started in Lesson 5 and get its belts into spec. Record in
+    <code>tuning-log.md</code>:</p>
+    <ol>
+      <li><b>The before number.</b> MK3S: belt status X and Y. Core One: upper and lower Hz, and the gap
+      between them. MK4: describe the feel, and note the pluck pitch if you can measure it.</li>
+      <li><b>What you changed</b>, in physical terms — which screw, how many turns, which direction.</li>
+      <li><b>The after number</b>, measured the same way as the before.</li>
+      <li><b>MK3S only:</b> re-run <code>Calibrate XYZ</code> and log the skew result again. Did it move?</li>
+      <li><b>Core One only:</b> the gap between belts, explicitly. Two in-band numbers 9 Hz apart is a fail.</li>
+    </ol>
+    <p>Then print a 40 mm cube at a deliberately high acceleration, photograph a corner, and tell me what
+    you see.</p>
+    <p class="go">→ Paste it back to me with the photo. I'll tell you whether what you're looking at is
+    ghosting, over-extrusion at the corner, or pressure lag — the three look similar and get confused
+    constantly.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>Each machine expresses belt tension in a different unit</strong> — a number on the MK3S,
+      a feel on the MK4, a frequency on the Core One.</li>
+      <li><strong>On the MK3S, lower means tighter.</strong> Under 240, loosen; over 290, tighten.</li>
+      <li><strong>On the Core One both belts must match within 8 Hz</strong>, and the tensioners are turned
+      evenly and alternately so the gantry stays square.</li>
+      <li><strong>Too loose degrades visibly; too tight fails abruptly.</strong> Which is why people
+      overtighten.</li>
+      <li><strong>Belts come before Input Shaper</strong>, and an Input Shaper frequency outside 35–70 Hz is
+      a signal to come back here.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/article/adjusting-belt-tension-mk4-s-mk3-9-s-mk3-5-s-mk3-s_112380" target="_blank" rel="noopener">Adjusting belt tension (MK4/S, MK3.9/S, MK3.5/S, MK3/S/+) — Prusa Knowledge Base</a></div>
+      <div class="desc">The source of every MK3S and MK4 number above, with photographs of each screw. Core
+      One owners want the <a href="https://help.prusa3d.com/article/adjusting-belt-tension-core-one_845048" target="_blank" rel="noopener">CORE One article</a>
+      instead — different machine, different procedure, different units.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> Belt work is the part of this course where a photo is worth
+    more than a paragraph. Show me the tensioner you're about to turn if you're not sure it's the right one,
+    and send the before-and-after numbers even if they look fine. Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#belt-tension">belt tension</a>,
+    <a href="../reference/glossary.html#ghosting">ghosting</a>,
+    <a href="../reference/glossary.html#input-shaper">Input Shaper</a>,
+    <a href="../reference/glossary.html#corexy">CoreXY</a>,
+    <a href="../reference/glossary.html#bedslinger">bedslinger</a>,
+    <a href="../reference/glossary.html#skew">skew</a>,
+    <a href="../reference/glossary.html#selftest">selftest</a>,
+    <a href="../reference/glossary.html#one-variable-rule">one-variable rule</a>,
+    <a href="../reference/glossary.html#tuning-log">tuning log</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>Input Shaper (CORE One, MK4/S, MK3.9/S, MK3.5/S, XL, MINI/+)</i>. Belt
+    adjustment and maintenance are prerequisites; Input Shaper frequency values should fall between 35 and
+    70 Hz, and a value outside that band means checking belt tightness and assembly.
+    <a href="https://help.prusa3d.com/article/input-shaper-core-one-mk4-s-mk3-9-s-mk3-5-s-xl-mini_451816" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">Prusa Research. <i>Adjusting belt tension (MK4/S, MK3.9/S, MK3.5/S, MK3/S/+)</i>. MK3S belt
+    status targets (X ≈ 250, Y ≈ 275, ±15), the inverse relationship to motor load, the under-240 /
+    over-290 action thresholds, and the <code>Support → Belt status</code> and
+    <code>Calibration → Belt test</code> paths.
+    <a href="https://help.prusa3d.com/article/adjusting-belt-tension-mk4-s-mk3-9-s-mk3-5-s-mk3-s_112380" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r3">Prusa Research. <i>Check Axis Length X/Y/Z (MK3S)</i>. Slightly too tight or too loose belt
+    tension is a common cause of axis-length errors.
+    <a href="https://help.prusa3d.com/article/check-axis-length-x-y-z-mk3s_134223" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r4">Prusa Research. <i>Adjusting belt tension</i>, MK4 section. The X-end-motor rear screw with a
+    2.5 mm Allen ball end, the X-carriage cover route for large adjustments, and the M3x10 screws behind the
+    LCD module for Y.
+    <a href="https://help.prusa3d.com/article/adjusting-belt-tension-mk4-s-mk3-9-s-mk3-5-s-mk3-s_112380" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r5">Prusa Research. <i>Adjusting belt tension (CORE One)</i>. The 90–98 Hz band, the 8 Hz
+    tolerance between belts, the <code>Settings → Manual Belt Tuning</code> path on firmware 6.4.0+, the
+    strum-and-measure procedure, and the instruction to tighten both tensioner bolts evenly and alternately
+    to keep the gantry square.
+    <a href="https://help.prusa3d.com/article/adjusting-belt-tension-core-one_845048" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r6">Prusa Research. <i>Belt tuning wizard</i>. The guided wizard using controlled belt excitation
+    and stroboscopic feedback to visualise belt resonance.
+    <a href="https://help.prusa3d.com/article/belt-tuning-wizard_973716" target="_blank" rel="noopener">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0005-selftest-and-health-check.html">
+      <div class="dir">← Previous · L5</div>
+      <div class="ttl">Selftest and the health check</div>
+    </a>
+    <a class="next" href="0007-first-layer-and-z-offset.html">
+      <div class="dir">Next · L7</div>
+      <div class="ttl">First layer and Z-offset →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L6 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

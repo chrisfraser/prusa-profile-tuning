@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L1 · The machine in four parts</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 0 · Fundamentals · L1</p>
+  <h1 class="lesson-title">The machine in four parts</h1>
+  <p class="lesson-sub">Four subsystems, one job: put a controlled amount of melted plastic in a controlled
+  place. Every calibration in this course is fixing one of the four.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~12 minutes</span><span class="sep">•</span>
+    <span>🧠 Start here</span><span class="sep">•</span>
+    <span class="tag accent">Fundamentals</span>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-label">⏩ Already know this?</div>
+    <p>This lesson covers motion systems (bedslinger vs CoreXY), the hotend and melt zone, direct-drive
+    extruders, and the heated bed — plus which of the four causes which class of defect. If that's already
+    yours, <a href="0005-selftest-and-health-check.html">skip straight to Phase 1 →</a></p>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>You are about to tune three machines that fail in three different ways. An MK3S and a Core One
+    printing the same file with the same filament will produce different defects, because one drags a
+    heavy bed around and the other flings a light head around a fixed frame.<span class="cite"><a href="#r1">1</a></span>
+    If you can't say <em>which of the four parts</em> a defect came from, every calibration becomes trial
+    and error. This lesson gives you the four buckets you'll sort every problem into for the rest of the
+    course.</p>
+  </div>
+
+  <p>Strip away the enclosure, the touchscreen and the marketing and an FDM printer is four subsystems
+  cooperating on a single sentence: <em>put a controlled amount of melted plastic in a controlled place,
+  about a hundred thousand times.</em></p>
+
+  <p>The four are <b>motion</b>, the <a href="../reference/glossary.html#hotend">hotend</a>, the
+  <a href="../reference/glossary.html#extruder">extruder</a>, and the
+  <a href="../reference/glossary.html#build-plate">build plate</a>. Two of them control <em>place</em> and
+  two of them control <em>amount</em>. Hold onto that split — it is the fastest diagnostic you have.</p>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>Two parts control <em>place</em></h2>
+
+  <p><b>Motion</b> is the frame, rails, belts and stepper motors that decide where the nozzle tip is at
+  every instant. <b>The build plate</b> is the reference surface all of that is measured from: a heated
+  aluminium bed carrying a removable spring-steel sheet.</p>
+
+  <p>Motion is where the two Prusa families genuinely diverge, and it is not cosmetic.</p>
+
+  <table>
+    <caption>The same job, two mechanical answers.</caption>
+    <thead><tr><th>&nbsp;</th><th><a href="../reference/glossary.html#bedslinger">Bedslinger</a> — MK3S, MK4</th><th><a href="../reference/glossary.html#corexy">CoreXY</a> — Core One</th></tr></thead>
+    <tbody>
+      <tr><td>What moves on Y</td><td>the bed, plus your whole part</td><td>nothing — the head does X and Y</td></tr>
+      <tr><td>Moving mass</td><td><b>grows as the print grows</b></td><td>constant, and small</td></tr>
+      <tr><td>Motors</td><td>one per axis, X motor rides on the gantry</td><td>two fixed motors, crossed belts, both drive X <em>and</em> Y</td></tr>
+      <tr><td>First thing to give</td><td>acceleration and external-perimeter speed</td><td>gantry squareness, if the two belts aren't matched</td></tr>
+      <tr><td>Tell-tale defect</td><td>ghosting worse on tall thin parts</td><td>circles come out slightly oval</td></tr>
+    </tbody>
+  </table>
+
+  <p>That "moving mass grows" row is the whole reason the MK3S is the slow machine of your three. Halfway
+  up a 200 g part it is accelerating 200 g of plastic back and forth on the Y axis, and every reversal
+  rings the frame. The Core One accelerates the same light toolhead on layer one and layer four hundred.</p>
+
+  <div class="callout key">
+    <div class="callout-label">▲ Why CoreXY belts must match</div>
+    <p>On a bedslinger, X and Y are separate belts doing separate jobs — a loose X belt is an X problem. On
+    CoreXY both belts contribute to <em>both</em> axes, so unequal tension pulls the gantry out of square.
+    That's why Prusa's Core One procedure insists you tighten the two tensioner bolts <em>evenly and
+    alternately</em>: it's what keeps the gantry square while you adjust.<span class="cite"><a href="#r2">2</a></span>
+    You'll do this for real in <a href="0006-belt-tension-and-squareness.html">Lesson 6</a>.</p>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>Two parts control <em>amount</em></h2>
+
+  <p><b>The extruder</b> is a geared motor that grips filament and pushes it. <b>The hotend</b> melts what
+  arrives. All three of your printers are <em>direct drive</em>: the extruder sits on the moving toolhead,
+  a few centimetres above the melt zone, rather than pushing filament down a long Bowden tube. That short
+  path is why direct-drive machines handle flexible filament at all, and why they need much less
+  <a href="../reference/glossary.html#retraction">retraction</a> than Bowden machines.</p>
+
+  <p>Inside the hotend, four things stack up:</p>
+
+  <ul class="steps">
+    <li><span class="step-title">Heatsink</span>
+      <span class="step-detail">Kept cold by a fan. Filament arriving here must still be stiff — a stiff
+      rod is what lets the extruder push at all.</span></li>
+    <li><span class="step-title">Heatbreak</span>
+      <span class="step-detail">A deliberately thin-walled bridge between cold and hot. Its job is to make
+      the transition <em>abrupt</em>, so the molten region stays short and predictable. When it stops doing
+      that, softened filament creeps upward and jams the cold section — <em>heat creep</em>.</span></li>
+    <li><span class="step-title">Heater block</span>
+      <span class="step-detail">Cartridge heater and thermistor. The thermistor reads block temperature,
+      not plastic temperature — a distinction that matters the moment you print fast.</span></li>
+    <li><span class="step-title">Nozzle</span>
+      <span class="step-detail">The 0.4 mm orifice everything is measured against. A worn or clone nozzle
+      is not 0.4 mm, and will not reproduce anyone's numbers including your own.</span></li>
+  </ul>
+
+  <p>The melt zone — the short heated stretch where solid becomes liquid — is the machine's real speed
+  limit. Push filament through faster than it can absorb heat and the centre of the strand arrives still
+  solid. It comes out under-pressure, matte and weak. That ceiling has a name and a number:
+  <a href="../reference/glossary.html#max-volumetric-speed">max volumetric speed</a>, in mm³/s, and you will
+  measure yours in Lesson 14.</p>
+
+  <div class="callout note">
+    <div class="callout-label">⌁ The one number that separates your three machines</div>
+    <p>Practical flow ceiling on a 0.4 mm nozzle: <b>MK3S ~11–13 mm³/s</b>, <b>MK4 ~15–20</b> (MK4S and
+    high-flow nozzles: 22–28), <b>Core One ~22–28</b>. Same plastic, same nozzle diameter — nearly three
+    times the throughput, purely from how much heat the hotend can put into the strand per second. These
+    are the working figures from your own tuning guide, to be replaced by measured ones in Phase 2.</p>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>Where the machine ends and the profile begins</h2>
+
+  <p>Here is the idea the whole course is built on. Every filament calibration you will run in Phase 2
+  measures <b>filament behaviour <em>plus</em> machine behaviour</b>, mixed together, with no way to
+  separate them afterwards.</p>
+
+  <div class="compare">
+    <figure class="before">
+      <div class="difflabel">Tune the profile first</div>
+      <pre><code><span class="c"># belt is 12% loose</span>
+corners bulge      → lower PA
+walls measure thin → raise EM
+circles are oval   → ...?
+
+<span class="hl">You have now encoded a
+loose belt into a
+filament profile.</span></code></pre>
+    </figure>
+    <figure class="after">
+      <div class="difflabel">Tune the machine first</div>
+      <pre><code><span class="c"># belt set to spec, logged</span>
+corners bulge      → lower PA
+walls measure thin → raise EM
+circles are round
+
+<span class="ok">Every number now describes
+the filament, and travels
+with the spool.</span></code></pre>
+    </figure>
+  </div>
+
+  <p>This is not a philosophical point. A profile tuned around a mechanical fault stops working the moment
+  you fix the fault — and it never worked on your other two printers at all. Phase 1 exists to turn the
+  machine into a <em>constant</em>, so Phase 2 can treat the filament as the only variable.</p>
+
+  <p>Two features complicate the picture, and both belong to the machine rather than the filament, even
+  though they get tuned per filament:</p>
+
+  <ul>
+    <li><b><a href="../reference/glossary.html#input-shaper">Input Shaper</a></b> cancels the frame
+      resonances that cause <a href="../reference/glossary.html#ghosting">ghosting</a>, so the printer can
+      run much higher acceleration for the same surface finish. Your MK4 and Core One have it; the MK3S
+      does not.<span class="cite"><a href="#r1">1</a></span> Note what it does <em>not</em> do: it
+      compensates for resonance, it does not tighten a belt. Prusa are explicit that belt adjustment and
+      general maintenance come first, because those mechanical factors limit how much Input Shaper can
+      help.<span class="cite"><a href="#r1">1</a></span></li>
+    <li><b>The bed probe</b> differs by family and this changes the entire first-layer procedure. The MK3S
+      uses a <a href="../reference/glossary.html#pinda">PINDA</a> inductive probe, which senses the steel
+      sheet — not the nozzle. The MK4 family has a
+      <a href="../reference/glossary.html#loadcell">loadcell</a> in the heatsink that detects the nozzle
+      physically touching the sheet, so first-layer height is measured automatically before every print and
+      no manual calibration is needed.<span class="cite"><a href="#r3">3</a></span> Two different
+      procedures, in <a href="0007-first-layer-and-z-offset.html">Lesson 7</a>.</li>
+  </ul>
+
+  <!-- ===== INTERACTIVE WIDGET ===== -->
+  <h2><span class="num">4</span>Sort the symptom</h2>
+  <p>Click each symptom. Which of the four parts owns it — and is it a <em>place</em> problem or an
+  <em>amount</em> problem?</p>
+  <div class="faultfinder">
+    <div class="ff-q">Which subsystem does each defect belong to?</div>
+    <ul class="ff-list">
+      <li class="ff-item"
+          data-cause="The nozzle is arriving in the wrong place after a direction change — the frame is still ringing from the last reversal. It's a motion problem, made worse by mass: on a bedslinger the part itself is part of the moving mass."
+          data-fix="Belt tension first, then acceleration, then Input Shaper on the machines that have it. Never reach for a filament setting.">Faint repeated echoes downstream of every sharp corner<span class="ff-tag">Motion</span></li>
+      <li class="ff-item"
+          data-cause="Plastic is arriving faster than the melt zone can heat it, so the strand core is still solid when it's laid down. It's an amount problem — specifically a hotend-capacity problem."
+          data-fix="Measure max volumetric speed and let it clamp your speeds (Lesson 14). Raising temperature buys a little headroom; it does not remove the ceiling.">Walls go matte, thin and weak above a certain speed<span class="ff-tag">Hotend</span></li>
+      <li class="ff-item"
+          data-cause="Either the nozzle is too far from the sheet, or the sheet isn't where the printer thinks it is. Place, not amount — and the reference surface is the build plate."
+          data-fix="First layer and Z-offset, per your probe type: Live Adjust Z on the MK3S, the loadcell's automatic measurement on the MK4 family (Lesson 7).">First layer lines are round and separated, and lift at the corners<span class="ff-tag">Build plate</span></li>
+      <li class="ff-item"
+          data-cause="The extruder is losing grip on the filament — pushing harder than the filament can take, or than the melt zone can accept. Amount, at the delivery end rather than the melting end."
+          data-fix="Back off retraction length and flow demand first. On flexibles, reduce speed and loosen the idler. Grinding is always the extruder telling you the downstream path is blocked or too slow.">A rhythmic click, and a flat chewed patch on the filament<span class="ff-tag">Extruder</span></li>
+      <li class="ff-item"
+          data-cause="Both belts contribute to both axes on CoreXY, so unequal tension racks the gantry out of square. Circles become ellipses in a fixed direction. Purely a motion problem, and one no slicer setting can compensate for."
+          data-fix="Match the two belt frequencies within spec, tightening the tensioners evenly and alternately so the gantry stays square (Lesson 6).">On the Core One, circles print consistently oval<span class="ff-tag">Motion</span></li>
+    </ul>
+    <div class="ff-panel"><div class="ff-cause"></div><div class="ff-fix"></div></div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">5</span>Check yourself</h2>
+  <p>Answer from memory. Pulling these out of your own head is what makes them stick.</p>
+
+  <div class="quiz" data-explain-right="That's the one." data-explain-wrong="Re-read section 1.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">Why does the MK3S lose print quality on a tall part faster than the Core One does?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. It's a bedslinger: the part rides on the Y axis, so the mass being accelerated grows as the print grows.">Its moving mass grows as the part grows</button>
+      <button class="opt" data-feedback="Its hotend flow ceiling is lower, but that limits speed at any height — it doesn't get worse as the part gets taller.">Its hotend cannot melt plastic quickly</button>
+      <button class="opt" data-feedback="It has one belt per axis, which is simpler than CoreXY, not worse. Tall-part ringing comes from mass, not belt count.">It drives each axis with one belt</button>
+      <button class="opt" data-feedback="Marlin versus Buddy changes which advance command you use, not how much mass the Y axis has to accelerate.">Its firmware family is an older one</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read section 3.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">You tune a PETG profile beautifully, then discover and fix a loose Y belt. What happened to your profile?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Correct. Every number was measured against the fault, so the numbers described machine-plus-filament and now describe neither.">Its numbers now describe a machine that no longer exists</button>
+      <button class="opt" data-feedback="Fixing the belt improves motion, but the profile's numbers were fitted to the old behaviour — a better machine doesn't rescue a mis-fitted profile.">Its numbers are still correct and now perform better</button>
+      <button class="opt" data-feedback="Only motion-adjacent values would be visibly wrong at first, but flow and advance were tuned against the fault too. All of it is suspect.">Its numbers are fine except for the print speeds</button>
+      <button class="opt" data-feedback="Belt tension is a machine property, not a filament property — but that's precisely why it must be fixed before, not after, the filament is tuned.">Its numbers were never affected by belt tension</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read the Input Shaper note in section 3.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">Your Core One shows ghosting. Input Shaper is enabled. What does that tell you?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Input Shaper cancels resonance; it cannot cancel slop. Prusa put belt adjustment and maintenance before it for exactly this reason.">Something mechanical is beneath what Input Shaper can fix</button>
+      <button class="opt" data-feedback="Input Shaper isn't a slider you turn up. If ghosting survives it, the cause is mechanical, not a matter of strength.">Input Shaper needs to be set to a stronger setting</button>
+      <button class="opt" data-feedback="Filament choice changes surface finish, but ghosting is a positional error — the nozzle was in the wrong place, whatever was coming out of it.">The filament is wrong for the acceleration in use</button>
+      <button class="opt" data-feedback="Enclosed printers do run hotter, and that matters for PLA, but chamber heat softens parts — it doesn't print echoes after corners.">The enclosure is holding too much heat inside</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Write down what your three machines actually are</h3>
+    <p>Open a file called <code>fleet.md</code> in this folder and fill in one row per printer. Read the
+    values off the machine — the firmware version from the LCD, the nozzle from what you last installed, the
+    sheet from what's on the bed right now. Don't copy them from the guide.</p>
+    <pre><code><span class="c">| Printer | Firmware ver | Kinematics | Probe | Nozzle | Sheet | Last hardware change |</span>
+| MK3S     | ? | bedslinger | PINDA    | 0.4 | ? | ? |
+| MK4      | ? | bedslinger | loadcell | 0.4 | ? | ? |
+| Core One | ? | CoreXY     | loadcell | 0.4 | ? | ? |</code></pre>
+    <p>Then add one sentence per machine: <em>"The first thing that will limit quality on this printer
+    is ___, because ___."</em></p>
+    <p class="go">→ Paste it back to me and I'll tell you which of your three predictions I'd bet against.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>Four subsystems, two jobs.</strong> Motion and build plate control <em>place</em>; extruder
+      and hotend control <em>amount</em>. Every defect belongs to one of the four.</li>
+      <li><strong>Bedslingers and CoreXY fail differently.</strong> Growing moving mass versus gantry
+      squareness — which is why one profile can't serve both.</li>
+      <li><strong>The melt zone is the real speed limit</strong>, and it is a different number on each of my
+      three machines even with the same nozzle.</li>
+      <li><strong>Filament calibration measures filament <em>plus</em> machine.</strong> That's the whole
+      argument for doing Phase 1 first.</li>
+      <li><strong>Input Shaper compensates for resonance, not for slop.</strong> Belts come first.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/article/input-shaper-core-one-mk4-s-mk3-9-s-mk3-5-s-xl-mini_451816" target="_blank" rel="noopener">Input Shaper — Prusa Knowledge Base</a></div>
+      <div class="desc">Short, and the clearest statement of which printers have Input Shaper and why
+      mechanical maintenance has to come before it. Read the limitations section in particular.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> Not sure which subsystem a defect on your desk belongs to?
+    Describe it, or photograph it and tell me what you see. Working out the attribution together is worth
+    more than reading another table. Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#bedslinger">bedslinger</a>,
+    <a href="../reference/glossary.html#corexy">CoreXY</a>,
+    <a href="../reference/glossary.html#toolhead">toolhead</a>,
+    <a href="../reference/glossary.html#hotend">hotend</a>,
+    <a href="../reference/glossary.html#heatbreak">heatbreak</a>,
+    <a href="../reference/glossary.html#extruder">extruder</a>,
+    <a href="../reference/glossary.html#build-plate">build plate</a>,
+    <a href="../reference/glossary.html#input-shaper">Input Shaper</a>,
+    <a href="../reference/glossary.html#ghosting">ghosting</a>,
+    <a href="../reference/glossary.html#pinda">PINDA</a>,
+    <a href="../reference/glossary.html#loadcell">loadcell</a>,
+    <a href="../reference/glossary.html#max-volumetric-speed">max volumetric speed</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>Input Shaper (CORE One, MK4/S, MK3.9/S, MK3.5/S, XL, MINI/+)</i>. Which
+    printers have Input Shaper, what it cancels, and that belt adjustment and maintenance limit its
+    effectiveness.
+    <a href="https://help.prusa3d.com/article/input-shaper-core-one-mk4-s-mk3-9-s-mk3-5-s-xl-mini_451816" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">Prusa Research. <i>Adjusting belt tension (CORE One)</i>. The instruction to tighten both
+    tensioner bolts evenly and alternately so the gantry stays square during adjustment.
+    <a href="https://help.prusa3d.com/article/adjusting-belt-tension-core-one_845048" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r3">Prusa Research. <i>Loadcell (MK4/S, MK3.9/S, XL)</i>. The loadcell sits in the hotend
+    heatsink and detects nozzle-to-sheet contact, so manual first layer calibration is not needed.
+    <a href="https://help.prusa3d.com/article/loadcell-mk4-s-mk3-9-s-xl_401253" target="_blank" rel="noopener">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="../index.html">
+      <div class="dir">← Course home</div>
+      <div class="ttl">All lessons</div>
+    </a>
+    <a class="next" href="0002-filament-is-a-material.html">
+      <div class="dir">Next · L2</div>
+      <div class="ttl">Filament is a material →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L1 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

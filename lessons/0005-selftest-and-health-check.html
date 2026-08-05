@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L5 · Selftest and the health check</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 1 · The machine · L5</p>
+  <h1 class="lesson-title">Selftest and the health check</h1>
+  <p class="lesson-sub">Before you measure a filament, make the machine stop being a variable. Your printer
+  will run most of this check for you — if you know where it lives and what it proves.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~20 minutes + printer time</span><span class="sep">•</span>
+    <span>🖨 Hands on the machine</span><span class="sep">•</span>
+    <span class="tag accent">Phase 1</span>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>You have three printers and a written guide full of numbers that were never measured on them. The
+    first thing that has to happen isn't a temperature tower — it's establishing that each machine is
+    mechanically what it claims to be. The selftest is the printer's own hardware check, it's free, it takes
+    ten minutes, and until it passes, nothing you measure afterwards means anything. This is the floor of
+    the <a href="../reference/glossary.html#calibration-order">calibration order</a>.</p>
+  </div>
+
+  <p>A <a href="../reference/glossary.html#selftest">selftest</a> is not a print-quality test. It is the
+  printer checking that its own parts are connected, moving, heating and reading as designed. It answers
+  questions like <em>is the hotend fan actually spinning</em> and <em>are the X motor's wires on the right
+  header</em> — the kind of fault that produces bizarre print defects you will otherwise spend a weekend
+  attributing to filament.</p>
+
+  <p>Run it in three situations: <b>now</b>, before you calibrate anything; after <b>any hardware change</b>
+  (nozzle, belt, extruder, sheet, fan); and whenever a machine starts behaving in a way you can't explain.</p>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>Run it on your machine</h2>
+
+  <p>The path differs by firmware family, and so does what the test covers. <b>Open your machine — only
+  yours.</b></p>
+
+  <details class="panel">
+    <summary>MK3S · Marlin firmware</summary>
+    <div class="panel-body">
+      <p><b>Path:</b> <code>LCD → Calibration → Selftest</code>. It also runs automatically on first power-on
+      or after a factory reset, as the first part of the Calibration Wizard.<span class="cite"><a href="#r1">1</a></span></p>
+      <p><b>What it checks, in order</b><span class="cite"><a href="#r1">1</a></span>:</p>
+      <ol>
+        <li>Extruder and print fan</li>
+        <li>Heatbed and hotend wiring</li>
+        <li>XYZ motor wiring and function</li>
+        <li>XY axis length</li>
+        <li>XY belt tension</li>
+        <li>Loose belt pulley</li>
+        <li>Filament sensor / IR sensor</li>
+      </ol>
+      <p>Note items 4–6: the MK3S selftest is <em>also</em> your belt measurement. It writes a number you'll
+      read in Lesson 6. That's why the MK3S health check and belt check are naturally one session.</p>
+      <p><b>Then run, in this order:</b></p>
+      <ol>
+        <li><code>LCD → Calibration → Calibrate XYZ</code> — measures bed
+        <a href="../reference/glossary.html#skew">skew</a> and axis lengths and corrects them in firmware.
+        Results are readable afterwards at <code>LCD → Support → XYZ cal. details</code>.<span class="cite"><a href="#r2">2</a></span></li>
+        <li><code>LCD → Calibration → First layer calibration</code> — Lesson 7 covers judging it.</li>
+      </ol>
+      <p><b>If it fails:</b> stop. Don't work around it. Prusa's
+      <a href="https://help.prusa3d.com/article/selftest-failed-mk3-mk3s-mk3s_2045" target="_blank" rel="noopener">Selftest failed (MK3/MK3S/MK3S+)</a>
+      article diagnoses failure by failure. A common one — an XY axis length error — is frequently a belt
+      tension problem rather than a broken axis.<span class="cite"><a href="#r3">3</a></span></p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>MK4 / MK4S · Buddy firmware</summary>
+    <div class="panel-body">
+      <p><b>Path:</b> the full Calibration Wizard runs automatically on first power-on or after a factory
+      reset. Afterwards, each step can be run individually from
+      <code>LCD → Control → Calibrations &amp; tests</code>.<span class="cite"><a href="#r4">4</a></span></p>
+      <p><b>What's different from the MK3S:</b></p>
+      <ul>
+        <li>There is a <b><a href="../reference/glossary.html#loadcell">loadcell</a> calibration step.</b>
+        This is the one manual adjustment the loadcell needs — after it, first-layer height is measured
+        automatically before every print during mesh bed levelling, and no Live Adjust Z is
+        required.<span class="cite"><a href="#r5">5</a></span> Do not skip it.</li>
+        <li>There is <b>no belt-tension number</b> written by the selftest the way the MK3S writes one. Belt
+        tension on the MK4 is adjusted by feel and by the physical procedure in Lesson 6.</li>
+        <li><b><a href="../reference/glossary.html#input-shaper">Input Shaper</a> is present</b> and is
+        normally not something you calibrate on a stock printer — but it depends on the machine being
+        mechanically sound, so it comes after belts, not before.<span class="cite"><a href="#r6">6</a></span></li>
+      </ul>
+      <p><b>If it fails:</b> the firmware reports a numbered error code. Search that exact number in the
+      Prusa Knowledge Base — the KB indexes them individually, which is far faster than describing the
+      symptom.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Core One · Buddy firmware, CoreXY, enclosed</summary>
+    <div class="panel-body">
+      <p><b>Path:</b> same as the MK4 family — full wizard on first power-on or factory reset, individual
+      steps afterwards at <code>LCD → Control → Calibrations &amp; tests</code>.<span class="cite"><a href="#r4">4</a></span></p>
+      <p><b>What's different from the MK4:</b></p>
+      <ul>
+        <li><b>Kinematics.</b> A <a href="../reference/glossary.html#corexy">CoreXY</a> gantry can be out of
+        square in a way a <a href="../reference/glossary.html#bedslinger">bedslinger</a> can't, because both
+        belts drive both axes. Squareness is a belt-tension outcome here, which makes Lesson 6 more
+        consequential on this machine than on the other two.</li>
+        <li><b>The enclosure.</b> Before running anything thermal, decide the door and vent state and
+        <em>record it</em>. A check run with the door shut and a print run with it open are two different
+        machines. This matters most for PLA, whose
+        <a href="../reference/glossary.html#glass-transition">glass transition</a> is close to achievable
+        chamber temperatures.</li>
+        <li><b>Loadcell</b>, as on the MK4 — same automatic first layer, same one-time selftest
+        step.<span class="cite"><a href="#r5">5</a></span></li>
+      </ul>
+      <p><b>If it fails:</b> see
+      <a href="https://help.prusa3d.com/article/selftest-failed-core-one_837189" target="_blank" rel="noopener">Selftest failed (CORE One/+)</a>,
+      and check the firmware variant matches your machine — the Core One, Core One+ and Core One L have
+      separate KB articles with different numbers in them.</p>
+    </div>
+  </details>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>What the selftest does <em>not</em> prove</h2>
+
+  <p>A pass is a floor, not a certificate. It is easy to read "Selftest OK" as "the machine is fine" and
+  walk straight into Phase 2 with three unmeasured faults still in place.</p>
+
+  <table>
+    <caption>What a passing selftest establishes, and what it leaves open.</caption>
+    <thead><tr><th>Proved by the selftest</th><th>Still unproved — and which lesson closes it</th></tr></thead>
+    <tbody>
+      <tr><td>Fans spin, heaters heat, thermistors read</td><td>Whether temperature is <em>stable</em> under load — L8</td></tr>
+      <tr><td>Motors move and are wired correctly</td><td>Whether belts are at the right tension — L6</td></tr>
+      <tr><td>Axes reach their expected length (MK3S)</td><td>Whether the gantry is square (Core One) — L6</td></tr>
+      <tr><td>The probe responds</td><td>Whether the first layer is the right height — L7</td></tr>
+      <tr><td>The filament sensor triggers</td><td>Whether the nozzle is the size it claims to be — you</td></tr>
+    </tbody>
+  </table>
+
+  <p>That last row is on you and nothing automated will catch it. A worn or clone nozzle is not 0.4 mm, and
+  every number in this course is measured relative to a nozzle that is. If you can't say with confidence
+  what's currently installed and roughly how many kilograms have gone through it, that's a fault to resolve
+  before Phase 2 rather than a detail.</p>
+
+  <div class="callout key">
+    <div class="callout-label">▲ Two more prerequisites while you're here</div>
+    <p><b>Firmware current, on all three.</b> Not for features — for consistency. The Prusa KB documents
+    behaviour per firmware version, and menu paths move between releases. If a path in this course isn't
+    where it says, check your version first.<br>
+    <b>PrusaSlicer in Expert mode</b>, with the Configuration Wizard run so the system profiles for MK3S,
+    MK4/MK4S and Core One are installed with the nozzle sizes you actually own. Half the settings this
+    course touches are hidden in Simple and Advanced mode.</p>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>The health check as a repeatable ritual</h2>
+
+  <p>The point of Phase 1 isn't to do this once. It's to have a check you can re-run in twenty minutes,
+  whose results go in the <a href="../reference/glossary.html#tuning-log">tuning log</a>, so that when a
+  machine starts misbehaving in three months you can compare against a baseline instead of speculating.</p>
+
+  <div class="checklist-widget">
+    <div class="cl-title">✓ The per-printer health check — run once now, and after any hardware change</div>
+    <ul class="checklist">
+      <li data-check>Firmware version noted and current</li>
+      <li data-check>Nozzle size and rough age known and written down</li>
+      <li data-check>Frame screws and bed mounts checked for movement by hand</li>
+      <li data-check>Selftest run and passed (MK3S: Calibration → Selftest · MK4/Core One: Control → Calibrations &amp; tests)</li>
+      <li data-check>MK3S only: Calibrate XYZ run, skew result read from Support → XYZ cal. details</li>
+      <li data-check>MK4 / Core One only: loadcell calibration step completed</li>
+      <li data-check>Core One only: door and vent state decided and recorded</li>
+      <li data-check>Belt tension measured and in spec (Lesson 6)</li>
+      <li data-check>First layer calibrated and judged (Lesson 7)</li>
+      <li data-check>Thermal stability and Input Shaper confirmed (Lesson 8)</li>
+      <li data-check>Every number above written into <code>tuning-log.md</code> with today's date</li>
+    </ul>
+    <div class="checklist-bar"><span>Tick as you go</span><span data-checklist-progress></span></div>
+  </div>
+
+  <p>Three of those items are the next three lessons. Do the rest now, and leave the last three unticked —
+  you'll come back.</p>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">4</span>Check yourself</h2>
+  <p>From memory. Question 3 reaches back to Phase 0.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read section 2.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">Your selftest passes but prints still show ghosting. What has the pass actually told you?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. A pass proves parts are connected and moving; it doesn't prove tension, squareness, first-layer height or thermal stability.">That the parts work, not that they're adjusted right</button>
+      <button class="opt" data-feedback="On the MK3S the selftest does report a belt-tension number, but a pass there only means it's within a broad range — and on the MK4 and Core One it reports nothing of the kind.">That belt tension has been verified within spec</button>
+      <button class="opt" data-feedback="If the machine is mechanically sound, filament is a reasonable next suspect — but ghosting is a positional error, so it points at motion long before it points at plastic.">That the fault must lie in the filament instead</button>
+      <button class="opt" data-feedback="Input Shaper isn't part of the selftest, and on the MK3S it doesn't exist at all. A pass says nothing about it either way.">That Input Shaper is calibrated and working well</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read the MK4 and Core One panels.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">Why does the MK4-family selftest include a loadcell step that the MK3S has no equivalent for?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. The loadcell senses nozzle-to-sheet contact directly, so once it's calibrated the first layer is measured automatically before every print.">Its probe senses the nozzle itself, not the steel sheet</button>
+      <button class="opt" data-feedback="The MK4 does have a different extruder, but the loadcell lives in the hotend heatsink and its job is bed sensing, not filament driving.">Its extruder needs a force reading to feed properly</button>
+      <button class="opt" data-feedback="Buddy firmware is newer, but the step exists because of a hardware difference — the MK3S runs Buddy variants in some models and still uses PINDA.">Its firmware family runs a longer calibration wizard</button>
+      <button class="opt" data-feedback="Both machines do mesh bed levelling. What differs is what finds the surface: an inductive probe reading metal, versus a force sensor reading contact.">Its bed is not flat enough for a single probe point</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read the Core One panel.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">Why does the Core One's door position belong in the health check at all?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Chamber temperature is a machine variable. A check run closed and a print run open are two different thermal environments, so the state has to be recorded.">Chamber temperature changes with it, so it's a variable</button>
+      <button class="opt" data-feedback="An open door does let more noise out, but nothing in the calibration chain is measured in decibels — it's the heat that matters.">Enclosure noise interferes with resonance measurement</button>
+      <button class="opt" data-feedback="Draughts do affect open-frame printers, which is an argument for closing the door — but for PLA the enclosure's retained heat is the bigger problem, not the draught.">Air draughts would otherwise disturb the first layer</button>
+      <button class="opt" data-feedback="The selftest runs the same either way. The reason to record the state is that it changes the conditions every later measurement is taken under.">The selftest cannot complete with the door left open</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Run the health check on one printer</h3>
+    <p>Pick one machine — whichever you intend to calibrate first. Work down the checklist above as far as
+    "Belt tension", which is next lesson. Then write into <code>tuning-log.md</code>:</p>
+    <ol>
+      <li>Printer, firmware version, date.</li>
+      <li>Selftest result — and if anything failed, exactly which step and what the message said.</li>
+      <li><b>MK3S:</b> the skew value from <code>Support → XYZ cal. details</code>.<br>
+      <b>MK4 / Core One:</b> confirmation that the loadcell step completed, plus (Core One) the door and
+      vent state you've decided on.</li>
+      <li>Nozzle: size, and your honest estimate of how much filament has gone through it.</li>
+      <li>One line: <em>"The thing about this machine I am least confident in is ___."</em></li>
+    </ol>
+    <p class="go">→ Paste it back to me. Item 5 is the one I care about most — it usually predicts where the
+    calibration will go wrong, and it's cheaper to investigate now than in Phase 2.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>The selftest is the floor of the calibration order</strong> — free, ten minutes, and
+      everything downstream assumes it passed.</li>
+      <li><strong>The path differs by firmware family:</strong> <code>Calibration → Selftest</code> on the
+      MK3S, <code>Control → Calibrations &amp; tests</code> on the MK4 and Core One.</li>
+      <li><strong>The MK3S selftest measures belts; the Buddy machines don't</strong> — which is why Lesson 6
+      looks completely different on each.</li>
+      <li><strong>A pass proves connection and motion, not adjustment.</strong> Tension, squareness, first
+      layer and thermal stability all remain open.</li>
+      <li><strong>Re-run it after every hardware change</strong>, and log the result so there's a baseline to
+      compare against later.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/category/calibration_199" target="_blank" rel="noopener">Calibration — Prusa Knowledge Base</a></div>
+      <div class="desc">The per-model calibration hub. Find your exact printer in the model list before
+      reading anything — the KB splits these articles by model family, and following an MK4 article on an
+      MK3S will give you a menu path that doesn't exist.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> If a selftest step fails, paste me the exact message and the
+    machine. Prusa's failure articles are good but terse, and half the work is deciding whether you're
+    looking at a wiring fault, a tension problem, or a genuinely dead part. Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#selftest">selftest</a>,
+    <a href="../reference/glossary.html#skew">skew</a>,
+    <a href="../reference/glossary.html#loadcell">loadcell</a>,
+    <a href="../reference/glossary.html#pinda">PINDA</a>,
+    <a href="../reference/glossary.html#input-shaper">Input Shaper</a>,
+    <a href="../reference/glossary.html#corexy">CoreXY</a>,
+    <a href="../reference/glossary.html#bedslinger">bedslinger</a>,
+    <a href="../reference/glossary.html#glass-transition">glass transition temperature</a>,
+    <a href="../reference/glossary.html#calibration-order">calibration order</a>,
+    <a href="../reference/glossary.html#tuning-log">tuning log</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>Selftest (MK3/MK3S/MK3S+)</i>. The <code>Calibration → Selftest</code>
+    path, the seven checks in order, and that the selftest is the first part of the Calibration Wizard.
+    <a href="https://help.prusa3d.com/article/selbsttest-mk3-und-mk3s_6366" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">Prusa Research. <i>XYZ calibration details</i>. Detailed XYZ calibration results are readable
+    from <code>Support → XYZ cal. details</code> from firmware 3.0.12.
+    <a href="https://help.prusa3d.com/article/xyz-calibration-details_2272" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r3">Prusa Research. <i>Check Axis Length X/Y/Z (MK3S)</i>. Axis-length errors are commonly caused
+    by belt tension being slightly too tight or too loose.
+    <a href="https://help.prusa3d.com/article/check-axis-length-x-y-z-mk3s_134223" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r4">Prusa Research. <i>Selftest failed (CORE One/+)</i>. After initial calibration, each selftest
+    step can be started from <code>Control → Calibrations &amp; tests</code>.
+    <a href="https://help.prusa3d.com/article/selftest-failed-core-one_837189" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r5">Prusa Research. <i>Loadcell (MK4/S, MK3.9/S, XL)</i>. The only loadcell adjustment needed is
+    during the selftest; afterwards first layer calibration happens automatically during mesh bed levelling.
+    <a href="https://help.prusa3d.com/article/loadcell-mk4-s-mk3-9-s-xl_401253" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r6">Prusa Research. <i>Input Shaper</i>. Calibration is usually unnecessary on a stock printer,
+    and belt adjustment, nozzle inspection and debris removal are recommended beforehand.
+    <a href="https://help.prusa3d.com/article/input-shaper-core-one-mk4-s-mk3-9-s-mk3-5-s-xl-mini_451816" target="_blank" rel="noopener">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0004-the-calibration-mindset.html">
+      <div class="dir">← Previous · L4</div>
+      <div class="ttl">The calibration mindset</div>
+    </a>
+    <a class="next" href="0006-belt-tension-and-squareness.html">
+      <div class="dir">Next · L6</div>
+      <div class="ttl">Belt tension and squareness →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L5 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

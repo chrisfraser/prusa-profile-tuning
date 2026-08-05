@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L2 · Filament is a material, not a supply</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 0 · Fundamentals · L2</p>
+  <h1 class="lesson-title">Filament is a material, not a supply</h1>
+  <p class="lesson-sub">Three temperatures decide everything a polymer does in your printer — and one of
+  them isn't the one on the box.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~12 minutes</span><span class="sep">•</span>
+    <span>🧠 Builds on L1</span><span class="sep">•</span>
+    <span class="tag accent">Fundamentals</span>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-label">⏩ Already know this?</div>
+    <p>This lesson covers glass transition vs melting, why layer bonding is a temperature problem, what
+    moisture does inside the melt zone, and why drying is a prerequisite rather than an optimisation. If
+    that's already yours, <a href="0005-selftest-and-health-check.html">skip straight to Phase 1 →</a></p>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>You print in Mauritius. Ambient humidity there is high enough that a spool left open overnight is a
+    different material by morning — and PETG and TPU, two of your three target materials, are the two that
+    care most. Every measurement in Phase 2 is taken with a specific spool in a specific state. If that
+    state is "wet", you will spend an evening carefully measuring water and writing the result into a
+    profile. This lesson is why the first line of your calibration checklist is <em>dry the filament</em>.</p>
+  </div>
+
+  <p>A spool is not a consumable like ink. It is a thermoplastic with a personality: a temperature at which
+  it softens, a temperature at which it flows, and a strong opinion about water. Learn those three things
+  per material and most "mystery" print failures stop being mysterious.</p>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>Two temperatures, and only one is on the box</h2>
+
+  <p>The number printed on the spool — 215 °C, 240 °C — is a suggested <em>nozzle</em> temperature. It is
+  not a property of the plastic. Two temperatures are:</p>
+
+  <ul class="steps">
+    <li><span class="step-title">Glass transition temperature (T<sub>g</sub>)</span>
+      <span class="step-detail">Where a solid polymer stops being rigid and starts to go rubbery. Far
+      <em>below</em> the print temperature. PLA's is roughly 60 °C — which is why a PLA part left in a car
+      in Mauritius sags, and why a heated chamber is PLA's enemy rather than its friend.</span></li>
+    <li><span class="step-title">Melt / flow temperature</span>
+      <span class="step-detail">Where it flows well enough to be extruded. This is the region the number on
+      the box points at — a <em>range</em>, not a value, and the whole point of the temperature tower in
+      Lesson 9 is to find the right end of it for your spool.</span></li>
+  </ul>
+
+  <p>Now the part that matters for strength. When the nozzle lays a new line onto the layer below, the two
+  only fuse if the old surface is still above T<sub>g</sub> when the new plastic arrives, long enough for
+  the polymer chains to tangle across the boundary. That is <b>layer adhesion</b>, and it is why:</p>
+
+  <ul>
+    <li>Printing <b>too cold</b> gives you a part that snaps cleanly along a layer line. The geometry was
+    perfect; the layers never became one piece.</li>
+    <li><b>Too much cooling fan</b> does the same thing by a different route — the previous layer is chilled
+    below T<sub>g</sub> before the next arrives. This is exactly why PETG hates a strong fan and PLA
+    doesn't.</li>
+    <li>A print that is <b>fine at 40 mm/s and delaminates at 120 mm/s</b> may not have a temperature
+    problem at all — each layer is simply returning sooner, with less time under the fan. Speed and cooling
+    are coupled.</li>
+  </ul>
+
+  <div class="callout key">
+    <div class="callout-label">▲ The snap test</div>
+    <p>The honest way to judge layer adhesion is destructive. Snap the test part. A <b>granular, rough,
+    fibrous</b> fracture means the layers fused — the crack had to tear through material. A <b>clean flat
+    plane</b> following a layer line means they didn't. Surface finish tells you nothing about this; you have
+    to break it. You'll use this in Lesson 9.</p>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>Your three materials, in one sentence each</h2>
+
+  <table>
+    <caption>Working characteristics — the reasons behind the numbers you'll measure in Phase 2.</caption>
+    <thead><tr><th>&nbsp;</th><th>PLA</th><th>PETG</th><th>TPU (95A)</th></tr></thead>
+    <tbody>
+      <tr><td>Personality</td><td>stiff, brittle, forgiving to print</td><td>tough, slightly flexible, sticky when molten</td><td>rubber — the print is a spring</td></tr>
+      <tr><td>Softens at (T<sub>g</sub>)</td><td>~60 °C — low</td><td>~80 °C</td><td>low, and it doesn't matter much</td></tr>
+      <tr><td>Wants cooling</td><td>as much as you can give it</td><td>middle — too much delaminates it</td><td>moderate; needs to stay warm to bond</td></tr>
+      <tr><td>Moisture</td><td>mildly <a href="../reference/glossary.html#hygroscopic">hygroscopic</a></td><td>hygroscopic</td><td><b>badly</b> hygroscopic</td></tr>
+      <tr><td>Real speed limit set by</td><td>the hotend</td><td>the hotend</td><td><b>the extruder</b> — it buckles before it melts</td></tr>
+      <tr><td>Enclosure (Core One)</td><td><b>vent it open</b> — chamber heat approaches T<sub>g</sub></td><td>close it — likes the warmth</td><td>close it</td></tr>
+    </tbody>
+  </table>
+
+  <p>That last row is the clearest example of "material, not supply". The same enclosure that makes your
+  Core One better at PETG makes it worse at PLA, because PLA's glass transition is low enough that a warm
+  chamber starts softening the part you're printing and the filament in the extruder path above it.</p>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ Not documented by Prusa</div>
+    <p>The specific Core One chamber targets in your existing guide — vent open and ≤ 30 °C for PLA, closed
+    and 35–40 °C for PETG — are community consensus, not a figure from the Prusa Knowledge Base. Treat them
+    as a sensible starting point to test, not as a specification. The same caveat applies to the eSUN PETG
+    and eTPU-95A numbers in the starter bundle: those are manufacturer datasheet claims, not measurements
+    from your spools.</p>
+  </div>
+
+  <p>And the TPU row deserves a note of its own. On PLA and PETG the bottleneck is how fast the hotend can
+  melt. On TPU it is the extruder: pushing a rubber rod down a channel, past a certain force it stops
+  advancing and starts <em>buckling</em> sideways in the filament path. This is why TPU wants low speeds,
+  minimal <a href="../reference/glossary.html#retraction">retraction</a>, and a spool that unwinds with
+  almost no resistance — and why "just turn the temperature up" doesn't help.</p>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>Water, and why it invalidates measurements</h2>
+
+  <p><a href="../reference/glossary.html#hygroscopic">Hygroscopic</a> means the polymer pulls water vapour
+  out of the air and holds it. Not on the surface — dissolved into the material. You cannot see it, and the
+  spool feels identical.</p>
+
+  <p>Then it reaches the melt zone, which is 200–250 °C. The absorbed water flashes to steam <em>inside</em>
+  the molten plastic. What you get:</p>
+
+  <div class="compare">
+    <figure class="before">
+      <div class="difflabel">Wet spool</div>
+      <pre><code><span class="c"># what you observe</span>
+audible pops / hissing
+foamy, rough surface
+fine hairs everywhere
+weak layer bonding
+<span class="hl">extrusion width varies
+randomly, print to print</span></code></pre>
+    </figure>
+    <figure class="after">
+      <div class="difflabel">Dry spool</div>
+      <pre><code><span class="c"># what you observe</span>
+silent extrusion
+glossy, even surface
+stringing tracks retraction
+predictable bonding
+<span class="ok">extrusion width repeats
+within measurement error</span></code></pre>
+    </figure>
+  </div>
+
+  <p>Read that last pair again, because it is the point of the lesson. Moisture does not simply degrade the
+  print — it makes the print <b>non-reproducible</b>. And every calibration in Phase 2 is a comparison
+  between two prints. Steam-driven variation shows up as:</p>
+
+  <ul>
+    <li><b>Temperature tower:</b> apparent bad bonding at every temperature, so you pick a value 10–15 °C
+    too high and cook every future print.</li>
+    <li><b>Extrusion multiplier:</b> a wall that measures differently in three places for reasons that have
+    nothing to do with flow. You correct a number that wasn't wrong.</li>
+    <li><b>Retraction:</b> hairs from steam look exactly like hairs from oozing, so you dial retraction up
+    until the extruder starts grinding, chasing a problem retraction can't solve.</li>
+  </ul>
+
+  <p>Three of your first four Phase 2 steps, corrupted, in a way that <em>looks like data</em>. In a humid
+  climate this isn't an edge case — it's the default state of an opened spool.</p>
+
+  <div class="callout note">
+    <div class="callout-label">⌁ Drying — the working numbers</div>
+    <p>PLA ~55 °C for 6–8 h · PETG ~65 °C for 8 h · TPU ~50–55 °C for 8–12 h. These come from your existing
+    guide and from community consensus rather than a Prusa KB article — no Prusa article specifies
+    per-material drying schedules, so this is flagged as a gap in <code>RESOURCES.md</code>. The rule that
+    <em>is</em> solid: dry before you calibrate, store dry afterwards, and record on the spool the date it
+    was last dried. An undated spool in Mauritius is an unknown material.</p>
+  </div>
+
+  <!-- ===== INTERACTIVE WIDGET ===== -->
+  <h2><span class="num">4</span>Two hairs that look identical</h2>
+  <p>Click each symptom and decide, before you read the answer, whether it's a moisture problem, a
+  temperature problem, or neither.</p>
+  <div class="faultfinder">
+    <div class="ff-q">Moisture, temperature, or something else?</div>
+    <ul class="ff-list">
+      <li class="ff-item"
+          data-cause="Steam. Water dissolved in the polymer boils in the melt zone and blows the strand open. The popping is the giveaway — oozing is silent."
+          data-fix="Dry the spool and re-run. Do not touch retraction, and do not lower the temperature: you'd be treating a symptom of water as a symptom of heat.">Fine hairs between towers, plus audible popping<span class="ff-tag">Moisture</span></li>
+      <li class="ff-item"
+          data-cause="Molten plastic under residual pressure leaking during travel, with nothing dramatic happening thermally. Silent, and it tracks travel moves rather than appearing everywhere."
+          data-fix="Retraction length, then travel speed, then temperature — in that order (Lesson 12). Retraction is the right tool here, unlike in the case above.">Fine hairs between towers, silent, dry-stored spool<span class="ff-tag">Retraction</span></li>
+      <li class="ff-item"
+          data-cause="The previous layer dropped below its glass transition temperature before the next one landed, so the chains never tangled across the boundary. Geometry is perfect; the part is laminated, not solid."
+          data-fix="Raise temperature or reduce cooling — and on tall thin parts, add a second object so each layer takes longer. Never diagnose this from the surface; snap it."
+          >Perfect-looking part that snaps flat along one layer line<span class="ff-tag">Bonding</span></li>
+      <li class="ff-item"
+          data-cause="Chamber heat has taken the part above PLA's glass transition (~60 °C) while it was still printing. The plastic softened under its own weight and the extruder path above it got hot enough to soften filament before the melt zone."
+          data-fix="Open the Core One's vent, or the door, for PLA. This is the one material where the enclosure is a liability rather than an asset."
+          >PLA on the Core One: fine detail rounds off, extruder starts clicking<span class="ff-tag">Enclosure</span></li>
+    </ul>
+    <div class="ff-panel"><div class="ff-cause"></div><div class="ff-fix"></div></div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">5</span>Check yourself</h2>
+  <p>From memory — and notice these interleave with Lesson 1.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read section 1.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">Why does the Core One's enclosure need venting for PLA but not for PETG?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. PLA's glass transition sits near 60 °C, close to achievable chamber temperatures, so a warm chamber softens the part as it prints. PETG's is higher.">PLA softens near temperatures the chamber can reach</button>
+      <button class="opt" data-feedback="PLA does want more cooling, but the vent isn't about airflow volume — it's about the chamber's ambient temperature relative to PLA's glass transition.">PLA needs more airflow across the printed part</button>
+      <button class="opt" data-feedback="PLA is less hygroscopic than PETG, so if moisture drove this rule it would point the other way entirely.">PLA absorbs moisture faster in a sealed chamber</button>
+      <button class="opt" data-feedback="PLA does flow at a lower nozzle temperature, but nozzle temperature is set by the profile and is unaffected by whether the door is open.">PLA melts at a lower nozzle temperature setting</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read section 3.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">What is the worst thing a wet spool does to a calibration session?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. It adds random variation between prints, so comparisons between test bands are meaningless — but they still look like measurements.">It makes two identical prints come out differently</button>
+      <button class="opt" data-feedback="It does weaken layer bonding, but a consistently weak print is still a comparable print. Randomness is what destroys a calibration.">It makes every printed part measurably weaker</button>
+      <button class="opt" data-feedback="Surface roughness is cosmetic and visible — you'd notice and stop. The dangerous failures are the ones that still look like usable data.">It makes the surface of every part rougher</button>
+      <button class="opt" data-feedback="Steam can contribute to clogs, but a clog stops the print outright. A calibration you can't trust is worse than one that fails loudly.">It makes the hotend clog partway through printing</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read section 2.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">Your TPU print under-extrudes badly above 30 mm/s. What's the most likely bottleneck?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. TPU is the one material where the extruder gives out first — the filament buckles in the drive path before the hotend runs short of heat.">The extruder is buckling the filament, not feeding it</button>
+      <button class="opt" data-feedback="On PLA and PETG that would be the first suspect, but TPU's flow demand at 30 mm/s is tiny — well under any hotend's ceiling.">The hotend cannot melt the plastic fast enough</button>
+      <button class="opt" data-feedback="Moisture makes TPU pop and string and weakens layers, but it doesn't produce a clean speed threshold above which feeding stops.">The filament has absorbed moisture from the air</button>
+      <button class="opt" data-feedback="Nozzle temperature affects viscosity, but raising it doesn't stop a rubber rod from buckling under compressive load in the drive path.">The nozzle temperature is set too low for the speed</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Audit your spools</h3>
+    <p>Go to where your filament lives and write down, for every open spool: <b>brand · material · colour ·
+    where it's stored · when it was last dried (or "unknown")</b>. Add it to <code>fleet.md</code> from
+    Lesson 1.</p>
+    <p>Then pick the one spool you'll calibrate first, and answer three questions about it:</p>
+    <ol>
+      <li>Is it dry enough to trust right now — and how do you know, rather than assume?</li>
+      <li>Which of its three "personality" rows from the table above will bite you first on the machine
+      you'll use?</li>
+      <li>What would you have to observe, on the first calibration print, to conclude it's wet after all?</li>
+    </ol>
+    <p class="go">→ Paste it back to me. Question 3 is the one I'll push hardest on — "it looks fine" isn't
+    an answer.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>Glass transition, not melting point, governs layer bonding</strong> — the old layer must
+      still be above T<sub>g</sub> when the new one lands.</li>
+      <li><strong>Speed, temperature and cooling are one coupled system.</strong> Changing print speed
+      changes how long each layer sits under the fan.</li>
+      <li><strong>Moisture makes prints non-reproducible</strong>, which corrupts the temperature, flow and
+      retraction steps in a way that still looks like data.</li>
+      <li><strong>TPU's limit is the extruder, not the hotend</strong> — a rubber rod buckles before it runs
+      out of heat.</li>
+      <li><strong>Drying is a prerequisite, not an optimisation</strong>, and an undated spool in a humid
+      climate is an unknown material.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://ellis3dp.com/Print-Tuning-Guide/" target="_blank" rel="noopener">Ellis' Print Tuning Guide — Andrew Ellis</a></div>
+      <div class="desc">Free and the best independent, method-first treatment of material behaviour and
+      calibration order. Written for Voron/Klipper but explicitly aimed at being universal — take the
+      <em>reasoning</em>, and cross-check every number against the Prusa KB before applying it to a Prusa.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> If you're unsure whether a spool is wet, describe what you're
+    hearing and seeing and we'll work it out — the audible test is more reliable than the visual one, and
+    most people have never been told what to listen for. Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#glass-transition">glass transition temperature</a>,
+    <a href="../reference/glossary.html#hygroscopic">hygroscopic</a>,
+    <a href="../reference/glossary.html#drying">drying</a>,
+    <a href="../reference/glossary.html#hotend">hotend</a>,
+    <a href="../reference/glossary.html#extruder">extruder</a>,
+    <a href="../reference/glossary.html#retraction">retraction</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Ellis, A. <i>Ellis' Print Tuning Guide</i>. Method-first calibration reasoning, explicitly
+    intended to be firmware- and printer-agnostic.
+    <a href="https://ellis3dp.com/Print-Tuning-Guide/" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">This course. <i>Master tuning guide</i>, §0 and §4 — the drying schedules, per-material
+    tables and Core One enclosure guidance quoted here, flagged in <code>RESOURCES.md § Gaps</code> as
+    community-derived rather than Prusa-documented.
+    <a href="../reference/source-material/prusaslicer-profile-tuning.md">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0001-the-machine-in-four-parts.html">
+      <div class="dir">← Previous · L1</div>
+      <div class="ttl">The machine in four parts</div>
+    </a>
+    <a class="next" href="0003-what-the-slicer-decides.html">
+      <div class="dir">Next · L3</div>
+      <div class="ttl">What the slicer decides →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L2 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>
