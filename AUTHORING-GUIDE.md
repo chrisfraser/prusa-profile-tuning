@@ -64,6 +64,44 @@ topbar → `p.kicker` / `h1.lesson-title` / `p.lesson-sub` / `div.lesson-meta` �
 one interactive widget → `.quiz` ×3 → `.task` → `.recap` → `.sourcebox` → `.ask-teacher` → `.crosslinks` →
 `h2#refs` References → `nav.lesson-nav` → `p.pagefoot`.
 
+**Every page links `assets/widgets.js` as well as `assets/styles.css`** — including `index.html` and the
+reference pages. The progress tracking below is injected by that script, so a page that omits it silently
+drops out of the course's progress model.
+
+## Interactive widgets
+
+`assets/widgets.js` auto-wires four authored widgets — `.quiz`, `.checklist-widget`, `.faultfinder`, and
+`.calc` — plus a copy button (`[data-copy]`). Use only these; each is documented with a markup example in
+the source. Two behaviours are **injected**, so no lesson carries their markup:
+
+- **Progress.** Every lesson page grows a "mark complete" control above `nav.lesson-nav`; `index.html`
+  grows a resume bar, a per-phase progress bar and a tick on each finished card. State is per browser, in
+  `localStorage`, and every access is wrapped — a browser that refuses storage still works, and says so.
+- **Checklist persistence.** Ticks in a `.checklist-widget` survive a reload, keyed by page and widget
+  index, so a Phase 1 sign-off can be worked through over an evening at the printer.
+
+### `.calc` — the live calculator
+
+The rule that "never present a number without the measurement that produces it" has a corollary: where a
+lesson's number comes out of *arithmetic*, the reader should be able to run that arithmetic on their own
+measurements, in the lesson. `.calc` is declarative — inputs carry `data-var`, outputs carry a `data-out`
+expression over those names, `data-when` shows a block conditionally, `data-tpl` fills a copyable template.
+Repeat a `data-var` name across several inputs and it arrives as an array (`avg()`, `spread()`, `count()`).
+
+Four lessons carry one, and each reproduces that lesson's own worked examples exactly — **that is the
+acceptance test.** L3's flow calculator returns 4.05 and 18.00 mm³/s for its drills and 213 mm/s for
+drill 3; L10's returns 0.953 for the worked example; L13's returns 60 % / 51 % / 40 % for its three drills.
+If you change a formula, re-check it against the prose before committing.
+
+Two constraints learned the hard way:
+
+- **Don't reuse a class name the stylesheet already owns.** `.calc-out.hero` inherited the index page's
+  `.hero` padding and blew the card out to 188 px tall. The card class is `.calc-out.primary`.
+- **Don't invent a numeric threshold to drive a flag.** An early L18 flag tried to detect a Buddy `S` value
+  pasted into an MK3S row by testing `< 0.02`; the K and S ranges genuinely overlap (L11: MK3S PETG K 0.08,
+  MK4S PLA PA 0.03–0.04), so the test was ungrounded. It was replaced by labelling the row's command letter
+  from the selected printer — structural, and true.
+
 ## Pedagogy for this course
 
 The learner **has already written a tuning guide on this topic**. That is reading knowledge, not skill —

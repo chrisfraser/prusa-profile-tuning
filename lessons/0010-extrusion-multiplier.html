@@ -231,6 +231,71 @@ new EM = 1.00 × (0.45 / 0.472) = <span class="n">0.953</span></code></pre>
   already carries a tuned EM — which is exactly what your second run is — you need the general form, or you
   will throw the first correction away.</p>
 
+  <div class="calc">
+    <div class="calc-title">🧮 Twelve readings in, one extrusion multiplier out</div>
+    <p class="calc-lede">Three points per wall, four walls, middle of the wall and away from the seam. Enter
+    them as you measure — the average, the spread and the corrected EM update as you go, and the widget
+    complains in exactly the places the lesson says you should stop.</p>
+    <div class="calc-grid">
+      <label class="calc-field">Nominal width <span class="u">mm, from your profile</span>
+        <input type="number" data-var="nom" value="0.45" step="0.01" min="0.1" max="1.2"></label>
+      <label class="calc-field">Current EM <span class="u">× , what's in the box now</span>
+        <input type="number" data-var="cur" value="1.00" step="0.001" min="0.5" max="1.5"></label>
+    </div>
+
+    <p class="calc-lede" style="margin:1rem 0 .4rem">One row per wall, three readings across it, in mm.</p>
+    <div class="calc-grid walls">
+      <label class="calc-field">W1 a<input type="number" data-var="m" step="0.001" placeholder="0.000"></label>
+      <label class="calc-field">W1 b<input type="number" data-var="m" step="0.001" placeholder="0.000"></label>
+      <label class="calc-field">W1 c<input type="number" data-var="m" step="0.001" placeholder="0.000"></label>
+      <label class="calc-field">W2 a<input type="number" data-var="m" step="0.001" placeholder="0.000"></label>
+      <label class="calc-field">W2 b<input type="number" data-var="m" step="0.001" placeholder="0.000"></label>
+      <label class="calc-field">W2 c<input type="number" data-var="m" step="0.001" placeholder="0.000"></label>
+      <label class="calc-field">W3 a<input type="number" data-var="m" step="0.001" placeholder="0.000"></label>
+      <label class="calc-field">W3 b<input type="number" data-var="m" step="0.001" placeholder="0.000"></label>
+      <label class="calc-field">W3 c<input type="number" data-var="m" step="0.001" placeholder="0.000"></label>
+      <label class="calc-field">W4 a<input type="number" data-var="m" step="0.001" placeholder="0.000"></label>
+      <label class="calc-field">W4 b<input type="number" data-var="m" step="0.001" placeholder="0.000"></label>
+      <label class="calc-field">W4 c<input type="number" data-var="m" step="0.001" placeholder="0.000"></label>
+    </div>
+
+    <div class="calc-outs">
+      <div class="calc-out primary"><span class="lab">New EM</span>
+        <span class="val" data-out="cur * (nom / avg(m))" data-dp="3"></span></div>
+      <div class="calc-out"><span class="lab">Average measured</span>
+        <span class="val" data-out="avg(m)" data-dp="3" data-suffix=" mm"></span></div>
+      <div class="calc-out"><span class="lab">Spread (max − min)</span>
+        <span class="val" data-out="spread(m)" data-dp="3" data-suffix=" mm"></span></div>
+      <div class="calc-out"><span class="lab">Readings entered</span>
+        <span class="val" data-out="count(m) + ' / 12'"></span></div>
+    </div>
+
+    <div class="calc-flag warn" data-when="count(m) > 0 && count(m) < 12">Keep going — the average of four
+      readings is not the average of twelve, and it is the <em>spread</em> that tells you whether to trust
+      any of them.</div>
+    <div class="calc-flag bad" data-when="count(m) >= 12 && (cur*(nom/avg(m)) < 0.9 || cur*(nom/avg(m)) > 1.1)">
+      <b>Outside Prusa's 0.9–1.1 band — don't write this down.</b> Check firmware flow
+      (<code>M221</code>), that the wall really was a single perimeter, and that the nominal width above is
+      the one your profile actually uses. On an MK3S, suspect the legacy <code>M221 S95</code> line first.</div>
+    <div class="calc-flag warn" data-when="count(m) >= 12 && spread(m) > 0.02 && cur*(nom/avg(m)) >= 0.9 && cur*(nom/avg(m)) <= 1.1">
+      <b>Spread over 0.02 mm.</b> That is usually a mechanical or measurement problem rather than filament
+      variation — look at the part before you trust the average. A wall that varies along its length will
+      not be fixed by a multiplier.</div>
+    <div class="calc-flag good" data-when="count(m) >= 12 && spread(m) <= 0.02 && abs(avg(m)-nom) > 0.01 && cur*(nom/avg(m)) >= 0.9 && cur*(nom/avg(m)) <= 1.1">
+      Believable: inside the band, tight spread. Apply it, reprint, and re-measure —
+      <span data-out="abs(avg(m)-nom)" data-dp="3"></span> mm off nominal now, and you are aiming to land
+      inside ±0.01 mm on the second run.</div>
+    <div class="calc-flag good" data-when="count(m) >= 12 && abs(avg(m)-nom) <= 0.01">
+      <b>Already within ±0.01 mm of nominal.</b> This run is signed off — the correction above is a
+      rounding-level tweak, so record the EM you used and stop. Three iterations means something else is
+      wrong.</div>
+
+    <div class="calc-foot">
+      <button type="button" data-calc-reset>Clear</button>
+      <span>Nothing here is saved. Paste the twelve raw readings to your tutor, not the average.</span>
+    </div>
+  </div>
+
   <h3 style="font-family:var(--sans);font-size:1rem;margin-top:2rem">Drill it</h3>
   <p>Work each one out before opening it. Getting this arithmetic wrong is the single commonest way people end
   up with an EM that makes things worse.</p>

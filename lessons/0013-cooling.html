@@ -219,7 +219,63 @@
 
   <!-- ===== INTERACTIVE WIDGET ===== -->
   <h2><span class="num">5</span>Work out what the fan will actually do</h2>
-  <p>Answer each before opening it. If you can predict these, you understand the pane.</p>
+  <p>Answer each before opening it. If you can predict these, you understand the pane. Then use the
+  calculator to sweep layer time across the whole range and watch where the two thresholds bite — the
+  interpolation is the part nobody has an intuition for until they've seen it move.</p>
+
+  <div class="calc">
+    <div class="calc-title">🌀 The cooling pane, resolved</div>
+    <p class="calc-lede">Four settings from <code>Filament Settings → Cooling</code>, plus how long one
+    layer of your part actually takes. Drag the layer time; the answer is what PrusaSlicer will write into
+    the <code>M106</code> for that layer.</p>
+    <div class="calc-grid">
+      <label class="calc-field">Min fan speed <span class="u">%</span>
+        <input type="number" data-var="mn" value="40" step="5" min="0" max="100"></label>
+      <label class="calc-field">Max fan speed <span class="u">%</span>
+        <input type="number" data-var="mx" value="60" step="5" min="0" max="100"></label>
+      <label class="calc-field">Enable fan below <span class="u">seconds</span>
+        <input type="number" data-var="ena" value="60" step="5" min="0" max="300"></label>
+      <label class="calc-field">Slow down below <span class="u">seconds</span>
+        <input type="number" data-var="slo" value="15" step="1" min="0" max="120"></label>
+      <label class="calc-field">Keep fan always on
+        <select data-var="always" data-type="number">
+          <option value="1" selected>Yes — never below Min</option>
+          <option value="0">No — fan off above the threshold</option>
+        </select></label>
+      <label class="calc-field">This layer takes <span class="u">seconds</span>
+        <input type="range" data-var="t" value="35" min="1" max="120" step="1"></label>
+    </div>
+    <div class="calc-outs">
+      <div class="calc-out primary"><span class="lab">Fan for this layer</span>
+        <span class="val" data-out="t &lt; slo ? mx : (t &lt;= ena ? mx + (mn-mx)*(t-slo)/(ena-slo) : (always ? mn : 0))" data-dp="0" data-suffix=" %"></span></div>
+      <div class="calc-out"><span class="lab">Layer time</span>
+        <span class="val" data-out="t" data-dp="0" data-suffix=" s"></span></div>
+      <div class="calc-out"><span class="lab">Regime</span>
+        <span class="val" data-out="t &lt; slo ? 'Max + brake' : (t &lt;= ena ? 'Interpolated' : (always ? 'Min' : 'Off'))"></span></div>
+    </div>
+    <div class="calc-flag bad" data-when="ena <= slo"><b>Your thresholds are inverted.</b> "Slow down below"
+      has to sit below "enable fan below", or the interpolation band doesn't exist and the pane stops
+      behaving the way the KB describes. Fix that before reading anything else here.</div>
+    <div class="calc-flag bad" data-when="ena > slo && t < slo"><b>The speed brake is engaged.</b> Fan at Max,
+      <em>and</em> PrusaSlicer is scaling print speeds down to stretch this layer toward
+      <span data-out="slo" data-dp="0"></span> s — no further than the Min print speed floor. This is the
+      case that gets misread as a slicing bug: the profile says 120 mm/s and the preview says 45. Watch for
+      heat creep if a lot of layers land here.</div>
+    <div class="calc-flag warn" data-when="ena > slo && t >= slo && t <= ena">Interpolated between Min and
+      Max. <b>Most of your layers live in this band</b> — which is why both numbers have to be real settings
+      rather than one setting and one placeholder.</div>
+    <div class="calc-flag good" data-when="ena > slo && t > ena && always == 1">Above the threshold, so the
+      fan sits at Min for the whole layer. Bridges still override to Bridges fan speed — that's a
+      within-layer change, not a per-layer one.</div>
+    <div class="calc-flag warn" data-when="ena > slo && t > ena && always == 0"><b>Fan off entirely for this
+      layer.</b> Of the three materials in this course only TPU has any business here, and only sometimes.
+      Turn "keep fan always on" off deliberately and log the reason, never as a default.</div>
+    <div class="calc-foot">
+      <button type="button" data-calc-reset>Reset</button>
+      <span>Bridges fan speed isn't modelled here: it overrides the result above for bridges and overhangs
+      only.</span>
+    </div>
+  </div>
 
   <details class="panel">
     <summary>Drill 1 · Min 40 %, Max 60 %, enable-fan-below 60 s, slow-down-below 15 s. Layer takes 8 s.</summary>

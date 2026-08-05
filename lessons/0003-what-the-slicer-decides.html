@@ -171,7 +171,50 @@
   <!-- ===== INTERACTIVE WIDGET ===== -->
   <h2><span class="num">4</span>Do the arithmetic before you look</h2>
   <p>Work each one out on paper first — actually compute it. Retrieval is the point; reading the answer
-  teaches nothing.</p>
+  teaches nothing. The calculator below is for <em>checking</em> your answer and then for playing with the
+  three terms until the shape of the equation is yours.</p>
+
+  <div class="calc">
+    <div class="calc-title">🧮 The extrusion equation, live</div>
+    <p class="calc-lede">Type your own profile's numbers in. Read extrusion width out of
+    <code>Print Settings → Advanced → Extrusion width</code> — not off the nozzle.</p>
+    <div class="calc-grid">
+      <label class="calc-field">Layer height <span class="u">mm</span>
+        <input type="number" data-var="h" value="0.20" step="0.01" min="0.05" max="0.4"></label>
+      <label class="calc-field">Extrusion width <span class="u">mm</span>
+        <input type="number" data-var="w" value="0.45" step="0.01" min="0.2" max="1"></label>
+      <label class="calc-field">Print speed <span class="u">mm/s</span>
+        <input type="number" data-var="s" value="45" step="5" min="1" max="600"></label>
+      <label class="calc-field">Flow ceiling <span class="u">mm³/s — yours</span>
+        <input type="number" data-var="ceil" value="24" step="1" min="1" max="60"></label>
+    </div>
+    <p class="calc-lede" style="margin:.6rem 0 0">Working ceilings from Lesson 1, until you measure your own:
+    <b>MK3S ~11–13</b> · <b>MK4S ~22–28</b> · <b>Core One ~22–28</b> mm³/s. After
+    <a href="0014-max-volumetric-speed.html">Lesson 14</a> you type your measured MVS in here instead, and
+    this becomes a calculator about <em>your</em> machine rather than a table.</p>
+    <div class="calc-outs">
+      <div class="calc-out primary"><span class="lab">Volumetric flow</span>
+        <span class="val" data-out="h*w*s" data-dp="2" data-suffix=" mm³/s"></span></div>
+      <div class="calc-out"><span class="lab">Share of the ceiling</span>
+        <span class="val" data-out="(h*w*s)/ceil*100" data-dp="0" data-suffix=" %"></span></div>
+      <div class="calc-out"><span class="lab">Speed that saturates it</span>
+        <span class="val" data-out="ceil/(h*w)" data-dp="0" data-suffix=" mm/s"></span></div>
+    </div>
+    <div class="calc-flag good" data-when="h*w*s <= ceil*0.85">Comfortable. You have headroom — and if you
+      want the part sooner, raising <b>layer height</b> buys more time than raising speed does, right up
+      until it doesn't.</div>
+    <div class="calc-flag warn" data-when="h*w*s > ceil*0.85 && h*w*s <= ceil">Inside the ceiling, but
+      within 15 % of it. That is where a cold draught, a slightly wet spool or a thicker patch of filament
+      starts showing up as matte walls. Fine for infill, tight for external perimeters.</div>
+    <div class="calc-flag bad" data-when="h*w*s > ceil">Over the ceiling. With max volumetric speed set
+      correctly, PrusaSlicer silently clamps this move to about
+      <b><span data-out="ceil/(h*w)" data-dp="0" data-suffix=" mm/s"></span></b> and your print takes longer
+      than the settings suggest. With MVS left permissive, the machine attempts it and under-extrudes.</div>
+    <div class="calc-foot">
+      <button type="button" data-calc-reset>Reset</button>
+      <span>Nothing is saved — this is a scratchpad, not a profile.</span>
+    </div>
+  </div>
 
   <details class="panel">
     <summary>Your MK3S at 0.20 mm layers, 0.45 mm width, 45 mm/s perimeters. What flow, and is it safe?</summary>

@@ -168,12 +168,12 @@
   </details>
 
   <details class="panel">
-    <summary>MK4S and Core One · verify rather than calibrate</summary>
+    <summary>MK4S · verify rather than calibrate</summary>
     <div class="panel-body">
       <p><b>Calibration is usually unnecessary on a stock printer.</b><span class="cite"><a href="#r4">4</a></span>
       The shipped values are correct for the shipped hardware. Prusa offer an optional accelerometer set for
       recalibration after hardware modifications;<span class="cite"><a href="#r4">4</a></span> if your
-      machines are stock, you don't need it.</p>
+      machine is stock, you don't need it.</p>
       <div class="callout key">
         <div class="callout-label">▲ Read the frequency as a diagnostic</div>
         <p>Input Shaper frequency values should sit between <b>35 Hz and 70 Hz</b>. A value too low or too
@@ -188,6 +188,34 @@
       cube with ribs from Lesson 6 works — at your intended production acceleration, and look downstream of
       the feature. Clean means motion trust is established at that acceleration. Ghosting means: belts first
       (Lesson 6), assembly second, and only then Input Shaper.</p>
+      <p>Remember what this machine is: a <a href="../reference/glossary.html#bedslinger">bedslinger</a>. Its
+      Y resonance is a function of the <em>part</em> — a tall heavy print changes the moving mass that Input
+      Shaper was calibrated against. Judge ghosting on a part like the ones you actually print, not on an
+      empty bed.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Core One · same verification, different resonant structure</summary>
+    <div class="panel-body">
+      <p><b>Identical position to the MK4S:</b> calibration is usually unnecessary on a stock
+      printer,<span class="cite"><a href="#r4">4</a></span> the accelerometer set is for after hardware
+      modifications,<span class="cite"><a href="#r4">4</a></span> and crash detection is not compatible with
+      Input Shaper.<span class="cite"><a href="#r4">4</a></span></p>
+      <div class="callout key">
+        <div class="callout-label">▲ Read the frequency as a diagnostic</div>
+        <p>The same <b>35–70 Hz</b> band applies, and the same instruction if you fall outside it: go back
+        and <b>check belt tightness and the assembly</b>.<span class="cite"><a href="#r4">4</a></span> On this
+        machine that check is Lesson 6's <em>pair</em> of belt frequencies — a CoreXY with mismatched belts
+        can produce an Input Shaper result that looks acceptable while the two axes disagree.</p>
+      </div>
+      <p><b>What to verify, practically:</b> the same tall ribbed cube at production acceleration. What
+      differs is where to look. The <a href="../reference/glossary.html#corexy">CoreXY</a> head is light and
+      the part stands still, so ghosting here points at the gantry and the belt pair rather than at the mass
+      of your print — and it will not get worse as the part gets taller, which is itself a useful
+      discriminator against the MK4S.</p>
+      <p>One enclosure note: run this verification with the door in the state you actually print in. A warm
+      chamber changes belt tension slightly, and this test is downstream of belt tension.</p>
     </div>
   </details>
 

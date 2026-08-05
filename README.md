@@ -28,6 +28,19 @@ throughout, because `M900 K` (MK3S, Marlin) and `M572 S` (MK4S / Core One, Buddy
 
 All 18 lessons are written. Phase 3 was written before Phase 2 and the two now join up.
 
+## What's interactive
+
+Every lesson has three quizzes and one hands-on widget. Four of them are **calculators you feed your own
+measurements to** — the extrusion equation (L3), the twelve-caliper extrusion multiplier with its 0.9–1.1
+sanity check (L10), the cooling pane's threshold-and-interpolation logic (L13), and a tuning-log row
+builder that makes you mark every value measured or inherited (L18). Each reproduces its own lesson's
+worked examples exactly.
+
+The course also **remembers where you are**: mark a lesson complete at the bottom of the page and the home
+page shows a resume link and per-phase progress; checklist ticks survive a reload, so a Phase 1 sign-off
+can be worked through over an evening at the printer. All of it is `localStorage` in your own browser —
+nothing is uploaded, and nothing needs an account.
+
 ## What's here
 
 - `index.html` — the course home (phases + lessons).

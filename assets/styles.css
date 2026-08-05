@@ -242,8 +242,83 @@ pre .ok { background: rgba(47,125,78,.28); border-radius: 3px; padding: 0 .15em;
 .checklist [data-check]:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 .checklist [data-check].done { background:#f1faf3; border-color:#cfe6d3; opacity:.75; text-decoration:line-through; text-decoration-color:var(--ink-faint); }
 .checklist [data-check].done::before { content:"●"; color:var(--good); }
-.checklist-bar { display:flex; justify-content:space-between; gap:1rem; font-family:var(--sans); font-size:.82rem; font-weight:700; color:var(--ink-soft); margin-top:.8rem; padding-top:.7rem; border-top:1px solid var(--rule); }
-.checklist-bar [data-checklist-progress] { color:var(--good); }
+.checklist-bar { display:flex; justify-content:space-between; align-items:center; gap:1rem; font-family:var(--sans); font-size:.82rem; font-weight:700; color:var(--ink-soft); margin-top:.8rem; padding-top:.7rem; border-top:1px solid var(--rule); }
+.checklist-bar [data-checklist-progress] { color:var(--good); margin-left:auto; }
+.cl-reset { font-family:var(--sans); font-size:.72rem; font-weight:700; cursor:pointer; color:var(--ink-faint); background:none; border:1px solid var(--rule); border-radius:999px; padding:.15rem .6rem; }
+.cl-reset:hover { color:var(--bad); border-color:var(--bad); }
+
+/* ---- Live calculator (paired with .calc in widgets.js) ------------------ */
+[hidden] { display:none !important; }
+
+.calc { background:#fff; border:1px solid var(--rule); border-top:4px solid var(--gold); border-radius:var(--radius); padding:1.1rem 1.2rem 1.15rem; margin:1.8rem 0; box-shadow:var(--shadow); }
+.calc .calc-title { font-family:var(--sans); font-weight:700; font-size:.95rem; color:var(--accent-deep); margin-bottom:.2rem; display:flex; align-items:center; gap:.5rem; }
+.calc .calc-lede { font-family:var(--sans); font-size:.82rem; color:var(--ink-soft); margin:0 0 .9rem; line-height:1.45; }
+.calc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(9.5rem, 1fr)); gap:.6rem .8rem; }
+.calc-grid.tight { grid-template-columns:repeat(auto-fit, minmax(6rem, 1fr)); }
+/* one row per printed wall, so three readings always read as a set */
+.calc-grid.walls { grid-template-columns:repeat(3, minmax(0, 1fr)); max-width:28rem; }
+/* a value and its measured/inherited mark must never wrap apart */
+.calc-grid.pairs { grid-template-columns:repeat(auto-fit, minmax(15rem, 1fr)); }
+.calc-pair { display:grid; grid-template-columns:1fr 4.6rem; gap:.5rem; align-items:end; }
+.calc-field { font-family:var(--sans); font-size:.72rem; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--ink-faint); display:flex; flex-direction:column; gap:.25rem; }
+.calc-field input, .calc-field select {
+  font-family:var(--mono); font-size:.92rem; color:var(--ink); background:var(--paper);
+  border:1.5px solid var(--rule); border-radius:8px; padding:.45rem .55rem; width:100%; min-width:0;
+}
+.calc-field select { font-family:var(--sans); }
+.calc-field input[type=range] { padding:0; border:0; background:none; accent-color:var(--accent); height:2.1rem; }
+.calc-field input:focus, .calc-field select:focus { outline:none; border-color:var(--accent); background:#fff; }
+.calc-field .u { font-weight:600; letter-spacing:0; text-transform:none; color:var(--ink-faint); font-size:.7rem; }
+
+.calc-outs { display:grid; grid-template-columns:repeat(auto-fit, minmax(11rem, 1fr)); gap:.6rem; margin-top:1rem; padding-top:.9rem; border-top:1px solid var(--rule); }
+.calc-out { background:var(--paper-2); border-radius:8px; padding:.6rem .75rem; }
+.calc-out .lab { display:block; font-family:var(--sans); font-size:.66rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); }
+.calc-out .val { font-family:var(--mono); font-size:1.25rem; font-weight:700; color:var(--accent-deep); font-variant-numeric:tabular-nums; line-height:1.3; }
+.calc-out .val.pending { color:var(--ink-faint); font-weight:400; }
+.calc-out.primary { background:linear-gradient(180deg, color-mix(in srgb, var(--accent) 12%, #fff), #fff); border:1px solid color-mix(in srgb, var(--accent) 25%, #fff); }
+.calc-out.primary .val { font-size:1.5rem; color:var(--accent); }
+
+.calc-flag { font-family:var(--sans); font-size:.85rem; line-height:1.5; border-radius:8px; padding:.6rem .8rem; margin-top:.75rem; border-left:4px solid var(--rule); }
+.calc-flag b { color:inherit; }
+.calc-flag.good { background:#f1faf3; border-left-color:var(--good); color:#245c30; }
+.calc-flag.warn { background:#fffdf3; border-left-color:var(--gold); color:#7a5a10; }
+.calc-flag.bad  { background:#fdf2f0; border-left-color:var(--bad);  color:#8d2f1a; }
+
+.calc-tpl { font-family:var(--mono); font-size:.8rem; line-height:1.6; background:var(--dark); color:#e7e6fb; border-radius:8px; padding:.8rem .9rem; margin-top:.9rem; overflow-x:auto; white-space:pre; }
+.calc-foot { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; margin-top:.8rem; font-family:var(--sans); font-size:.76rem; color:var(--ink-faint); }
+.copy-btn, .calc-foot button {
+  font-family:var(--sans); font-size:.76rem; font-weight:700; cursor:pointer;
+  background:var(--accent); color:#fff; border:0; border-radius:8px; padding:.42rem .85rem;
+}
+.copy-btn:hover, .calc-foot button:hover { background:var(--accent-deep); }
+.calc-foot button[data-calc-reset] { background:none; color:var(--ink-faint); border:1px solid var(--rule); }
+.calc-foot button[data-calc-reset]:hover { background:var(--paper-2); color:var(--ink); }
+
+/* ---- Course progress (injected by widgets.js) --------------------------- */
+.lesson-done { display:flex; align-items:center; gap:.8rem; flex-wrap:wrap; margin-top:2.6rem; padding:.9rem 1.1rem; background:var(--paper-2); border:1px solid var(--rule); border-radius:var(--radius); }
+.lesson-done.is-done { background:#f1faf3; border-color:#cfe6d3; }
+.lesson-done .ld-btn { font-family:var(--sans); font-size:.85rem; font-weight:700; cursor:pointer; background:var(--accent); color:#fff; border:0; border-radius:8px; padding:.5rem 1rem; }
+.lesson-done .ld-btn:hover { background:var(--accent-deep); }
+.lesson-done.is-done .ld-btn { background:var(--good); }
+.lesson-done .ld-note { font-family:var(--sans); font-size:.75rem; color:var(--ink-faint); }
+
+.resume { display:flex; align-items:center; gap:.8rem; flex-wrap:wrap; margin-top:2rem; padding:.85rem 1.1rem; background:#fff; border:1px solid var(--rule); border-left:4px solid var(--good); border-radius:var(--radius); box-shadow:var(--shadow); font-family:var(--sans); }
+.resume .rz-lab { font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); }
+.resume .rz-count { font-size:.9rem; color:var(--ink-soft); }
+.resume .rz-cta { margin-left:auto; font-size:.85rem; font-weight:700; text-decoration:none; color:#fff; background:var(--accent); border-radius:8px; padding:.45rem .95rem; }
+.resume .rz-cta:hover { background:var(--accent-deep); }
+.resume .rz-reset { font-size:.72rem; font-weight:700; cursor:pointer; color:var(--ink-faint); background:none; border:1px solid var(--rule); border-radius:999px; padding:.2rem .65rem; }
+.resume .rz-reset:hover, .resume .rz-reset.armed { color:var(--bad); border-color:var(--bad); }
+@media (max-width: 40rem) { .resume .rz-cta { margin-left:0; } }
+
+.phase-progress { display:flex; align-items:center; gap:.7rem; margin:.7rem 0 0; font-family:var(--sans); }
+.phase-progress .pp-bar { flex:1 1 auto; height:6px; background:var(--paper-2); border:1px solid var(--rule); border-radius:999px; overflow:hidden; }
+.phase-progress .pp-bar span { display:block; height:100%; background:var(--good); transition:width .3s; }
+.phase-progress .pp-count { font-size:.72rem; font-weight:700; color:var(--ink-faint); white-space:nowrap; }
+.phase-progress.all-done .pp-count { color:var(--good); }
+
+.lesson-card.done { border-left-color:var(--good); }
+.lesson-card .done-tick { align-self:center; margin-left:.4rem; font-weight:700; color:var(--good); }
 
 /* ---- Collapsible panels (native <details>) — "try, then reveal" ---------- */
 details.panel { border:1px solid var(--rule); border-radius:8px; background:#fff; margin:.5rem 0; overflow:hidden; box-shadow: var(--shadow); }
@@ -331,7 +406,10 @@ details.panel .panel-body pre { font-family: var(--mono); }
   :root { --paper: #fff; }
   body { font-size: 11pt; color: #000; }
   .topbar, .lesson-nav, .pagefoot { display: none; }
-  .callout, .sourcebox, .quiz, .frame, .task, .faultfinder, .steps > li { box-shadow: none; break-inside: avoid; }
+  .lesson-done, .resume, .phase-progress, .cl-reset, .copy-btn, .calc-foot { display: none; }
+  .callout, .sourcebox, .quiz, .frame, .task, .faultfinder, .calc, .steps > li { box-shadow: none; break-inside: avoid; }
+  .calc { border: 1px solid #999; }
+  .calc-tpl { background: #f4f4f4; color: #000; border: 1px solid #999; }
   a { color: #000; text-decoration: underline; }
   pre { background: #f4f4f4; color: #000; border: 1px solid #999; }
   pre .c { color:#555; } pre .k,pre .s,pre .f,pre .n { color:#000; }

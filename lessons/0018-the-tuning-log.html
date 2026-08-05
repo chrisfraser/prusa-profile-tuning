@@ -154,8 +154,105 @@ NB: black runs ~0.02 lower EM than the green spool</code></pre>
   </div>
 
   <!-- ===== INTERACTIVE WIDGET ===== -->
-  <h2><span class="num">4</span>Read the log</h2>
-  <p>Each of these is a real log entry with a problem in it. Decide what's wrong before you open the answer.</p>
+  <h2><span class="num">4</span>Build a row, then read four broken ones</h2>
+
+  <p>Start by building your own. Every field is here because leaving it out has cost somebody an evening —
+  and every measurement carries its own <code>(m)</code> or <code>(i)</code> mark, so you cannot fill this
+  in without deciding, value by value, whether you measured it or inherited it. That decision <em>is</em>
+  the lesson.</p>
+
+  <div class="calc">
+    <div class="calc-title">🗒 Row builder — <code>tuning-log.md</code> and the notes field</div>
+    <p class="calc-lede">Fill what you have. Marks: <b>m</b> = measured on this machine with this spool,
+    <b>i</b> = inherited from a table, another spool or another machine.</p>
+    <div class="calc-grid">
+      <label class="calc-field">Date <span class="u">absolute, never "last week"</span>
+        <input type="date" data-var="date"></label>
+      <label class="calc-field">Printer
+        <select data-var="printer">
+          <option>MK3S</option><option selected>MK4S</option><option>Core One</option>
+        </select></label>
+      <label class="calc-field">Spool <span class="u">brand · material · colour</span>
+        <input type="text" data-var="spool" placeholder="eSun PETG black"></label>
+      <label class="calc-field">Dried <span class="u">temp/hours + date, or "unknown"</span>
+        <input type="text" data-var="dried" placeholder="65C/8h 08-02"></label>
+    </div>
+
+    <div class="calc-grid pairs" style="margin-top:.9rem">
+      <div class="calc-pair">
+        <label class="calc-field">Temperature <span class="u">°C</span>
+          <input type="text" data-var="temp" placeholder="235"></label>
+        <label class="calc-field">Mark
+          <select data-var="tempM"><option>m</option><option>i</option></select></label>
+      </div>
+      <div class="calc-pair">
+        <label class="calc-field">Extrusion multiplier <span class="u">×</span>
+          <input type="text" data-var="em" placeholder="0.94"></label>
+        <label class="calc-field">Mark
+          <select data-var="emM"><option>m</option><option>i</option></select></label>
+      </div>
+      <div class="calc-pair">
+        <label class="calc-field">Advance <span class="u">K on MK3S, S on the others</span>
+          <input type="text" data-var="adv" placeholder="0.048"></label>
+        <label class="calc-field">Mark
+          <select data-var="advM"><option>m</option><option>i</option></select></label>
+      </div>
+      <div class="calc-pair">
+        <label class="calc-field">Retraction <span class="u">mm</span>
+          <input type="text" data-var="ret" placeholder="0.8"></label>
+        <label class="calc-field">Mark
+          <select data-var="retM"><option>m</option><option>i</option></select></label>
+      </div>
+      <div class="calc-pair">
+        <label class="calc-field">Max volumetric speed <span class="u">mm³/s</span>
+          <input type="text" data-var="mvs" placeholder="13"></label>
+        <label class="calc-field">Mark
+          <select data-var="mvsM"><option>m</option><option>i</option></select></label>
+      </div>
+      <label class="calc-field">Validated <span class="u">scope, not just a tick</span>
+        <input type="text" data-var="val" placeholder="all 5, door shut, 2026-08-04"></label>
+    </div>
+
+    <div class="calc-flag warn" data-when="printer == 'MK3S' && adv != ''">
+      <b>This row is a Marlin machine, so the advance value is written <code>K</code>, not <code>S</code></b>
+      — and the builder below has labelled it for you. That letter is the whole point: an
+      <code>M572 S</code> number copied here would still print, just plausibly wrong forever. If this value
+      came off the MK4S, it is <code>(i)</code> at best. There is no conversion between the two; the only
+      honest fix is to re-run <a href="0011-pressure-and-linear-advance.html">Lesson 11</a> on the MK3S.</div>
+    <div class="calc-flag warn" data-when="printer != 'MK3S' && adv != ''">
+      Buddy firmware, so this is <code>M572 S</code> — labelled <code>S</code> in the row below. Your MK4S
+      and Core One values should land close to each other; if they agree within a step, that agreement is
+      itself evidence you measured rather than copied.</div>
+    <div class="calc-flag warn" data-when="tempM == 'm' && emM == 'm' && advM == 'm' && retM == 'm' && mvsM == 'm'">
+      <b>Everything marked measured.</b> Legitimate after a full evening — but if every row in your log
+      looks like this, the marks have stopped distinguishing anything. A healthy log is mostly
+      <code>(i)</code> with a few well-chosen <code>(m)</code>.</div>
+    <div class="calc-flag warn" data-when="val != '' && val.length &lt; 12">
+      <b>Record the scope, not just the tick.</b> Material, machine, speeds, enclosure state, date — a bare
+      ✅ isn't a falsifiable claim, and you won't later be able to tell whether a failure is inside or
+      outside what you certified.</div>
+
+    <div class="calc-tpl" id="logrow" data-tpl="### ${printer} · Filament
+
+| Date | Spool | Dried | Temp | EM | Advance | Retract | MVS | Validated |
+|---|---|---|---|---|---|---|---|---|
+| ${date} | ${spool} | ${dried} | ${temp} (${tempM}) | ${em} (${emM}) | ${printer == 'MK3S' ? 'K' : 'S'} ${adv} (${advM}) | ${ret} (${retM}) | ${mvs} (${mvsM}) | ${val} |
+
+--- Filament Settings → Notes ---
+${spool} @${printer} | dried ${dried}
+temp ${temp} (${tempM}) | EM ${em} (${emM}) | ${printer == 'MK3S' ? 'M900 K' : 'M572 S'}${adv} (${advM})
+retract ${ret} (${retM}) | MVS ${mvs} (${mvsM})
+validated ${val}"></div>
+    <div class="calc-foot">
+      <button type="button" class="copy-btn" data-copy="#logrow">Copy both</button>
+      <button type="button" data-calc-reset>Clear</button>
+      <span>Top block goes in <code>tuning-log.md</code> under that printer's heading; bottom block goes in
+      the profile's notes field. Same facts, two homes.</span>
+    </div>
+  </div>
+
+  <p>Now four rows that came out of a real log, each with something wrong. Decide what it is before you open
+  the answer.</p>
 
   <details class="panel">
     <summary><code>| 2026-08-04 | eSun PETG | dried | 235 | 0.94 | 0.048 | 0.8 | 13 |</code></summary>
