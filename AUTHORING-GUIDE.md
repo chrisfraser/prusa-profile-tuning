@@ -86,9 +86,11 @@ Keep in sync with `reference/glossary.html`. Lessons link only to anchors listed
 `#extrusion-multiplier` `#retraction`
 `#linear-advance` `#pressure-advance` `#input-shaper` `#ghosting`
 `#selftest` `#belt-tension` `#pinda` `#loadcell` `#live-adjust-z` `#mesh-bed-levelling` `#pid-tuning` `#skew`
+`#dynamic-overhang-speed` `#autospeed`
 `#glass-transition` `#hygroscopic` `#drying`
-`#system-profile` `#compatible-printers-condition` `#config-bundle` `#elephant-foot` `#validation-set`
-`#calibration-order` `#one-variable-rule` `#tuning-log`
+`#system-profile` `#compatible-printers-condition` `#after-layer-change` `#filament-overrides`
+`#config-bundle` `#elephant-foot` `#validation-set`
+`#calibration-order` `#one-variable-rule` `#temperature-tower` `#snap-test` `#tuning-log`
 
 ## Phase / lesson map (for nav + kicker)
 
@@ -104,18 +106,25 @@ Keep in sync with `reference/glossary.html`. Lessons link only to anchors listed
 - L7 `0007-first-layer-and-z-offset.html`
 - L8 `0008-thermal-and-motion-trust.html`
 
-**Phase 2 · The filament** — `#phase-2` (not yet written)
-- L9 temperature tower · L10 extrusion multiplier · L11 pressure/linear advance · L12 retraction ·
-  L13 cooling · L14 max volumetric speed · L15 speeds and accelerations
+**Phase 2 · The filament** — `#phase-2`
+- L9 `0009-the-temperature-tower.html`
+- L10 `0010-extrusion-multiplier.html`
+- L11 `0011-pressure-and-linear-advance.html`
+- L12 `0012-retraction.html`
+- L13 `0013-cooling.html`
+- L14 `0014-max-volumetric-speed.html`
+- L15 `0015-speeds-and-accelerations.html`
 
 **Phase 3 · Ship it** — `#phase-3`
 - L16 `0016-profile-structure-and-naming.html`
 - L17 `0017-the-validation-set.html`
 - L18 `0018-the-tuning-log.html`
 
-Phase 3 was written **before** Phase 2, at the learner's request — it stands alone, and gives Phase 2 a
-place to put its results. L16's `nav.lesson-nav` prev therefore points at `../index.html#phase-2` rather
-than at L15. **When L15 is written, repoint it.**
+Phase 3 was written **before** Phase 2, at the learner's request. Phase 2 landed 2026-08-05 and L16's
+`nav.lesson-nav` prev has been repointed from `../index.html#phase-2` to `0015-*.html`. The course is now
+a continuous 18-lesson chain with no gaps.
 
-Source material for Phases 2–3 is already written and fact-checked:
-`reference/source-material/prusaslicer-profile-tuning.md`.
+Source material for Phases 2–3: `reference/source-material/prusaslicer-profile-tuning.md`. **It is the
+input, not the authority.** Where Phase 2 lessons diverge from it, the divergence is stated in the lesson
+and the guide is left as originally written — see L12 §4 (flexibles retraction, where Prusa and the guide
+genuinely disagree) and L14 §4 (the KB's hotend table predating the MK4S and Core One).

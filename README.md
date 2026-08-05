@@ -23,8 +23,10 @@ throughout, because `M900 K` (MK3S, Marlin) and `M572 S` (MK4S / Core One, Buddy
 |---|---|---|
 | **0 · Fundamentals** | the machine · filament as a material · what the slicer decides · the calibration mindset | ✅ written |
 | **1 · The machine** | selftest · belt tension · first layer · thermal and motion trust | ✅ written |
-| **2 · The filament** | temperature · flow · advance · retraction · cooling · MVS · speeds | planned |
-| **3 · Ship it** | profile structure · validation set · tuning log | planned |
+| **2 · The filament** | temperature · flow · advance · retraction · cooling · MVS · speeds | ✅ written |
+| **3 · Ship it** | profile structure · validation set · tuning log | ✅ written |
+
+All 18 lessons are written. Phase 3 was written before Phase 2 and the two now join up.
 
 ## What's here
 

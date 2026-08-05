@@ -141,7 +141,118 @@ total flow = M221 (firmware, %) × extrusion multiplier (slicer)</code></pre>
     </tbody>
   </table>
 
-  <h2><span class="num">5</span>Method rules</h2>
+  <h2><span class="num">5</span>Phase 2 starting values — 0.4 nozzle, 0.2 mm layer</h2>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ Entry points, not answers</div>
+    <p>Every number below is where you <em>start</em> a measurement, not where you stop. Compare against the
+    stock Prusa system profile for that printer before deviating — if a value here differs a lot from stock,
+    trust stock and tune from there. Core One chamber figures are community consensus, not Prusa
+    specification.</p>
+  </div>
+
+  <table>
+    <caption>PLA</caption>
+    <thead><tr><th>Setting</th><th>MK3S</th><th>MK4S</th><th>Core One</th></tr></thead>
+    <tbody>
+      <tr><td>Nozzle, first / other</td><td>215 / 210</td><td>230 / 225</td><td>230 / 225</td></tr>
+      <tr><td>Bed, first / other</td><td>60 / 60</td><td>60 / 60</td><td>60 / 55–60</td></tr>
+      <tr><td>Chamber</td><td>—</td><td>—</td><td>vent open, ≤ 30 °C</td></tr>
+      <tr><td>Extrusion multiplier</td><td>0.95–1.00</td><td>0.95–1.00</td><td>0.95–1.00</td></tr>
+      <tr><td>Advance</td><td>K 0.03–0.05</td><td>S 0.03–0.05</td><td>S 0.03–0.05</td></tr>
+      <tr><td>Retract length / speed</td><td>0.8 / 35</td><td>0.6–0.8 / 35</td><td>0.6–0.8 / 35</td></tr>
+      <tr><td>Fan min / max, bridges</td><td>100 / 100, 100 %</td><td>100 / 100, 100 %</td><td>100 / 100, 100 %</td></tr>
+      <tr><td>Disable fan, first N</td><td class="num">1</td><td class="num">1</td><td class="num">1</td></tr>
+      <tr><td>Max volumetric speed</td><td class="num">13</td><td class="num">24</td><td class="num">24</td></tr>
+      <tr><td>External perimeter</td><td class="num">30</td><td class="num">45</td><td class="num">45</td></tr>
+      <tr><td>Perimeters</td><td class="num">45</td><td class="num">120</td><td class="num">130</td></tr>
+      <tr><td>Solid / infill</td><td>50 / 70</td><td>150 / 200</td><td>150 / 220</td></tr>
+      <tr><td>Travel</td><td class="num">180</td><td class="num">400</td><td class="num">450</td></tr>
+    </tbody>
+  </table>
+
+  <table>
+    <caption>PETG — on smooth PEI use a separator or switch to satin/textured, and squish slightly less than PLA.</caption>
+    <thead><tr><th>Setting</th><th>MK3S</th><th>MK4S</th><th>Core One</th></tr></thead>
+    <tbody>
+      <tr><td>Nozzle, first / other</td><td>240 / 240</td><td>245 / 240</td><td>245 / 240</td></tr>
+      <tr><td>Bed, first / other</td><td>85 / 90</td><td>85 / 85</td><td>85 / 85</td></tr>
+      <tr><td>Chamber</td><td>—</td><td>—</td><td>closed, 35–40 °C</td></tr>
+      <tr><td>Extrusion multiplier</td><td>0.93–0.98</td><td>0.93–0.98</td><td>0.93–0.98</td></tr>
+      <tr><td>Advance</td><td>K 0.05–0.09</td><td>S 0.04–0.06</td><td>S 0.04–0.06</td></tr>
+      <tr><td>Retract length / speed</td><td>1.0–1.2 / 35</td><td>0.8–1.0 / 35</td><td>0.8–1.0 / 35</td></tr>
+      <tr><td>Z-lift</td><td>0.4–0.6</td><td>1.5 (stock)</td><td>1.5 (stock)</td></tr>
+      <tr><td>Fan min / max, bridges</td><td>30 / 50, 100 %</td><td>40 / 60, 100 %</td><td>30 / 50, 100 %</td></tr>
+      <tr><td>Disable fan, first N</td><td class="num">2–3</td><td class="num">2–3</td><td class="num">2–3</td></tr>
+      <tr><td>Max volumetric speed</td><td class="num">8</td><td class="num">10–13</td><td class="num">13</td></tr>
+      <tr><td>External perimeter</td><td class="num">25</td><td class="num">40</td><td class="num">40</td></tr>
+      <tr><td>Perimeters</td><td class="num">40</td><td class="num">100</td><td class="num">110</td></tr>
+      <tr><td>Solid / infill</td><td>40 / 55</td><td>120 / 160</td><td>120 / 170</td></tr>
+      <tr><td>Travel</td><td class="num">180</td><td class="num">400</td><td class="num">450</td></tr>
+    </tbody>
+  </table>
+
+  <table>
+    <caption>TPU 95A — speed is limited by the extruder, not the hotend. Ironing off; approach retraction from below.</caption>
+    <thead><tr><th>Setting</th><th>MK3S</th><th>MK4S</th><th>Core One</th></tr></thead>
+    <tbody>
+      <tr><td>Nozzle, first / other</td><td>235 / 230</td><td>235 / 230</td><td>235 / 230</td></tr>
+      <tr><td>Bed, first / other</td><td>55 / 50</td><td>55 / 50</td><td>55 / 50</td></tr>
+      <tr><td>Chamber</td><td>—</td><td>—</td><td>closed</td></tr>
+      <tr><td>Extrusion multiplier</td><td>1.00–1.05</td><td>1.00–1.05</td><td>1.00–1.05</td></tr>
+      <tr><td>Advance</td><td>K 0.00–0.03</td><td>S 0.02–0.04</td><td>S 0.02–0.04</td></tr>
+      <tr><td>Retract length / speed</td><td>0.4–0.8 / 20</td><td>0.4–0.8 / 25</td><td>0.4–0.8 / 25</td></tr>
+      <tr><td>Fan min / max</td><td>50 / 80</td><td>50 / 80</td><td>40 / 70</td></tr>
+      <tr><td>Disable fan, first N</td><td class="num">1</td><td class="num">1</td><td class="num">1</td></tr>
+      <tr><td>Max volumetric speed</td><td>1.8–2.5</td><td>3–4</td><td>3–5</td></tr>
+      <tr><td>External perimeter</td><td class="num">15</td><td class="num">25</td><td class="num">25</td></tr>
+      <tr><td>Perimeters</td><td class="num">20</td><td class="num">35</td><td class="num">40</td></tr>
+      <tr><td>Solid / infill</td><td>20 / 25</td><td>35 / 45</td><td>40 / 50</td></tr>
+      <tr><td>Travel</td><td class="num">120</td><td class="num">250</td><td class="num">300</td></tr>
+    </tbody>
+  </table>
+
+  <div class="codefig">
+    <div class="difflabel">The three test blocks · Printer Settings → Custom G-code → After layer change</div>
+    <pre><code><span class="c"># L9 · temperature tower — 0.2 mm layers, 50 layers = 10 mm bands.</span>
+<span class="c"># Set the profile to the TOP of the range and step DOWN. M104 does not wait.</span>
+{if layer_num == <span class="n">50</span>}<span class="k">M104</span> <span class="f">S</span><span class="n">245</span>{endif}
+{if layer_num == <span class="n">100</span>}<span class="k">M104</span> <span class="f">S</span><span class="n">240</span>{endif}   <span class="c">← judge the MIDDLE of each band</span>
+
+<span class="c"># L11 · advance tower. MK3S uses M900 K; MK4S and Core One use M572 S.</span>
+<span class="c"># Print with the print profile you actually intend to use.</span>
+{if layer_num == <span class="n">20</span>}<span class="k">M900</span> <span class="f">K</span><span class="n">0.02</span>{endif}    <span class="c">← MK3S only</span>
+{if layer_num == <span class="n">20</span>}<span class="k">M572</span> <span class="f">S</span><span class="n">0.02</span>{endif}    <span class="c">← MK4S / Core One only</span>
+
+<span class="c"># L14 · MVS ramp. Set MVS to 40 first so it can't clamp what you're measuring.</span>
+{if layer_num == <span class="n">30</span>}<span class="k">M220</span> <span class="f">S</span><span class="n">150</span>{endif}
+{if layer_num == <span class="n">60</span>}<span class="k">M220</span> <span class="f">S</span><span class="n">200</span>{endif}   <span class="c">← take 85 % of the failure band</span>
+
+<span class="c">### DELETE EVERY ONE OF THESE WHEN THE TEST IS OFF THE BED. ###</span>
+<span class="c">### They live in the PRINTER profile and fire on every later print. ###</span></code></pre>
+  </div>
+
+  <table>
+    <caption>Diagnostic shorthand for Phase 2.</caption>
+    <thead><tr><th>What you see</th><th>Which step</th><th>Which way</th></tr></thead>
+    <tbody>
+      <tr><td>Clean flat split along a layer line</td><td>L9 temperature</td><td>too cold — go up a band</td></tr>
+      <tr><td>Strings, sag, curl, gloss</td><td>L9 temperature</td><td>too hot — go down a band</td></tr>
+      <tr><td>Wall measures over nominal</td><td>L10 flow</td><td>EM down</td></tr>
+      <tr><td>Pinholes in top surface</td><td>L10 flow</td><td>EM up</td></tr>
+      <tr><td>Blob on the outside of a corner</td><td>L11 advance</td><td>value up</td></tr>
+      <tr><td>Gap just after a corner or travel</td><td>L11 advance</td><td>value down</td></tr>
+      <tr><td>Strings, everything else ruled out</td><td>L12 retraction</td><td>length up, 0.1 mm at a time</td></tr>
+      <tr><td>Extruder clicking, ground filament</td><td>L12 retraction</td><td>length down, immediately</td></tr>
+      <tr><td>Overhangs droop, bridges sag</td><td>L13 cooling</td><td>fan up</td></tr>
+      <tr><td>Layers delaminate, part is brittle</td><td>L13 cooling</td><td>fan down</td></tr>
+      <tr><td>Wall goes matte and thin at speed</td><td>L14 MVS</td><td>ceiling down to 85 % of failure</td></tr>
+      <tr><td>Infill far slower than the profile says</td><td>L14 MVS</td><td>at the ceiling — lower layer height</td></tr>
+      <tr><td>Ghosting downstream of a feature</td><td>L15 accel</td><td>down — and re-check belts</td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="num">6</span>Method rules</h2>
   <table>
     <caption>The habits, compressed.</caption>
     <thead><tr><th>Rule</th><th>Because</th></tr></thead>
@@ -156,7 +267,7 @@ total flow = M221 (firmware, %) × extrusion multiplier (slicer)</code></pre>
     </tbody>
   </table>
 
-  <h2><span class="num">6</span>Shipping a profile</h2>
+  <h2><span class="num">7</span>Shipping a profile</h2>
 
   <div class="codefig">
     <div class="difflabel">Naming and scoping</div>
@@ -200,10 +311,12 @@ File → Export → Export Config Bundle</code></pre>
   hypothesis; a profile of <code>(m)</code> values is a measurement.</p>
 
   <div class="callout note">
-    <div class="callout-label">⌁ Still to come</div>
-    <p>Phase 2 will add the per-material starting tables and the custom G-code blocks for the temperature,
-    PA/LA and MVS towers. Until then, those numbers live in
-    <a href="source-material/prusaslicer-profile-tuning.md">the original guide</a> §4.</p>
+    <div class="callout-label">⌁ Complete as of 2026-08-05</div>
+    <p>All four phases are on this card. What it deliberately does <b>not</b> carry is your own measurements —
+    those live in <code>tuning-log.md</code> and in the profiles themselves. When one of your measured numbers
+    disagrees with a starting value here, <b>your number wins</b>; this page is where you began, not where you
+    ended up. Fuller context in <a href="source-material/prusaslicer-profile-tuning.md">the original
+    guide</a>.</p>
   </div>
 
   <p class="pagefoot">The Calibration Card · <a href="../index.html">all lessons</a> ·

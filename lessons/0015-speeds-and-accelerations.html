@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L15 · Speeds and accelerations</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 2 · The filament · L15</p>
+  <h1 class="lesson-title">Speeds and accelerations</h1>
+  <p class="lesson-sub">Last, deliberately. Everything above has already decided how fast you may go — this
+  lesson is about spending that budget in the right places.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~45 minutes</span><span class="sep">•</span>
+    <span>✅ Closes Phase 2</span><span class="sep">•</span>
+    <span class="tag accent">Phase 2</span>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>Speed is the setting everyone reaches for first and it belongs eighth. By now the hotend's ceiling is
+    measured (<a href="0014-max-volumetric-speed.html">Lesson 14</a>), the cooling brake is configured
+    (<a href="0013-cooling.html">Lesson 13</a>), and the pressure compensation is tuned for a specific
+    acceleration (<a href="0011-pressure-and-linear-advance.html">Lesson 11</a>). Those three between them have
+    already set the envelope. What is left is a distribution problem: given a fixed budget, which features do
+    you spend it on? The answer is not "all of them equally", and getting it right is the difference between a
+    fast print and a fast print that looks fast.</p>
+  </div>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>The hierarchy, in Prusa's own words</h2>
+
+  <p>"Infill is usually printed the fastest, perimeters are printed slower and the external perimeter is
+  printed the slowest for the best surface finish and accurate
+  dimensions."<span class="cite"><a href="#r1">1</a></span></p>
+
+  <p>That single sentence is the whole strategy. Nobody sees your infill. Everybody sees your external
+  perimeter, and it is the surface your calipers land on when you check dimensional accuracy. So the external
+  perimeter gets the slow, careful treatment and the infill gets whatever is left.</p>
+
+  <div class="callout key">
+    <div class="callout-label">▲ External perimeter speed is the dominant quality lever</div>
+    <p>If you change exactly one number in this lesson, change this one. Keep it low even when everything else
+    is fast — the time cost is small because external perimeters are a modest fraction of total extrusion, and
+    the quality gain is the one that shows.<span class="cite"><a href="#r4">4</a></span></p>
+    <p>The same logic applies to <b>acceleration</b>: keep external-perimeter acceleration well below infill
+    acceleration. On the MK4S and Core One,
+    <a href="../reference/glossary.html#input-shaper">Input Shaper</a> lets you run high acceleration
+    generally — but corners and seams still degrade first, so the exception still
+    earns its place.<span class="cite"><a href="#r4">4</a></span></p>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>The speed you set is not the speed you get</h2>
+
+  <p>Prusa are direct about this: print speeds are affected by the printer's acceleration and jerk settings,
+  and when printing small models "it's possible the printer will never actually reach the target
+  speeds".<span class="cite"><a href="#r2">2</a></span></p>
+
+  <p>A 120 mm/s perimeter setting on a 20 mm cube is fiction. The toolhead spends the whole wall accelerating
+  and decelerating and never touches 120. Which means two things worth internalising:</p>
+
+  <ul class="steps">
+    <li><span class="step-title">On small parts, acceleration <em>is</em> the speed setting</span>
+      <span class="step-detail">Raising the speed number changes nothing; raising acceleration changes
+      everything — including surface quality, which is why it degrades faster than the speed number suggests
+      it should.</span></li>
+    <li><span class="step-title">Use the Speed preview, not the profile, to know what you've built</span>
+      <span class="step-detail">Switch the preview mode to <b>Speed</b> to inspect the actual print speeds
+      after all accelerations are applied.<span class="cite"><a href="#r2">2</a></span> This is the companion to
+      the Volumetric flow rate view from Lesson 14 — same habit, different question.</span></li>
+    <li><span class="step-title">Benchmark on a real part, not a cube</span>
+      <span class="step-detail">A calibration cube's speeds bear almost no relation to a 150 mm bracket's.
+      Judge a speed profile on geometry you actually print.</span></li>
+  </ul>
+
+  <div class="callout note">
+    <div class="callout-label">⌁ Travel speed is nearly free</div>
+    <p>Set travel high. It costs nothing in quality once retraction and advance are right, and on parts with
+    many small islands it is a large fraction of wall-clock time.<span class="cite"><a href="#r4">4</a></span>
+    If raising travel speed <em>does</em> hurt quality, that is a retraction or advance problem showing itself
+    (Lessons 11 and 12), not a reason to slow travel down.</p>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>Two features that spend the budget for you</h2>
+
+  <h3 style="font-family:var(--sans);font-size:1rem;margin-top:1.6rem">Dynamic overhang speed</h3>
+
+  <p>Slows the print when printing overhangs so cooling has time to work. The algorithm calculates extrusion
+  overlap with the previous layer and applies a speed from an overhang slowdown function that <b>you</b> shape
+  via four control points — each point pairing an overlap percentage with a desired speed, linearly
+  interpolated between.<span class="cite"><a href="#r2">2</a></span></p>
+
+  <p><b>Turn it on.</b> Without it, the only way to make overhangs survive is to slow the entire print down to
+  the speed the worst overhang needs — which means paying for the hardest 2 % of the geometry across
+  100 % of it.<span class="cite"><a href="#r4">4</a></span> Note the shared vocabulary with dynamic fan speeds
+  in Lesson 13: both are functions of overlap percentage, both use four points, both interpolate linearly. They
+  are the same idea applied to two different actuators, and they should agree with each other.</p>
+
+  <h3 style="font-family:var(--sans);font-size:1rem;margin-top:1.8rem">Pressure equalizer</h3>
+
+  <p>Available from PrusaSlicer 2.5, at <code>Print Settings → Speed</code>. It smooths sudden changes in speed
+  between two features — infill to perimeter, for example — because extruders "love to extrude at a constant
+  rate for the best extrusion consistency" and a print is anything but
+  constant.<span class="cite"><a href="#r3">3</a></span></p>
+
+  <ul class="steps">
+    <li><span class="step-title">Max volumetric slope positive</span>
+      <span class="step-detail">The acceleration limit going from lower to higher
+      speed.<span class="cite"><a href="#r3">3</a></span></span></li>
+    <li><span class="step-title">Max volumetric slope negative</span>
+      <span class="step-detail">The limit going from higher to lower
+      speed.<span class="cite"><a href="#r3">3</a></span></span></li>
+    <li><span class="step-title">Lower value = smoother transition</span>
+      <span class="step-detail">Prusa suggest <b>values between 2 and 10</b>, and note the transitions add a
+      little print time.<span class="cite"><a href="#r3">3</a></span></span></li>
+    <li><span class="step-title">If infill-after-perimeter costs too much time</span>
+      <span class="step-detail">Set Max volumetric slope <em>positive</em> to zero to suppress that
+      slowdown specifically.<span class="cite"><a href="#r3">3</a></span></span></li>
+  </ul>
+
+  <div class="callout key">
+    <div class="callout-label">▲ Pressure equalizer is not a substitute for advance</div>
+    <p>Prusa draw the line precisely. Linear Advance "predicts the pressure build-up in the extruder … and
+    decreases the amount of filament extruded just before stopping and decelerating" — in short, <b>it affects
+    extrusion</b>. The pressure equalizer "smooths the speed changes when transitioning from printing one
+    feature to another" — in short, <b>it affects print
+    speed</b>.<span class="cite"><a href="#r3">3</a></span></p>
+    <p>They work together, and Prusa note the equalizer "can make the job of Linear Advance easier … by
+    reducing the number of sudden fast movements".<span class="cite"><a href="#r3">3</a></span> So if you enable
+    it now, after tuning advance in Lesson 11, you have changed the conditions your advance value was measured
+    under. Enable it, then look at your corners again.</p>
+  </div>
+
+  <!-- ===== SECTION 4 ===== -->
+  <h2><span class="num">4</span>Starting values per machine</h2>
+
+  <p>These are entry points to test against the stock system profile, not answers.
+  <b>Always compare against the stock Prusa profile for that printer before deviating</b> — and if a value
+  below differs a lot from stock, trust stock and tune from there.<span class="cite"><a href="#r4">4</a></span>
+  PrusaSlicer has a built-in preset comparison tool for exactly this
+  job.<span class="cite"><a href="#r5">5</a></span></p>
+
+  <p><b>Open your machine.</b></p>
+
+  <details class="panel">
+    <summary>MK3S · accept that it is the slow one, and win on quality</summary>
+    <div class="panel-body">
+      <p>A <a href="../reference/glossary.html#bedslinger">bedslinger</a> with no
+      <a href="../reference/glossary.html#input-shaper">Input Shaper</a>. The Y axis is carrying your part, and
+      the moving mass grows as the part does. There is no filter for mass.</p>
+      <p><b>Starting values</b> (0.4 nozzle, 0.2 mm layer)<span class="cite"><a href="#r4">4</a></span>:</p>
+      <ul>
+        <li><b>PLA</b> — external perimeter 30, perimeters 45, solid/infill 50/70, travel 180 mm/s</li>
+        <li><b>PETG</b> — external perimeter 25, perimeters 40, solid/infill 40/55, travel 180 mm/s</li>
+        <li><b>TPU 95A</b> — external perimeter 15, perimeters 20, solid/infill 20/25, travel 120 mm/s</li>
+      </ul>
+      <p><b>The strategic advice for this machine:</b> accept ~45–60 mm/s perimeters and get quality from
+      there, rather than pushing it to MK4S numbers and fighting
+      <a href="../reference/glossary.html#ghosting">ghosting</a>.<span class="cite"><a href="#r4">4</a></span>
+      An MK3S printing beautifully at 45 mm/s is a more useful machine than an MK3S printing acceptably at
+      90.</p>
+      <p><b>Bridges:</b> 25–30 mm/s, with bridge flow ratio ~0.95 for PLA and ~0.9 for
+      PETG.<span class="cite"><a href="#r4">4</a></span></p>
+      <p>And remember from Lesson 14: at 0.2 × 0.45, this machine's flow ceiling corresponds to roughly
+      140 mm/s. You will hit the motion limit long before the flow limit. On this printer,
+      <a href="../reference/glossary.html#max-volumetric-speed">MVS</a> is a safety net rather than the binding
+      constraint.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>MK4S · Input Shaper buys acceleration, not corners</summary>
+    <div class="panel-body">
+      <p>Still a <a href="../reference/glossary.html#bedslinger">bedslinger</a> — the bed and your part still
+      move on Y — but with Input Shaper cancelling the frame resonances that would otherwise limit
+      acceleration.<span class="cite"><a href="#r6">6</a></span></p>
+      <p><b>Starting values</b><span class="cite"><a href="#r4">4</a></span>:</p>
+      <ul>
+        <li><b>PLA</b> — external perimeter 45, perimeters 120, solid/infill 150/200, travel 400 mm/s</li>
+        <li><b>PETG</b> — external perimeter 40, perimeters 100, solid/infill 120/160, travel 400 mm/s</li>
+        <li><b>TPU 95A</b> — external perimeter 25, perimeters 35, solid/infill 35/45, travel 250 mm/s</li>
+      </ul>
+      <p><b>Notice the ratio.</b> External perimeter is 45 while perimeters are 120 — a factor of nearly three.
+      On the MK3S the same ratio is 30 to 45. The faster the machine, the <em>wider</em> the gap should be,
+      because the external perimeter's requirements haven't changed at all while everything else's ceiling has
+      risen.</p>
+      <p><b>On acceleration:</b> Input Shaper lets you run high accelerations, but corners and seams still
+      degrade first.<span class="cite"><a href="#r4">4</a></span> Keep external-perimeter acceleration well
+      below infill acceleration even here. And note Prusa's own diagnostic from Lesson 8 — an Input Shaper
+      frequency outside 35–70 Hz means go back and check belts, not raise
+      acceleration.<span class="cite"><a href="#r6">6</a></span></p>
+      <p><b>Bridges:</b> 50–80 mm/s.<span class="cite"><a href="#r4">4</a></span></p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Core One · CoreXY, where the acceleration budget is genuinely larger</summary>
+    <div class="panel-body">
+      <p><a href="../reference/glossary.html#corexy">CoreXY</a>: two fixed motors, only the light toolhead
+      accelerates, and the part's mass never enters the motion equation. This is the one machine where the
+      motion system is not your first constraint.</p>
+      <p><b>Starting values</b><span class="cite"><a href="#r4">4</a></span>:</p>
+      <ul>
+        <li><b>PLA</b> — external perimeter 45, perimeters 130, solid/infill 150/220, travel 450 mm/s</li>
+        <li><b>PETG</b> — external perimeter 40, perimeters 110, solid/infill 120/170, travel 450 mm/s</li>
+        <li><b>TPU 95A</b> — external perimeter 25, perimeters 40, solid/infill 40/50, travel 300 mm/s</li>
+      </ul>
+      <p><b>The interesting consequence:</b> this is the machine most likely to be limited by
+      <a href="../reference/glossary.html#max-volumetric-speed">MVS</a> rather than by motion. Its flow ceiling
+      and the MK4S's are comparable, but it can actually reach the speeds that demand them. Check the
+      Volumetric flow rate preview here first — on this printer it is the binding constraint far more often
+      than on the other two.</p>
+      <p><b>And the gantry-squareness caveat from Lesson 6 comes back:</b> CoreXY squareness depends on the two
+      belts being tensioned equally, within 8 Hz of each other. High acceleration on an unequally tensioned
+      gantry produces dimensional error that no speed setting fixes. If you're about to raise acceleration
+      substantially, re-measure the belts first.</p>
+      <p><b>Bridges:</b> 50–80 mm/s.<span class="cite"><a href="#r4">4</a></span> And remember the chamber —
+      bridges in warm still air sag more than bridges in room air.</p>
+    </div>
+  </details>
+
+  <!-- ===== SECTION 5 ===== -->
+  <h2><span class="num">5</span>The one legitimate loop back</h2>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ If you changed acceleration meaningfully, Lesson 11 is now stale</div>
+    <p>Advance compensates for a pressure lag whose magnitude scales with how hard the machine accelerates.
+    You tuned it in Lesson 11 <em>at production accelerations</em> precisely so this wouldn't happen — but if
+    this lesson has moved your accelerations substantially, that assumption has broken.</p>
+    <p><b>Re-run the advance tower.</b> It is the only step in the
+    <a href="../reference/glossary.html#calibration-order">calibration order</a> that is allowed to loop, and
+    this is the loop. Everything else stays forward-only: change a step and everything below it is void.</p>
+    <p>The cheap version of this check: print your corner-test object at the new accelerations and look at one
+    corner. If it's still clean, you're done. If a bulge or a gap has appeared, run the full tower.</p>
+  </div>
+
+  <!-- ===== SECTION 6: PHASE 2 SIGN-OFF ===== -->
+  <h2><span class="num">6</span>Sign Phase 2 off</h2>
+
+  <p>One material, one machine, one spool. Everything measured, everything logged, and every number
+  attributable to a print you can point at.</p>
+
+  <div class="checklist-widget">
+    <div class="cl-title">✓ Phase 2 sign-off — one material on one machine, all of it dated</div>
+    <ul class="checklist">
+      <li data-check>Phase 1 signed off on this machine, and nothing has changed since</li>
+      <li data-check>Spool drying temperature, duration and date recorded</li>
+      <li data-check>Spool brand, material, <b>colour</b> and batch recorded</li>
+      <li data-check>L9 · Nozzle temperature measured by tower and confirmed by snap test</li>
+      <li data-check>L9 · First-layer temperature set 5 °C above the measured value</li>
+      <li data-check>L10 · Firmware <code>M221</code> state known and recorded</li>
+      <li data-check>L10 · Extrusion multiplier measured from twelve caliper readings, inside 0.9–1.1</li>
+      <li data-check>L11 · Advance measured at production accelerations, with the right command for this firmware</li>
+      <li data-check>L11 · Advance value written into the <b>filament</b> profile's start G-code, nozzle-aware</li>
+      <li data-check>L12 · Other stringing causes ruled out before retraction was touched</li>
+      <li data-check>L12 · Retraction length measured; the grinding threshold also known</li>
+      <li data-check>L13 · Fan bands and the two time thresholds set, and the live description read</li>
+      <li data-check>L14 · MVS measured to failure, set at 85 % of it, in the filament profile</li>
+      <li data-check>L14 · Hotend ceiling set in the print profile, separately</li>
+      <li data-check>L15 · External perimeter speed and acceleration kept below everything else</li>
+      <li data-check>L15 · Dynamic overhang speed enabled</li>
+      <li data-check>Volumetric flow rate preview checked on a real part</li>
+      <li data-check>Speed preview checked on the same real part</li>
+      <li data-check>All test G-code deleted from the printer profile</li>
+      <li data-check>Every value marked measured or inherited in the log</li>
+    </ul>
+    <div class="checklist-bar"><span>Tick as you go</span><span data-checklist-progress></span></div>
+  </div>
+
+  <p>That last item is the one that matters most in six months, and it is what
+  <a href="0018-the-tuning-log.html">Lesson 18</a> is about. A profile full of numbers where you can't tell
+  which were measured and which came from a table is a profile you cannot debug.</p>
+
+  <p><b>Phase 2 ends here.</b> Next comes turning this pile of measurements into something durable: a named,
+  machine-scoped preset that can't end up on the wrong printer, a validation set that tells you when it's
+  finished, and a log that keeps three printers honest.</p>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">7</span>Check yourself</h2>
+  <p>From memory. Question 3 interleaves the whole of Phase 2.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read section 2.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">You raise perimeter speed from 90 to 130 mm/s. A 20 mm cube prints no faster. Why?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. On a small model the toolhead spends every wall accelerating and decelerating and never reaches the target. On parts like this, acceleration is the speed setting.">Acceleration limits it — 130 is never reached</button>
+      <button class="opt" data-feedback="MVS would clamp the speed and show up in the volumetric flow preview — but a 20 mm cube's perimeters are short, and the more likely explanation is that the target was never approached at all.">Max volumetric speed is clamping it back down</button>
+      <button class="opt" data-feedback="The cooling brake slows layers that finish too quickly, which is possible on a small cube — but it would also have applied at 90 mm/s, so it doesn't explain the lack of change.">The layer-time cooling brake is holding it back</button>
+      <button class="opt" data-feedback="Both settings apply to the same feature and the higher one takes effect. External perimeter speed governs only the outermost loop, not the rest.">External perimeter speed overrides the new value</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read the callout in section 3.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">What is the difference between the pressure equalizer and Linear Advance?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right, and this is Prusa's own framing. LA changes how much filament is extruded around decelerations; the equalizer changes how abruptly the speed itself is allowed to move.">Advance affects extrusion; the equalizer affects speed</button>
+      <button class="opt" data-feedback="Both are available on your machines, and the equalizer works without any firmware changes on essentially all FDM printers. They aren't alternatives for different hardware.">The equalizer replaces advance on newer firmware</button>
+      <button class="opt" data-feedback="The equalizer is a slicer feature and advance is a firmware one, which is true — but that describes where they run, not what they do differently.">One runs in the slicer, so it is strictly weaker</button>
+      <button class="opt" data-feedback="They aren't alternatives for different features. Both operate across the whole print, and Prusa describe them as working together rather than in separate domains.">The equalizer handles infill, advance handles walls</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read section 5.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">Which Phase 2 step is allowed to be re-run after this lesson, and why?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Advance compensates for a pressure lag that scales with acceleration, so changing acceleration genuinely invalidates a value measured at the old one. It is the only sanctioned loop.">Advance — the lag it corrects scales with acceleration</button>
+      <button class="opt" data-feedback="Temperature is step one and nothing downstream should send you back to it. If speeds have forced a temperature change, you have to re-run all of Phase 2, not loop.">Temperature — faster printing needs a hotter nozzle</button>
+      <button class="opt" data-feedback="Extrusion multiplier is a property of the filament and the flow path, not of how fast you move. Speed changes don't invalidate it.">Extrusion multiplier — flow changes with print speed</button>
+      <button class="opt" data-feedback="Cooling settings are time-based and speeds do change layer times — but that's the settings behaving as designed, not a measurement being invalidated.">Cooling — the fan thresholds are all time-based</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Close Phase 2 on one machine and one material</h3>
+    <ol>
+      <li>Set your speed values from the panel for your machine. Then open PrusaSlicer's preset comparison
+      against the stock system profile for that printer and <b>report every value where you differ by more
+      than 20 %</b>, with your reason for each.</li>
+      <li>Slice a real part you actually print. Screenshot both the <b>Speed</b> preview and the
+      <b>Volumetric flow rate</b> preview.</li>
+      <li>Tell me which of the four limits from Lesson 14 is binding, and where.</li>
+      <li>Print one corner-test object at your new accelerations. Is the advance value from Lesson 11 still
+      right? Show me a corner.</li>
+      <li>Complete the sign-off checklist above and paste the finished Phase 2 block from your log.</li>
+    </ol>
+    <p class="go">→ Point 1 is the assessment. Deviating from stock is fine — that's the whole course — but
+    every deviation should have a measurement behind it. If you can't name the measurement, take the stock
+    value back.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>External perimeter slowest, infill fastest</strong> — and the faster the machine, the wider
+      that gap should be.</li>
+      <li><strong>Acceleration is the real speed setting on small parts</strong>, where the target speed is
+      never reached at all.</li>
+      <li><strong>The Speed and Volumetric flow rate previews tell you what you actually built</strong>, which
+      the profile does not.</li>
+      <li><strong>Pressure equalizer affects speed; advance affects extrusion.</strong> They cooperate, and
+      enabling one changes the conditions the other was measured under.</li>
+      <li><strong>Changing acceleration is the one sanctioned loop back</strong> in the calibration order.
+      Everything else stays forward-only.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/article/pressure-equalizer_331504" target="_blank" rel="noopener">Pressure equalizer — Prusa Knowledge Base</a></div>
+      <div class="desc">Short, and it contains the clearest statement anywhere in Prusa's documentation of what
+      advance actually does versus what a speed-smoothing feature does. If Lesson 11 left you fuzzy on the
+      mechanism, this article is the one that fixes it — read the "Linear Advance vs Pressure Equalizer"
+      section twice.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> Phase 2 ends here, so send me the whole sign-off and I'll tell
+    you honestly whether it holds together — the commonest problem is a number that's measured on paper but was
+    actually measured before something upstream of it moved. Screenshots of the two preview modes are the
+    fastest way for me to see what you've built. Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#dynamic-overhang-speed">dynamic overhang speed</a>,
+    <a href="../reference/glossary.html#autospeed">AutoSpeed</a>,
+    <a href="../reference/glossary.html#max-volumetric-speed">max volumetric speed</a>,
+    <a href="../reference/glossary.html#linear-advance">Linear Advance</a>,
+    <a href="../reference/glossary.html#pressure-advance">Pressure Advance</a>,
+    <a href="../reference/glossary.html#input-shaper">Input Shaper</a>,
+    <a href="../reference/glossary.html#ghosting">ghosting</a>,
+    <a href="../reference/glossary.html#bedslinger">bedslinger</a>,
+    <a href="../reference/glossary.html#corexy">CoreXY</a>,
+    <a href="../reference/glossary.html#calibration-order">calibration order</a>,
+    <a href="../reference/glossary.html#tuning-log">tuning log</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>Pressure equalizer</i>. "Infill is usually printed the fastest, perimeters
+    are printed slower and the external perimeter is printed the slowest for the best surface finish and
+    accurate dimensions."
+    <a href="https://help.prusa3d.com/article/pressure-equalizer_331504" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">Prusa Research. <i>Speed settings</i>. That print speeds are affected by the printer's
+    acceleration and jerk settings and that on small models "it's possible the printer will never actually
+    reach the target speeds"; the <b>Speed</b> preview mode for inspecting actual speeds after accelerations
+    are applied; and dynamic overhang speed with four control points pairing extrusion overlap percentage with
+    a desired speed, linearly interpolated.
+    <a href="https://help.prusa3d.com/article/speed-settings_480325" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r3">Prusa Research. <i>Pressure equalizer</i>. Available from PrusaSlicer 2.5; located in
+    <code>Print settings → Speed</code>; Max volumetric slope positive and negative; that lower values give
+    smoother transitions and Prusa "suggest using values between 2-10"; setting the positive slope to zero to
+    suppress excessive slowdown of infill after perimeters; that it needs no firmware changes; and the
+    distinction that Linear Advance "affects extrusion" while the pressure equalizer "affects print speed",
+    with the equalizer able to "make the job of Linear Advance easier … by reducing the number of sudden fast
+    movements".
+    <a href="https://help.prusa3d.com/article/pressure-equalizer_331504" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r4">This course. <i>Master tuning guide</i>, §2.7, §3 and §4 — the per-machine per-material speed
+    tables, the external-perimeter and acceleration rules, dynamic overhang speed, travel speed, bridge speeds
+    and flow ratios, the MK3S strategic advice, and the instruction to compare against the stock system profile
+    before deviating.
+    <a href="../reference/source-material/prusaslicer-profile-tuning.md">Link</a>.</li>
+    <li id="r5">Prusa Research. <i>Compare presets</i>. PrusaSlicer's built-in tool for diffing two presets —
+    the practical way to audit your profile against the stock one.
+    <a href="https://help.prusa3d.com/article/compare-presets_301482" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r6">Prusa Research. <i>Input Shaper</i>. What it cancels, that it is coordinated with pressure
+    advance compensation, and the 35–70 Hz expected frequency band whose violation points back at belt tension
+    and assembly.
+    <a href="https://help.prusa3d.com/article/input-shaper-core-one-mk4-s-mk3-9-s-mk3-5-s-xl-mini_451816" target="_blank" rel="noopener">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0014-max-volumetric-speed.html">
+      <div class="dir">← Previous · L14</div>
+      <div class="ttl">Max volumetric speed</div>
+    </a>
+    <a class="next" href="0016-profile-structure-and-naming.html">
+      <div class="dir">Next · L16</div>
+      <div class="ttl">Profile structure and naming →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L15 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

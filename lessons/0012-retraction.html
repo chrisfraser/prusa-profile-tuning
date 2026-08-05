@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L12 · Retraction</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 2 · The filament · L12</p>
+  <h1 class="lesson-title">Retraction</h1>
+  <p class="lesson-sub">A printer setting with a material-dependent answer — which is why it gets overridden
+  per filament, and why more is emphatically not better.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~45 minutes</span><span class="sep">•</span>
+    <span>🧪 Spike towers, 0.1 mm at a time</span><span class="sep">•</span>
+    <span class="tag accent">Phase 2</span>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>Molten plastic under pressure keeps coming out of a nozzle that has stopped printing.
+    <a href="../reference/glossary.html#retraction">Retraction</a> pulls filament back to kill that pressure
+    before a travel move. It is the setting people reach for first when they see strings — and it is very
+    often the wrong one. Prusa name <b>high printing temperature</b> and <b>moisture</b> as causes of stringing
+    alongside retraction settings.<span class="cite"><a href="#r1">1</a></span> Coming fourth in the
+    <a href="../reference/glossary.html#calibration-order">calibration order</a> is what lets you rule those
+    out first, so that what's left really is retraction.</p>
+  </div>
+
+  <p>Retraction lives in <code>Printer Settings → Extruder 1</code> — it describes a mechanism, not a
+  material.<span class="cite"><a href="#r1">1</a></span> But the <em>correct value</em> is entirely
+  material-dependent, so you override it per filament rather than editing the printer profile.</p>
+
+  <div class="codefig">
+    <div class="difflabel">Filament Settings → Filament Overrides</div>
+    <pre><code><span class="c"># tick the box beside each value you want to override,</span>
+<span class="c"># and only those. Unticked = inherit from the printer.</span>
+
+<span class="f">Retraction length</span>          <span class="c"># almost always override</span>
+<span class="f">Retraction speed</span>           <span class="c"># override for flexibles</span>
+<span class="f">Retract lift (Z hop)</span>       <span class="c"># override for PETG</span>
+<span class="f">Minimum travel after retraction</span></code></pre>
+  </div>
+
+  <p>The tickbox matters. An unticked override <em>inherits</em>, so improvements you make to the printer
+  profile still reach that filament. A ticked one is frozen at whatever you set. Override the values the
+  material genuinely changes, and leave the rest alone.</p>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>Rule out the other three causes first</h2>
+
+  <p>Before you touch a single retraction setting, walk this list. Every item on it produces strings that look
+  exactly like a retraction problem and will not respond to retraction changes.</p>
+
+  <ul class="steps">
+    <li><span class="step-title">Moisture</span>
+      <span class="step-detail">Prusa's own diagnostic is to simply try a different spool — filament that "might
+      have gathered moisture … will cause a lot of stringing".<span class="cite"><a href="#r1">1</a></span> In
+      a humid climate this is the first suspect, not the last.</span></li>
+    <li><span class="step-title">Temperature</span>
+      <span class="step-detail">Prusa suggest dropping the nozzle 5–10 °C and checking whether stringing
+      reduces.<span class="cite"><a href="#r1">1</a></span> If it does, your Lesson 9 answer was too hot —
+      go back and fix it there, not here.</span></li>
+    <li><span class="step-title">A dirty nozzle</span>
+      <span class="step-detail">Printing a long time in one material, PETG especially, leaves a film on the
+      nozzle that strings on its own.<span class="cite"><a href="#r1">1</a></span> Clean it before you
+      measure.</span></li>
+    <li><span class="step-title">Heat creep</span>
+      <span class="step-detail">Prusa point at heat dissipation in the hotend, and at re-applying thermal paste
+      between heatbreak and heatsink.<span class="cite"><a href="#r1">1</a></span> This is a Phase 1 machine
+      fault wearing a Phase 2 costume.</span></li>
+  </ul>
+
+  <p>Only when all four are ruled out is the remaining stringing yours to tune.</p>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>The settings, and what each one costs</h2>
+
+  <p>Prusa document the retraction family as follows.<span class="cite"><a href="#r1">1</a></span> Read the
+  cost column as carefully as the setting — every one of these buys you something at a price.</p>
+
+  <ul class="steps">
+    <li><span class="step-title">Retraction length</span>
+      <span class="step-detail">How far filament is pulled back. The main lever. <b>Cost:</b> too much on a
+      direct-drive machine grinds the filament, drives heat creep, and leaves a gap where extrusion
+      restarts.</span></li>
+    <li><span class="step-title">Retraction speed</span>
+      <span class="step-detail">How fast the extruder motor pulls. "A higher value improves stringing, but if
+      it is too high it may skip steps in the motor."<span class="cite"><a href="#r1">1</a></span>
+      <b>Cost:</b> skipped steps are silent and cumulative.</span></li>
+    <li><span class="step-title">Lift Z (Z hop)</span>
+      <span class="step-detail">Raises the nozzle during travel so it can't drag through the print.
+      <b>Cost:</b> Prusa note that disabling it may cause the nozzle to hit the printed
+      part<span class="cite"><a href="#r1">1</a></span> — so this one has a cost in both directions.</span></li>
+    <li><span class="step-title">Minimum travel after retraction</span>
+      <span class="step-detail">The travel distance that triggers a retraction at all. PrusaSlicer's preset is
+      1 mm, which Prusa describe as "a low amount"; raising it lowers print times but increases oozing and
+      stringing.<span class="cite"><a href="#r1">1</a></span></span></li>
+    <li><span class="step-title">Retract on layer change · Wipe while retracting</span>
+      <span class="step-detail">Prusa recommend leaving both <b>on</b>.<span class="cite"><a href="#r1">1</a></span>
+      Treat them as defaults you need a measured reason to change.</span></li>
+  </ul>
+
+  <div class="callout note">
+    <div class="callout-label">⌁ Two print settings that reduce stringing without touching retraction</div>
+    <p><b>Only retract when crossing perimeters</b> (<code>Print Settings → Infill → Advanced</code>) skips
+    retraction when the travel stays inside the upper layer's perimeter — any ooze lands where it can't be
+    seen. <b>Avoid crossing perimeters</b> (<code>Print Settings → Layers and perimeters → Quality</code>)
+    routes travels to cross fewer walls in the first place.<span class="cite"><a href="#r1">1</a></span></p>
+    <p>Both are geometry-level fixes. They're worth knowing because they solve the visible problem without
+    asking more of the extruder — which is always the better trade on a direct-drive machine.</p>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>Measure it</h2>
+
+  <p>Print <b>four to six tall thin spikes, spaced about 40 mm apart</b>. Every layer forces a travel between
+  them, so a single short print gives you dozens of retraction events to judge. Adjust
+  <b>length only</b>, in 0.1 mm steps, until the strings go. Do not touch speed until length has stopped
+  improving things.</p>
+
+  <p><b>Open your machine.</b> The starting values and, on the MK3S, the hard ceiling both differ.</p>
+
+  <details class="panel">
+    <summary>MK3S · Bondtech direct drive, and a documented 2 mm ceiling</summary>
+    <div class="panel-body">
+      <div class="callout key">
+        <div class="callout-label">▲ Prusa's stated maximum</div>
+        <p>"On the MK2.5/S and MK3/S/+, the retraction length should be a maximum of
+        <b>2 mm</b>."<span class="cite"><a href="#r1">1</a></span> That is a ceiling, not a target. If you find
+        yourself pushing toward it, the problem is somewhere else — go back to section 1.</p>
+      </div>
+      <p><b>Working starting points</b><span class="cite"><a href="#r4">4</a></span> — begin here and step down
+      as well as up:</p>
+      <ul>
+        <li>PLA <b>0.8 mm</b> at 35 mm/s · PETG <b>1.0–1.2 mm</b> at 35 mm/s · TPU 95A <b>0.4–0.8 mm</b> at
+        20 mm/s</li>
+      </ul>
+      <p><b>Z-lift:</b> 0.4–0.6 mm suits PETG on this machine. Consider dropping it for PLA if you see travel
+      scarring on top surfaces — but remember Prusa's warning that removing it entirely risks the nozzle
+      striking the part.<span class="cite"><a href="#r1">1</a></span></p>
+      <p>For scale, and to show how much geometry matters: the Bowden-fed MINI/+ ships a default retraction of
+      3.2 mm.<span class="cite"><a href="#r1">1</a></span> Your MK3S needs a third of that because the filament
+      path from drive gear to melt zone is a few centimetres rather than half a metre. Never take a retraction
+      number from a machine with a different extruder arrangement.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>MK4S · Nextruder, and stock settings worth respecting</summary>
+    <div class="panel-body">
+      <p>The 2 mm figure above is stated for the MK2.5/MK3 family specifically and is not a Nextruder
+      spec<span class="cite"><a href="#r1">1</a></span> — but the underlying reason (a very short direct-drive
+      filament path) applies here just as strongly. Expect the answer to be small.</p>
+      <p><b>Stock behaviour to know:</b> MK4S profiles ship with <b>Z-lift enabled at 1.5 mm</b> and
+      <b>wipe-on-retract disabled</b>.<span class="cite"><a href="#r4">4</a></span> Note that this is the
+      opposite of Prusa's general "leave wipe on" advice<span class="cite"><a href="#r1">1</a></span> — the
+      machine-specific profile wins over the general article, and it's worth understanding why before you
+      change it. Confirm both against your own installed profile rather than trusting either source.</p>
+      <p><b>Working starting points</b><span class="cite"><a href="#r4">4</a></span>:</p>
+      <ul>
+        <li>PLA <b>0.6–0.8 mm</b> at 35 mm/s · PETG <b>0.8–1.0 mm</b> at 35 mm/s · TPU 95A <b>0.4–0.8 mm</b>
+        at 25 mm/s</li>
+      </ul>
+      <p><b>Keep Z-lift for PETG.</b> PETG oozes stringy and welds to whatever the nozzle drags through; the
+      1.5 mm hop is doing real work. For PLA you can often drop it to 0.2–0.4 mm and gain a little
+      speed.<span class="cite"><a href="#r4">4</a></span></p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Core One · as MK4S, plus the enclosure's contribution to oozing</summary>
+    <div class="panel-body">
+      <p><b>Same starting values and same reasoning as the MK4S.</b> Same extruder, same firmware.</p>
+      <p><b>What the enclosure adds:</b> warmer ambient air means the extrudate stays soft longer after it
+      leaves the nozzle, so strings that would have snapped on an open-frame machine stay attached. You may
+      measure a slightly longer retraction here than on the MK4S <em>for the same material</em> — and that
+      difference is real, not measurement error.</p>
+      <p>Run the spike test in the <b>door and vent state you actually use for that material</b>. A retraction
+      value measured with the door open is a value for a machine you don't have.</p>
+      <p>And keep the diagnostic order straight: on this machine especially, a hot chamber can push the hotend
+      toward heat creep, which strings for a Phase 1 reason.<span class="cite"><a href="#r1">1</a></span> If
+      more retraction makes things <em>worse</em>, suspect that before you suspect the number.</p>
+    </div>
+  </details>
+
+  <!-- ===== SECTION 4 ===== -->
+  <h2><span class="num">4</span>TPU: where two good sources disagree</h2>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ A genuine conflict, stated rather than hidden</div>
+    <p><b>Prusa say:</b> "Flexible filaments usually need longer retractions, because the material stretches
+    while being pulled back to the nozzle."<span class="cite"><a href="#r1">1</a></span></p>
+    <p><b>This course's own master guide says:</b> keep retraction on flexibles as low as you can tolerate,
+    because long retracts buckle the filament in the drive path.<span class="cite"><a href="#r4">4</a></span></p>
+    <p><b>Both mechanisms are real.</b> TPU is elastic, so part of a retraction is absorbed by the filament
+    stretching rather than by the melt zone depressurising — that argues for more. TPU is also soft, so a long
+    fast pull can buckle it inside the extruder path, where it jams — that argues for less. Which one dominates
+    depends on your specific extruder geometry and your specific filament's shore hardness.</p>
+    <p><b>How to resolve it:</b> start <em>low</em> and walk up in 0.1 mm steps, watching the extruder as much
+    as the print. The reason to approach from below is asymmetric risk — under-retracting gives you strings you
+    can see and cut off; over-retracting gives you a jam and a strip-down. Log the value you land on and which
+    direction you approached from.</p>
+  </div>
+
+  <p>Two more TPU-specific notes, both from this course's guide rather than from
+  Prusa:<span class="cite"><a href="#r4">4</a></span> the spool must unwind with almost no resistance — mount
+  it so there is no side pull — and the PTFE path from drive gear to hotend must be smooth and gap-free. A
+  flexible filament will happily coil up in any gap it finds rather than move forward. Neither of these is a
+  slicer setting, and both will masquerade as a retraction problem.</p>
+
+  <!-- ===== INTERACTIVE WIDGET ===== -->
+  <h2><span class="num">5</span>Find the fault</h2>
+  <p>Click each. Every one of these is stringing that will not respond to a retraction change.</p>
+  <div class="faultfinder">
+    <div class="ff-q">It's stringing. Is retraction actually the problem?</div>
+    <ul class="ff-list">
+      <li class="ff-item"
+          data-cause="No. Absorbed water flashes to steam in the melt zone and blows plastic out of the nozzle regardless of what the extruder is doing. Prusa list moisture directly and suggest trying a different spool as the test."
+          data-fix="Dry the spool and reprint the same spike test. If the strings halve, you had a moisture problem and any retraction value you 'found' before drying is void.">Strings everywhere, with faint popping while printing<span class="ff-tag">Moisture</span></li>
+      <li class="ff-item"
+          data-cause="Probably not. Prusa's first suggestion for stringing is lowering the nozzle 5-10 °C. Hot plastic is less viscous, so it flows out of an unpressurised nozzle more readily and no retraction length fixes that cleanly."
+          data-fix="Drop 5 °C and reprint. If it improves, your Lesson 9 answer was too hot — fix it there and re-measure extrusion multiplier, because temperature is upstream of everything.">Fine hairs, and the surface is glossier than expected<span class="ff-tag">Temperature</span></li>
+      <li class="ff-item"
+          data-cause="No — that's advance, not retraction. A gap immediately after a travel restart is pressure taking time to rebuild, which is precisely what Lesson 11's value compensates for. Adding retraction makes it worse."
+          data-fix="Go back to L11 and check the band either side of your chosen value. A gap after restart with no strings present usually means advance is slightly too high.">A gap where printing restarts, but no strings at all<span class="ff-tag">Advance</span></li>
+      <li class="ff-item"
+          data-cause="No. That's the extruder grinding a flat onto the filament because it is being asked to pull back further or faster than the drive can manage. The gear then slips on every subsequent move."
+          data-fix="Reduce retraction length in 0.1 mm steps until the clicking stops, then leave a margin. On the MK3S, Prusa cap length at 2 mm — but the practical limit is well below that.">Clicking from the extruder, and worsening under-extrusion<span class="ff-tag">Grinding</span></li>
+      <li class="ff-item"
+          data-cause="No, and this one is a machine fault. A hotend that dissipates heat poorly softens filament above the melt zone; it oozes continuously and eventually jams. Prusa point at thermal paste between heatbreak and heatsink."
+          data-fix="Stop tuning and go back to Phase 1. Check the hotend fan, the assembly, and the heatbreak interface. On the Core One, also check whether the chamber is running hotter than you think.">Oozing that gets worse the longer the print runs<span class="ff-tag">Heat creep</span></li>
+    </ul>
+    <div class="ff-panel"><div class="ff-cause"></div><div class="ff-fix"></div></div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">6</span>Check yourself</h2>
+  <p>From memory. Question 3 interleaves Lesson 11.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read section 1.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">Why does retraction come <em>after</em> temperature in the calibration order?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Prusa treat temperature as a primary cause of stringing and suggest dropping 5–10 °C. Tuning retraction on top of an over-hot profile means compensating for the wrong thing.">Temperature is itself a major cause of stringing</button>
+      <button class="opt" data-feedback="Retraction length isn't derived from temperature arithmetically. The dependency is diagnostic: hot plastic strings, and you can't attribute strings until temperature is settled.">The correct length is calculated from the temperature</button>
+      <button class="opt" data-feedback="Both are set per filament, so that isn't the distinction. Retraction is a printer setting overridden per filament; temperature is native to the filament profile.">Retraction is per filament and temperature is not</button>
+      <button class="opt" data-feedback="The order is about attribution, not about firmware. Both settings apply identically on Marlin and Buddy machines.">Firmware applies them in that order during a print</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read section 4.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">On TPU, why does the lesson say approach the answer from below rather than above?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Under-retraction gives strings you can see and trim. Over-retraction buckles soft filament in the drive path and gives you a jam and a strip-down — the risks aren't symmetric.">Under-retracting is cheap; over-retracting jams it</button>
+      <button class="opt" data-feedback="Prusa actually say the opposite about flexibles — that they usually need longer retractions because the material stretches. The lesson doesn't resolve that by assuming low is right.">Flexible filaments always want the shortest value</button>
+      <button class="opt" data-feedback="Elasticity does mean part of the pull is absorbed by stretch rather than depressurising the melt zone. But that argues for more retraction, not for the direction of approach.">Elastic filament absorbs the pull, so less is needed</button>
+      <button class="opt" data-feedback="Step size is 0.1 mm in either direction. Nothing about the resolution of the test changes based on which end you start from.">Small steps are only possible from the low end</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read the faultfinder's third item.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">A gap appears where extrusion restarts after travel, but there are no strings. Cause?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. No strings means the nozzle is depressurising fine. A gap on restart with pressure already dumped points at advance being slightly too high, not at retraction being too short.">Advance is a little too high — go back to Lesson 11</button>
+      <button class="opt" data-feedback="Retraction length that's too long does produce restart gaps — but it would not simultaneously eliminate all stringing so cleanly. The absence of strings is the clue.">Retraction length is too long — reduce it in steps</button>
+      <button class="opt" data-feedback="A low extrusion multiplier thins every line uniformly. A defect that appears only at restart points is a timing problem, not a quantity problem.">Extrusion multiplier is low — the whole wall is thin</button>
+      <button class="opt" data-feedback="Minimum travel after retraction changes how often retraction happens, not what the restart looks like when it does. Raising it would add strings, not gaps.">Minimum travel is too low, so it retracts too often</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Spike test, one material, one machine</h3>
+    <ol>
+      <li>Walk section 1's four causes and report on each: spool drying date, current nozzle temperature,
+      when you last cleaned the nozzle, and whether stringing worsens through a long print.</li>
+      <li>Print the spike tower at your current retraction length. Photograph it.</li>
+      <li>Step <b>length only</b>, 0.1 mm at a time, reprinting each time. Report the value where strings stop
+      and the value where the extruder starts complaining. Both numbers.</li>
+      <li>Only then, if strings remain, try speed — and say what changed.</li>
+      <li>Set the winner in <code>Filament Settings → Filament Overrides</code>, tick the override box, and
+      tell me which fields you ticked and which you deliberately left inheriting.</li>
+    </ol>
+    <p class="go">→ I want both numbers from point 3. The distance between "strings stop" and "extruder
+    complains" is your safety margin, and knowing how wide it is tells you how much this profile will tolerate
+    a wetter spool or a warmer day.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>Stringing has four common causes and retraction is only one</strong> — moisture, temperature
+      and a dirty nozzle come first.</li>
+      <li><strong>Retraction is a printer setting with a material answer</strong>, so it is overridden per
+      filament, selectively.</li>
+      <li><strong>Prusa cap MK3-family retraction at 2 mm</strong>; a Bowden MINI needs 3.2 mm, which is why
+      values never transfer between extruder types.</li>
+      <li><strong>Length first, in 0.1 mm steps; speed only after.</strong> One variable at a time, even inside
+      a single setting family.</li>
+      <li><strong>On flexibles, approach from below</strong> — the two credible sources disagree, and the
+      downside risks are not symmetric.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/article/stringing-and-oozing_1805" target="_blank" rel="noopener">Stringing and oozing — Prusa Knowledge Base</a></div>
+      <div class="desc">The full retraction setting list with Prusa's own cost notes, the 2 mm MK3-family
+      ceiling, and — usefully — the non-retraction causes given equal billing. Read the order of their
+      suggestions: nozzle cleanliness and temperature come before settings, which is the ordering this whole
+      lesson is built on.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> Photos of spike towers are genuinely easy to compare, so send
+    them — and send the pair, before and after, not just the good one. If you think you've hit the TPU
+    conflict in section 4 from the buckling side, describe what the extruder sounds like and we'll work out
+    which mechanism you're in. Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#retraction">retraction</a>,
+    <a href="../reference/glossary.html#filament-overrides">filament overrides</a>,
+    <a href="../reference/glossary.html#pressure-advance">Pressure Advance</a>,
+    <a href="../reference/glossary.html#heatbreak">heatbreak</a>,
+    <a href="../reference/glossary.html#extruder">extruder</a>,
+    <a href="../reference/glossary.html#hygroscopic">hygroscopic</a>,
+    <a href="../reference/glossary.html#drying">drying</a>,
+    <a href="../reference/glossary.html#calibration-order">calibration order</a>,
+    <a href="../reference/glossary.html#one-variable-rule">one-variable rule</a>,
+    <a href="../reference/glossary.html#tuning-log">tuning log</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>Stringing and oozing</i>. That stringing "is caused by very high printing
+    temperatures and/or using incorrect retraction settings"; the nozzle-film cause and the instruction to
+    clean it; retraction settings living in <code>Printer Settings → Extruder 1</code>; that flexible filaments
+    "usually need longer retractions, because the material stretches"; retraction length, Lift Z, retraction
+    speed ("a higher value improves stringing, but if it is too high it may skip steps in the motor"), minimum
+    travel after retraction (preset 1 mm, "a low amount"), retract on layer change and wipe while retracting
+    (both recommended on); the 2 mm maximum for MK2.5/S and MK3/S/+ and the MINI/+ default of 3.2 mm; "Only
+    retract when crossing perimeters" and "Avoid crossing perimeters"; lowering nozzle temperature by 5–10 °C;
+    moisture as a cause; and heat dissipation / thermal paste on the heatbreak-to-heatsink threads.
+    <a href="https://help.prusa3d.com/article/stringing-and-oozing_1805" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">Prusa Research. <i>Cooling</i>. Referenced here for the interaction between fan settings and
+    heat creep at very low print speeds — the failure mode that mimics an over-retraction jam.
+    <a href="https://help.prusa3d.com/article/cooling_127569" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r3">Prusa Research. <i>Configuration and profiles</i>. Filament Overrides as the mechanism for
+    per-filament values that belong structurally to the printer profile.
+    <a href="https://help.prusa3d.com/category/configuration-and-profiles_207" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r4">This course. <i>Master tuning guide</i>, §2.4 and §4 — the spike-tower method, the per-material
+    starting lengths and speeds, MK4S stock Z-lift of 1.5 mm with wipe-on-retract disabled, and the
+    flexibles guidance that conflicts with Prusa's. The conflict is stated in section 4 rather than resolved by
+    picking a side.
+    <a href="../reference/source-material/prusaslicer-profile-tuning.md">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0011-pressure-and-linear-advance.html">
+      <div class="dir">← Previous · L11</div>
+      <div class="ttl">Pressure / Linear Advance</div>
+    </a>
+    <a class="next" href="0013-cooling.html">
+      <div class="dir">Next · L13</div>
+      <div class="ttl">Cooling →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L12 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L13 · Cooling</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 2 · The filament · L13</p>
+  <h1 class="lesson-title">Cooling</h1>
+  <p class="lesson-sub">Not one fan speed — a small control system with two thresholds, a speed brake and an
+  interpolation between them. Worth understanding rather than copying.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~40 minutes</span><span class="sep">•</span>
+    <span>🌬 One overhang test print</span><span class="sep">•</span>
+    <span class="tag accent">Phase 2</span>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>Prusa frame the problem in two halves. Printing must always happen on an <b>already solidified
+    layer</b>, or the new pass drags the old one around. And when printing overhangs or bridges you need to
+    <b>freeze the plastic in place</b> before it sags.<span class="cite"><a href="#r1">1</a></span> A fan
+    solves both — and with some materials makes things "actually worse and cause warping or layer
+    separation".<span class="cite"><a href="#r1">1</a></span> That is the whole tension of this lesson: the
+    same air that buys you crisp overhangs costs you layer strength.</p>
+  </div>
+
+  <p>Everything here lives at <code>Filament Settings → Cooling</code>. And it is not one number: it is a
+  little control system that decides fan speed from <em>how long each layer takes</em>, and which will also
+  slow the printer down if a layer is too quick to cool.</p>
+
+  <div class="callout key">
+    <div class="callout-label">▲ Use the live description — it is the best feature in this pane</div>
+    <p>With <b>Enable auto cooling</b> on, PrusaSlicer shows a text description above the fan settings that
+    <b>updates with every change of any cooling setting</b> and explains in plain language what the resulting
+    behaviour will be.<span class="cite"><a href="#r1">1</a></span> Change a value, read the sentence, change
+    it back. Five minutes of that teaches the interaction better than this lesson can.</p>
+  </div>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>How the fan speed is actually chosen</h2>
+
+  <p>You set a <b>Min</b> and a <b>Max</b> fan speed, as a percentage of the fan's maximum RPM. Which one gets
+  used — or what blend of them — depends on two <em>time</em> thresholds, not on
+  geometry:<span class="cite"><a href="#r1">1</a></span></p>
+
+  <ul class="steps">
+    <li><span class="step-title">Layer time below "Slow down if layer print time is below"</span>
+      <span class="step-detail"><b>Max</b> fan speed is used. The layer is finishing so fast that it needs
+      everything you have — and the printer will also slow the print down to stretch the layer out to that
+      duration.</span></li>
+    <li><span class="step-title">Layer time above "Enable fan if layer print time is below"</span>
+      <span class="step-detail"><b>Min</b> fan speed is used. The layer takes long enough that it has time to
+      cool on its own.</span></li>
+    <li><span class="step-title">Layer time between the two thresholds</span>
+      <span class="step-detail">The fan runs <b>proportionally</b>, interpolated between Min and Max. This is
+      the case most of your layers are actually in.</span></li>
+  </ul>
+
+  <p>Two more overrides sit on top of that. <b>Bridges fan speed</b> replaces the calculated value whenever the
+  printer is bridging or printing overhangs — typically set higher than normal
+  printing.<span class="cite"><a href="#r1">1</a></span> And <b>Disable fan for the first X layers</b>
+  suppresses cooling at the start of the print entirely; Prusa note the first layer usually doesn't need
+  cooling since it's on a flat surface, and that skipping a few more prevents warping and
+  detachment.<span class="cite"><a href="#r1">1</a></span> Typical values are 1–5.</p>
+
+  <div class="callout note">
+    <div class="callout-label">⌁ Keep fan always on, and when to turn it off</div>
+    <p><b>Keep fan always on</b> guarantees at least the Min speed at all times. Prusa say it is typically on
+    for most materials "with the exception of ABS, ASA, PC, and some flexibles".<span class="cite"><a href="#r1">1</a></span>
+    Of the three materials in this course, that exception clause touches only TPU — and only sometimes. Turn it
+    off deliberately and log the reason, never as a default.</p>
+    <p>With <b>auto cooling disabled</b> entirely, the fan simply runs at the Min speed for the whole print,
+    with bridges still governed by Bridges fan speed.<span class="cite"><a href="#r1">1</a></span> That is a
+    useful diagnostic mode — a fixed, known fan speed — but not how you should ship a profile.</p>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>Min print speed, and the heat-creep trap</h2>
+
+  <p><b>Slow down if layer print time is below</b> is a brake: if a layer would finish too fast, PrusaSlicer
+  scales print speeds down to stretch it out.<span class="cite"><a href="#r1">1</a></span> <b>Min print
+  speed</b> is the floor it will not go below.</p>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ The floor exists for a reason</div>
+    <p>Prusa's warning is explicit: "Printing at extremely low speeds for extended periods of time could lead
+    to problems such as heat creep."<span class="cite"><a href="#r1">1</a></span> A nozzle crawling over a tiny
+    layer is barely pulling filament through, so heat climbs the filament path instead of being carried away
+    by it — and you get a jam that looks like a retraction problem
+    (<a href="0012-retraction.html">Lesson 12</a>).</p>
+    <p>The counter-warning is on the same page: raising Min print speed too high "may partially invalidate the
+    minimum layer time",<span class="cite"><a href="#r1">1</a></span> because even at that floor the layer can
+    still finish faster than you asked for. Both settings are real constraints and they genuinely fight. If a
+    tall thin part comes out droopy <em>and</em> the extruder jams, you are caught between them — the answer is
+    usually to print two copies at once so each layer has more work in it.</p>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>Dynamic fan speeds, and a documentation trap</h2>
+
+  <p>Dynamic fan speeds vary the fan as a function of <b>overlap percentage</b> — how much of the current
+  extrusion sits on top of the previous layer. Prusa define it clearly: <b>100 % overlap is a full overlap (no
+  overhang), while 0 % overlap represents a full overhang</b> — a floating extrusion, a bridge. Speeds between
+  the control points are linearly interpolated.<span class="cite"><a href="#r1">1</a></span></p>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ Read the direction carefully — the KB's own example is misleading</div>
+    <p>The relationship you want is <b>less overlap → more fan</b>. A bridge (0 % overlap) has nothing beneath
+    it and needs maximum cooling; a vertical wall (100 % overlap) is fully supported and needs minimal.</p>
+    <p>The example image in Prusa's own article shows fan speed <em>increasing</em> with overlap, which is
+    backwards, and several readers have said so in the comments — one of them verified the correct behaviour by
+    slicing test geometry and reading the resulting <code>M106</code> values out of the
+    G-code.<span class="cite"><a href="#r1">1</a></span> <b>The text is right; the picture isn't.</b></p>
+    <p>Do what that reader did. If you use this feature, slice a test part and read the <code>M106</code>
+    commands. It takes two minutes and it settles the question for your version of the slicer rather than for
+    someone else's.</p>
+  </div>
+
+  <p>Dynamic fan speeds are optional. Plain Min/Max plus Bridges fan speed handles most of what you need, and
+  it is easier to reason about. Reach for the dynamic curve when you have a specific part with gradual
+  overhangs that the binary bridge/not-bridge distinction handles badly.</p>
+
+  <!-- ===== SECTION 4 ===== -->
+  <h2><span class="num">4</span>Per material, per machine</h2>
+
+  <p>The material determines the shape of the answer; the machine determines how far you have to move from it.
+  <b>Open your machine.</b></p>
+
+  <details class="panel">
+    <summary>MK3S · open frame, and the fan is the whole story</summary>
+    <div class="panel-body">
+      <p>Nothing between the part and the room. Ambient is whatever the room is, and in Mauritius that is warm
+      and humid year-round — expect to need slightly more fan than a temperate-climate profile suggests, and
+      log the room temperature alongside the result.</p>
+      <p><b>Starting bands</b><span class="cite"><a href="#r4">4</a></span> — these are entry points to test,
+      not answers:</p>
+      <ul>
+        <li><b>PLA</b> — Min/Max 100 / 100 %, bridges 100 %, disable first 1 layer</li>
+        <li><b>PETG</b> — Min/Max 30 / 50 %, bridges 100 %, disable first 2–3 layers</li>
+        <li><b>TPU 95A</b> — Min/Max 50 / 80 %, disable first 1 layer</li>
+      </ul>
+      <p><b>Why PETG's band is so much lower:</b> PETG's strength comes from layers staying warm enough to weld.
+      Too much fan gives you delamination and poor overhangs; too little gives you drooping and
+      stringing.<span class="cite"><a href="#r4">4</a></span> It is the one material in this course where the
+      correct answer is genuinely in the middle rather than at an extreme.</p>
+      <p>This machine's slower speeds mean longer layer times, which means the auto-cooling thresholds fire
+      less often than on the MK4S. That is a real difference: a threshold pair copied from a fast machine will
+      behave differently here even with identical fan percentages.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>MK4S · open frame, but fast enough that the thresholds matter more</summary>
+    <div class="panel-body">
+      <p><b>Starting bands</b><span class="cite"><a href="#r4">4</a></span>:</p>
+      <ul>
+        <li><b>PLA</b> — Min/Max 100 / 100 %, bridges 100 %, disable first 1 layer</li>
+        <li><b>PETG</b> — Min/Max 40 / 60 %, bridges 100 %, disable first 2–3 layers</li>
+        <li><b>TPU 95A</b> — Min/Max 50 / 80 %, disable first 1 layer</li>
+      </ul>
+      <p><b>The MK4S-specific point is the time thresholds, not the percentages.</b> This machine prints the
+      same layer in a fraction of the MK3S's time, so far more of your layers fall below "Slow down if layer
+      print time is below" — which means Max fan more often, <em>and</em> the speed brake engaging more often.
+      A part that prints at 40 mm/s despite a 120 mm/s profile is usually not a max volumetric speed problem
+      (<a href="0014-max-volumetric-speed.html">Lesson 14</a>) — it is the cooling brake.</p>
+      <p><b>How to tell them apart:</b> slice and look at the preview. If the slow regions are small layers near
+      the top of a tapering part, it's the cooling brake. If they're large flat infill regions, it's MVS.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Core One · enclosed, and cooling now has two knobs</summary>
+    <div class="panel-body">
+      <p><b>Starting bands</b><span class="cite"><a href="#r4">4</a></span>:</p>
+      <ul>
+        <li><b>PLA</b> — Min/Max 100 / 100 %, bridges 100 %, disable first 1 layer, <b>vent open</b></li>
+        <li><b>PETG</b> — Min/Max 30 / 50 %, bridges 100 %, disable first 2–3 layers, <b>closed</b></li>
+        <li><b>TPU 95A</b> — Min/Max 40 / 70 %, disable first 1 layer, closed</li>
+      </ul>
+      <p><b>Note the inversion.</b> PETG's fan band here is <em>lower</em> than the MK4S's (30–50 % against
+      40–60 %) even though the two machines share a hotend — because the enclosure is already doing part of the
+      job of keeping layers warm. And PLA needs the opposite: the same enclosure that helps PETG is actively
+      working against you, so it wants the vent open <em>and</em> full fan.</p>
+      <div class="callout warning">
+        <div class="callout-label">⚠ These chamber numbers are community consensus, not Prusa specification</div>
+        <p>The working targets — vent open with the chamber at or below 30 °C for PLA, closed at 35–40 °C for
+        PETG — come from community practice and this course's own guide, not from a Prusa KB
+        article.<span class="cite"><a href="#r4">4</a></span> Prusa's cooling documentation says nothing about
+        chamber temperature at all.<span class="cite"><a href="#r1">1</a></span></p>
+        <p>So treat them as a hypothesis you are testing, log what your chamber actually reached, and be
+        willing to find that your machine in your room wants something different. Remember from
+        <a href="0002-filament-is-a-material.html">Lesson 2</a> that PLA's
+        <a href="../reference/glossary.html#glass-transition">glass transition</a> is low enough that a hot
+        chamber softens the part itself — that part is physics, not opinion.</p>
+      </div>
+      <p><b>Record the door and vent state with every cooling number you log.</b> On this machine a fan
+      percentage without a chamber state is not a measurement.</p>
+    </div>
+  </details>
+
+  <!-- ===== INTERACTIVE WIDGET ===== -->
+  <h2><span class="num">5</span>Work out what the fan will actually do</h2>
+  <p>Answer each before opening it. If you can predict these, you understand the pane.</p>
+
+  <details class="panel">
+    <summary>Drill 1 · Min 40 %, Max 60 %, enable-fan-below 60 s, slow-down-below 15 s. Layer takes 8 s.</summary>
+    <div class="panel-body">
+      <p><b>Max — 60 %.</b> And the print also slows down.</p>
+      <p>8 s is below the 15 s "slow down" threshold, so two things fire at once: the fan goes to
+      Max,<span class="cite"><a href="#r1">1</a></span> and PrusaSlicer scales print speeds to stretch the layer
+      out toward 15 s — down to the Min print speed floor, no further.</p>
+      <p>This is the case people misread as a slicing bug. The profile says 120 mm/s, the preview says 45, and
+      nothing in the speed pane explains it. The explanation is in the cooling pane.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Drill 2 · Same settings. Layer takes 35 s.</summary>
+    <div class="panel-body">
+      <p><b>Interpolated — roughly 51 %.</b></p>
+      <p>35 s sits between the two thresholds, so the fan runs proportionally between Min and
+      Max.<span class="cite"><a href="#r1">1</a></span> Roughly: 35 s is a bit under halfway from 60 s down to
+      15 s, so you land a bit above the midpoint of 40–60 %.</p>
+      <p>The exact number matters less than the shape: <b>most of your layers live in this band</b>, which is
+      why Min and Max both need to be sensible values rather than one real setting and one placeholder.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Drill 3 · Same settings, but the layer contains a bridge. Bridges fan speed is 100 %.</summary>
+    <div class="panel-body">
+      <p><b>100 % — while bridging.</b> The rest of the layer uses whatever the time-based calculation gave.</p>
+      <p>Bridges fan speed <em>overrides</em> the calculated value for bridges and overhangs
+      specifically.<span class="cite"><a href="#r1">1</a></span> It is not a per-layer setting; the fan changes
+      within the layer and changes back.</p>
+      <p>This is why bridges fan speed can sit at 100 % for PETG even when the normal band is 30–50 %. The two
+      numbers describe different moments, and the delamination risk that keeps PETG's normal fan low simply
+      doesn't apply to an extrusion with nothing underneath it to delaminate from.</p>
+    </div>
+  </details>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">6</span>Check yourself</h2>
+  <p>From memory. Question 2 is the one that saves you an evening.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read section 1.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">What decides whether the fan runs at Min or Max fan speed?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. The two thresholds are both times in seconds. Max below the slow-down threshold, Min above the enable-fan threshold, proportional in between.">How long the layer takes to print, in seconds</button>
+      <button class="opt" data-feedback="Overhang angle drives Bridges fan speed and the optional dynamic fan curve — but the basic Min/Max choice is purely a function of layer time.">How steep the overhangs in that layer are</button>
+      <button class="opt" data-feedback="Height above the bed only matters for 'disable fan for the first X layers'. After that the calculation is identical at every height.">How far up the part the current layer sits</button>
+      <button class="opt" data-feedback="The material sets what you type into Min and Max, but it isn't what selects between them at slice time. That selection is time-based.">Which material the filament profile declares</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read Drill 1.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">Your 120 mm/s profile previews at 45 mm/s near the top of a tapering part. Why?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Small layers finish fast, so 'slow down if layer print time is below' scales the speeds to stretch them out. Nothing in the speed pane will explain it.">The cooling brake — those layers are too quick</button>
+      <button class="opt" data-feedback="MVS does cap speed, but it bites hardest on wide, thick extrusions like solid infill — not specifically on the small layers at the top of a taper.">Max volumetric speed is capping the requested flow</button>
+      <button class="opt" data-feedback="Advance changes extrusion timing around corners and travels. It doesn't scale the commanded feedrate of a whole region.">Pressure advance is compensating for the geometry</button>
+      <button class="opt" data-feedback="A too-low external perimeter speed would apply uniformly up the whole part, not just where the layers get small.">External perimeter speed is set far below the rest</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read the Core One panel.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">Why is the Core One's PETG fan band lower than the MK4S's, despite the same hotend?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. The enclosure already keeps layers warm, so less fan is needed to reach the same result — and more fan would start costing layer adhesion for no gain.">The enclosure does part of the job the fan would do</button>
+      <button class="opt" data-feedback="The fans are comparable. The difference is the air they are blowing, which on the Core One is warm chamber air rather than room air.">Its part-cooling fan moves substantially more air</button>
+      <button class="opt" data-feedback="CoreXY affects how fast the toolhead can move and accelerate, not how much cooling the extrudate needs once it has been deposited.">CoreXY motion changes how the extrudate is laid</button>
+      <button class="opt" data-feedback="Both machines run PETG in the same temperature region. The cooling difference comes from ambient air, not from a different nozzle target.">It prints PETG meaningfully cooler than the MK4S</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>One overhang test, and read the sentence</h3>
+    <ol>
+      <li>Open <code>Filament Settings → Cooling</code> for your material and <b>paste me the live description
+      text</b> that PrusaSlicer generates. That sentence is the ground truth for your profile.</li>
+      <li>Print an overhang and bridge test at your material's starting band. Photograph the underside of the
+      bridge and the steepest overhang that survived.</li>
+      <li>Change <b>only Min fan speed</b>, by 10 points, in the direction you think helps. Reprint. Report
+      what changed — including anything that got <em>worse</em>.</li>
+      <li>Snap a piece off both prints and compare the fractures. More fan should make the break cleaner along
+      layer lines; that is the cost you are paying.</li>
+      <li><b>Core One only:</b> record the chamber temperature at the start and end of each print, and the
+      door and vent state.</li>
+    </ol>
+    <p class="go">→ Point 4 is the one people skip. Cooling is a trade, and if you can't show me what the extra
+    fan cost you in layer strength, you've optimised one side of it blind.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>Fan speed is chosen by layer time</strong>, not geometry — Max below one threshold, Min above
+      the other, interpolated between.</li>
+      <li><strong>Bridges fan speed overrides the calculation</strong> mid-layer, which is why it can be 100 %
+      while the normal band is 40 %.</li>
+      <li><strong>The cooling brake can slow a print far below its profile speeds</strong>, and Min print speed
+      is the floor that keeps it out of heat creep.</li>
+      <li><strong>Dynamic fan speed runs inverse to overlap</strong> — 0 % overlap is a bridge and wants the
+      most air. Verify it in <code>M106</code> output; the KB's example image is backwards.</li>
+      <li><strong>An enclosed machine needs a different band, not a scaled one</strong> — less fan for PETG,
+      more for PLA, and a chamber state logged with every number.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/article/cooling_127569" target="_blank" rel="noopener">Cooling — Prusa Knowledge Base</a></div>
+      <div class="desc">Every setting in the pane, in Prusa's own words, including the exact Min/Max threshold
+      logic this lesson is built on. Read the comments too — the dynamic-fan-speed discussion is a good example
+      of documentation being corrected in public, and of a reader settling it by reading the G-code.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> Paste me the live description sentence from your cooling pane
+    and I'll tell you what it means for the part you're about to print — it's dense, and reading it accurately
+    is a skill. Bridge photos are welcome; sag is much easier to judge with a second opinion. Confused beats
+    stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#glass-transition">glass transition temperature</a>,
+    <a href="../reference/glossary.html#heatbreak">heatbreak</a>,
+    <a href="../reference/glossary.html#retraction">retraction</a>,
+    <a href="../reference/glossary.html#max-volumetric-speed">max volumetric speed</a>,
+    <a href="../reference/glossary.html#extrusion-width">extrusion width</a>,
+    <a href="../reference/glossary.html#corexy">CoreXY</a>,
+    <a href="../reference/glossary.html#bedslinger">bedslinger</a>,
+    <a href="../reference/glossary.html#calibration-order">calibration order</a>,
+    <a href="../reference/glossary.html#one-variable-rule">one-variable rule</a>,
+    <a href="../reference/glossary.html#tuning-log">tuning log</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>Cooling</i>. The two cooling problems (printing on a solidified layer;
+    freezing overhangs and bridges); that a fan can with some materials "make things actually worse and cause
+    warping or layer separation"; "Keep fan always on" and its exception list of ABS, ASA, PC and some
+    flexibles; "Enable auto cooling" and its live-updating text description; the Min/Max fan speed rules
+    against the "Slow down if layer print time is below" and "Enable fan if layer print time is below"
+    thresholds with proportional interpolation between them; Bridges fan speed as an override; "Disable fan for
+    the first X layers" (typically 1–5); dynamic fan speeds with 100 % overlap = no overhang and 0 % = full
+    overhang, linearly interpolated; Min print speed and the note that "printing at extremely low speeds for
+    extended periods of time could lead to problems such as heat creep"; and that raising Min print speed too
+    high "may partially invalidate the minimum layer time". The misleading dynamic-fan-speed example image and
+    its correction by <code>M106</code> inspection are from the article's reader comments, not from Prusa.
+    <a href="https://help.prusa3d.com/article/cooling_127569" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">Prusa Research. <i>Max volumetric speed</i>. That layer-time cooldown is one of the four limits
+    on final print speed, alongside per-feature speed, MVS and overhang slowdown — the framing used to
+    distinguish the cooling brake from an MVS cap.
+    <a href="https://help.prusa3d.com/article/max-volumetric-speed_127176" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r3">Prusa Research. <i>Stringing and oozing</i>. Heat creep, and re-applying thermal paste between
+    heatbreak and heatsink — the failure mode Min print speed exists to avoid.
+    <a href="https://help.prusa3d.com/article/stringing-and-oozing_1805" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r4">This course. <i>Master tuning guide</i>, §2.5 and §4 — the per-material fan bands for all three
+    machines, the PETG delamination-versus-drooping trade, and the Core One chamber guidance. The chamber
+    numbers are community consensus and are flagged as such in section 4.
+    <a href="../reference/source-material/prusaslicer-profile-tuning.md">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0012-retraction.html">
+      <div class="dir">← Previous · L12</div>
+      <div class="ttl">Retraction</div>
+    </a>
+    <a class="next" href="0014-max-volumetric-speed.html">
+      <div class="dir">Next · L14</div>
+      <div class="ttl">Max volumetric speed →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L13 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

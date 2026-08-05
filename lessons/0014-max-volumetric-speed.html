@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L14 · Max volumetric speed</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 2 · The filament · L14</p>
+  <h1 class="lesson-title">Max volumetric speed</h1>
+  <p class="lesson-sub">Your real speed limit — and the reason a fast print can come out matte, weak and
+  under-extruded without a single error message.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~50 minutes</span><span class="sep">•</span>
+    <span>🌀 One spiral-vase cylinder</span><span class="sep">•</span>
+    <span class="tag accent">Phase 2</span>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>Prusa's definition is exact: <a href="../reference/glossary.html#max-volumetric-speed">MVS</a> is "the
+    maximum amount of plastic (mm³/s) your hotend can reliably melt", and it acts as a speed limiter —
+    PrusaSlicer lets your requested speeds through when safe and reduces them only when the hotend would be
+    asked to melt more than it can.<span class="cite"><a href="#r1">1</a></span> Set it correctly and you never
+    have to calculate safe speeds for a nozzle-and-layer-height combination again. Leave it at a default and
+    you either lose speed you had, or exceed a limit that has no alarm on it.</p>
+  </div>
+
+  <div class="callout key">
+    <div class="callout-label">▲ MVS never makes anything faster</div>
+    <p>"MVS never increases your speed, it can only reduce it."<span class="cite"><a href="#r1">1</a></span>
+    That is worth holding onto, because it makes the setting safe to raise carefully and dangerous to raise
+    carelessly — nothing will go faster than you asked for, but plenty can go faster than the hotend can
+    supply.</p>
+  </div>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>Four things limit your print speed, and MVS is one</h2>
+
+  <p>Every extrusion move checks several limits and takes <b>the most restrictive</b>:<span class="cite"><a href="#r1">1</a></span></p>
+
+  <ul class="steps">
+    <li><span class="step-title">Per-feature speed</span>
+      <span class="step-detail">What you set in <code>Print Settings → Speed</code> for perimeters, infill,
+      bridges and the rest. That's <a href="0015-speeds-and-accelerations.html">Lesson 15</a>.</span></li>
+    <li><span class="step-title">Max volumetric speed</span>
+      <span class="step-detail">Reduces the requested speed when flow would exceed the ceiling. Wider and
+      taller extrusions get slowed more, because they carry more plastic per
+      millimetre.<span class="cite"><a href="#r1">1</a></span></span></li>
+    <li><span class="step-title">Overhang and cooling slowdown</span>
+      <span class="step-detail">Overhanging perimeters are slowed based on how unsupported they
+      are.<span class="cite"><a href="#r1">1</a></span></span></li>
+    <li><span class="step-title">Layer time cooldown</span>
+      <span class="step-detail">If a layer is too short in time, all speeds scale down, with Min print speed as
+      the floor.<span class="cite"><a href="#r1">1</a></span> That's
+      <a href="0013-cooling.html">Lesson 13</a>.</span></li>
+  </ul>
+
+  <p>Knowing which of the four is biting is the whole diagnostic skill. Three of them are visible in the
+  preview if you know where to look, and section 5 shows you how.</p>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>Two settings with the same name</h2>
+
+  <p>MVS exists in <b>two places</b>: <code>Print Settings → Speed → Max volumetric speed</code> and
+  <code>Filament Settings → Advanced → Max volumetric speed</code>. <b>The lower of the two always
+  wins</b>, and setting either to 0 disables that one and defers to the
+  other.<span class="cite"><a href="#r1">1</a></span></p>
+
+  <div class="callout note">
+    <div class="callout-label">⌁ This is a feature, not a redundancy</div>
+    <p>Prusa's framing: the effective MVS is limited by the weaker link, <b>either the hotend or the
+    material</b> — set each in its respective profile and PrusaSlicer uses the
+    lower.<span class="cite"><a href="#r1">1</a></span></p>
+    <p>So the <b>print profile's</b> MVS is a statement about <em>this machine's hotend</em>, and the
+    <b>filament profile's</b> is a statement about <em>this material</em>. Fill in both honestly and the right
+    thing happens automatically on every combination — which for a three-printer, three-material fleet is nine
+    combinations you no longer have to reason about individually.</p>
+    <p>The failure this prevents: putting the machine's number into the filament profile means your TPU
+    inherits your PLA's ceiling on that printer, and your MK3S's PETG profile carries the Core One's ceiling
+    the moment you copy it across.</p>
+  </div>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ Zero means <em>no limit</em>, not "off"</div>
+    <p>Setting MVS to zero removes the limit entirely.<span class="cite"><a href="#r1">1</a></span> It reads
+    like a disabled setting and behaves like an unlocked one. If you set MVS to 0 while testing and forget,
+    every speed in the profile goes through unchecked — which is exactly the state that produces a fast, matte,
+    weak print with no warning anywhere.</p>
+    <p>A second trap on the same setting: putting <b>0 in a per-feature speed field</b> activates
+    <b>AutoSpeed</b> for that feature, where MVS stops being a brake and becomes the basis for calculating
+    speed.<span class="cite"><a href="#r1">1</a></span> That's a legitimate mode, but it is not what you want
+    while measuring, and it is easy to trigger by clearing a field.</p>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>The arithmetic</h2>
+
+  <p>PrusaSlicer's rule is <code>Max speed = MVS / cross-section area</code>, using a stadium-shaped
+  cross-section model for accurate volume calculation.<span class="cite"><a href="#r1">1</a></span> Turned
+  around, that is the <a href="../reference/glossary.html#extrusion-equation">extrusion equation</a> from
+  <a href="0003-what-the-slicer-decides.html">Lesson 3</a> — the one piece of arithmetic the whole course rests
+  on.</p>
+
+  <div class="codefig">
+    <div class="difflabel">Flow, from settings you already have</div>
+    <pre><code>flow (mm³/s) = layer height × extrusion width × speed (mm/s)
+
+<span class="c"># 0.2 mm layer, 0.45 mm wide, 100 mm/s</span>
+0.2 × 0.45 × 100 = <span class="n">9.0</span> mm³/s
+
+<span class="c"># the same profile at 250 mm/s</span>
+0.2 × 0.45 × 250 = <span class="n">22.5</span> mm³/s  <span class="c">← past an MK3S hotend</span>
+
+<span class="c"># and going taller costs more than going faster feels like</span>
+0.3 × 0.45 × 100 = <span class="n">13.5</span> mm³/s  <span class="c">← +50% for one setting</span></code></pre>
+  </div>
+
+  <p>The stadium model means the true cross-section is slightly less than width × height — a rectangle with
+  rounded ends, not a rectangle.<span class="cite"><a href="#r1">1</a></span> For tuning purposes the simple
+  product is close enough and errs on the safe side; PrusaSlicer does the precise version at slice time.</p>
+
+  <!-- ===== SECTION 4 ===== -->
+  <h2><span class="num">4</span>Measure your ceiling</h2>
+
+  <p>Print a <b>spiral-vase cylinder</b> — single wall, 0.2 mm layers, continuous extrusion with no travels
+  and no seams to confuse the picture — and ramp the speed through it with
+  <code>M220</code>, the speed factor override.<span class="cite"><a href="#r2">2</a></span></p>
+
+  <div class="codefig">
+    <div class="difflabel">Printer Settings → Custom G-code → After layer change G-code</div>
+    <pre><code>{if layer_num == <span class="n">30</span>}<span class="k">M220</span> <span class="f">S</span><span class="n">150</span>{endif}
+{if layer_num == <span class="n">60</span>}<span class="k">M220</span> <span class="f">S</span><span class="n">200</span>{endif}
+{if layer_num == <span class="n">90</span>}<span class="k">M220</span> <span class="f">S</span><span class="n">250</span>{endif}
+{if layer_num == <span class="n">120</span>}<span class="k">M220</span> <span class="f">S</span><span class="n">300</span>{endif}
+<span class="c">; and set MVS to 40 for the test, so it doesn't clamp what you're measuring</span></code></pre>
+  </div>
+
+  <p><b>Set MVS artificially high — 40 or so — before printing this.</b> The whole point is to find where the
+  hotend fails, and a correctly-set MVS would prevent exactly that. Put it back afterwards.</p>
+
+  <ul class="steps">
+    <li><span class="step-title">Find where the wall changes</span>
+      <span class="step-detail">Look for the band where the surface goes <b>matte, thin or glassy</b> instead
+      of evenly glossy. That is the hotend running out of melt capacity — it is delivering less plastic than
+      the slicer asked for.</span></li>
+    <li><span class="step-title">Listen and watch as well</span>
+      <span class="step-detail">Prusa's signs of MVS set too high are <b>extruder clicking, under-extrusion at
+      high speeds, and poor layer adhesion</b>.<span class="cite"><a href="#r1">1</a></span> Clicking usually
+      arrives one band before the visual change.</span></li>
+    <li><span class="step-title">Compute the flow at that band</span>
+      <span class="step-detail">layer height × extrusion width × (profile speed × M220 %). Write the number
+      down.</span></li>
+    <li><span class="step-title">Take 85 % of it</span>
+      <span class="step-detail">The failure point is not the working point. 85 % leaves room for a colder day,
+      a wetter spool and a slightly different colour.<span class="cite"><a href="#r4">4</a></span></span></li>
+    <li><span class="step-title">Set it in the right profile</span>
+      <span class="step-detail">The material-derived number goes in <code>Filament Settings → Advanced</code>.
+      If you're also establishing the machine's hotend ceiling, that goes in
+      <code>Print Settings → Speed</code>.</span></li>
+  </ul>
+
+  <p><b>Open your machine.</b> The expected answers are far apart.</p>
+
+  <details class="panel">
+    <summary>MK3S · standard all-metal hotend, and the lowest ceiling of the three</summary>
+    <div class="panel-body">
+      <p>Prusa's own hotend table puts a <b>standard all-metal hotend — explicitly including the Prusa MK3
+      stock hotend — at 8–12 mm³/s</b>.<span class="cite"><a href="#r1">1</a></span> This course's guide puts
+      the practical ceiling slightly higher at ~11–13 mm³/s;<span class="cite"><a href="#r4">4</a></span> treat
+      8–12 as the conservative, Prusa-documented figure and anything above it as something you must have
+      measured.</p>
+      <p><b>Combined with the material limits</b><span class="cite"><a href="#r1">1</a></span> — PLA 12–20,
+      PETG 8–15, TPU 2–5 — the hotend is the weaker link for PLA on this machine, and the material is the
+      weaker link for TPU. That is exactly the "lower of the two wins" mechanism doing its job.</p>
+      <p><b>Working targets to test against</b><span class="cite"><a href="#r4">4</a></span>: PLA ~13, PETG ~8,
+      TPU 95A ~1.8–2.5.</p>
+      <p><b>The practical consequence:</b> at 0.2 × 0.45, a 13 mm³/s ceiling is about 144 mm/s. You will not
+      reach that on this machine anyway — the Y-axis mass gets you first (Lesson 8). On the MK3S, MVS is
+      mostly a safety net rather than an active constraint. That is fine. Set it correctly anyway, because it
+      is what stops a copied-from-elsewhere speed profile from quietly starving the nozzle.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>MK4S · where Prusa's own table has fallen behind</summary>
+    <div class="panel-body">
+      <div class="callout warning">
+        <div class="callout-label">⚠ The KB hotend table predates your machine</div>
+        <p>Prusa's table lists "Prusa Nextruder (MK4/XL)" at <b>15–20 mm³/s</b>, high-flow nozzles such as CHT
+        at <b>20–35</b>, and high-flow hotends at <b>25–40</b>.<span class="cite"><a href="#r1">1</a></span>
+        <b>It does not list the MK4S or the Core One at all</b>, and readers say so in the article's comments —
+        one relaying that Prusa's MK4S launch material quoted 24 mm³/s for Prusament PLA against the MK4's 16,
+        and another reporting a support answer of 24 mm³/s on high-flow nozzles versus 15 on
+        standard.<span class="cite"><a href="#r1">1</a></span></p>
+        <p><b>Those are comment-thread numbers and marketing copy, not KB specification.</b> They are the best
+        available public figures and they are consistent with this course's ~22–28 mm³/s
+        estimate,<span class="cite"><a href="#r4">4</a></span> but they are precisely the kind of number this
+        course exists to replace with one you measured.</p>
+      </div>
+      <p><b>Which row applies to you depends on your nozzle.</b> An MK4S with the stock high-flow nozzle sits
+      in the 20–35 band; the same machine with a plain 0.4 nozzle fitted sits much lower. Check what is actually
+      installed before you pick a starting point — this is the one setting where the physical nozzle changes
+      the answer more than the firmware does.</p>
+      <p><b>Working targets to test against</b><span class="cite"><a href="#r4">4</a></span>: PLA ~24, PETG
+      ~10–13, TPU 95A ~3–4.</p>
+      <p><b>And remember the temperature coupling.</b> Prusa note that with larger nozzles you should consider
+      raising nozzle temperature to allow a bigger MVS — PLA 10–20 °C hotter than standard on a 0.6
+      mm.<span class="cite"><a href="#r1">1</a></span> The same logic applies to high flow through a 0.4: if
+      your measured ceiling here is lower than you expected, going back to Lesson 9 and adding 10 °C is a
+      legitimate move. Just re-measure extrusion multiplier afterwards, because temperature is upstream of
+      everything.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Core One · same hotend class, and one enclosure effect worth measuring</summary>
+    <div class="panel-body">
+      <p><b>Same hotend class as the MK4S</b>, so the same starting bands: PLA ~24, PETG ~13, TPU 95A
+      ~3–5.<span class="cite"><a href="#r4">4</a></span> And the same absence from Prusa's published
+      table.<span class="cite"><a href="#r1">1</a></span></p>
+      <p><b>The enclosure's contribution is ambiguous and worth actually measuring.</b> Warm chamber air means
+      filament entering the extruder is warmer, which helps melting. It also means the heatsink has warmer air
+      to reject heat into, which hurts. Which effect dominates on your machine, in your room, is not something
+      you can look up.</p>
+      <p>So run the ramp <b>twice for PLA</b> — vented and closed — and note whether the failure band moves.
+      If it moves toward lower flow when closed, you are seeing heat creep territory and that is a real
+      operating constraint on this machine, not a curiosity.</p>
+      <p><b>The MK4S and Core One will land close on filament MVS</b> — same melting capacity — while landing
+      far apart on speeds and accelerations in Lesson 15, because one is a
+      <a href="../reference/glossary.html#bedslinger">bedslinger</a> and the other is
+      <a href="../reference/glossary.html#corexy">CoreXY</a>. Same flow ceiling, different motion ceiling.</p>
+    </div>
+  </details>
+
+  <!-- ===== SECTION 5 ===== -->
+  <h2><span class="num">5</span>Verify it in the preview</h2>
+
+  <p>Slice a real part, then switch the preview mode to <b>Volumetric flow rate</b> using the select box at the
+  top left.<span class="cite"><a href="#r1">1</a></span> You now have a colour map of exactly how much plastic
+  every move demands, on the model you actually print.</p>
+
+  <p>Prusa's own reading guide: on small models and at small layer heights you probably aren't capped at all;
+  on bigger models with tall layers you may see the limit bite, <b>especially on
+  infill</b>.<span class="cite"><a href="#r1">1</a></span> And if most of the model is being slowed by MVS,
+  their advice is counter-intuitive and correct — <b>lower the layer height</b>. You get more detail without
+  increasing print time, because the printer can then run faster.<span class="cite"><a href="#r1">1</a></span></p>
+
+  <p>This is the cheapest habit in the whole course. It costs one dropdown change, it needs no filament, and
+  it turns "I think my speeds are sensible" into "I can see where my speeds are being clamped and by what".</p>
+
+  <!-- ===== INTERACTIVE WIDGET ===== -->
+  <h2><span class="num">6</span>Find the fault</h2>
+  <p>Click each. All five produce a print that is slower or worse than the profile promised.</p>
+  <div class="faultfinder">
+    <div class="ff-q">Why isn't this printing the way the profile says?</div>
+    <ul class="ff-list">
+      <li class="ff-item"
+          data-cause="MVS is clamping. The hotend cannot melt what the requested speed demands, so PrusaSlicer reduces the feedrate — silently, at slice time. Wider and taller extrusions get reduced most, which is why infill suffers first."
+          data-fix="Open the preview in Volumetric flow rate mode and look at the infill. If you are at the ceiling, either lower the layer height or raise nozzle temperature and re-measure MVS.">Infill prints far slower than the number in the profile<span class="ff-tag">MVS cap</span></li>
+      <li class="ff-item"
+          data-cause="MVS is set too high or to zero, so the requested flow goes through unchecked. The hotend delivers less than commanded, the wall thins, and the surface loses its gloss. Nothing errors because nothing is out of range as far as the firmware is concerned."
+          data-fix="Set MVS to 85 % of your measured failure point. Remember zero means no limit at all, not disabled — check you didn't leave it at zero after a test.">Fast prints come out matte, thin and weak<span class="ff-tag">No ceiling</span></li>
+      <li class="ff-item"
+          data-cause="Not MVS at all — this is the layer-time cooling brake from Lesson 13. Small layers finish too quickly, so all speeds are scaled down to stretch the layer out, with Min print speed as the floor."
+          data-fix="Check whether the slow regions are small layers near a taper (cooling brake) or large flat areas (MVS). The two look identical in the speed preview and have completely different fixes.">Only the top of a tapering part prints slowly<span class="ff-tag">Wrong limit</span></li>
+      <li class="ff-item"
+          data-cause="A per-feature speed was left at 0, which activates AutoSpeed for that feature. MVS stops being a brake and becomes the basis for calculating speed, so the feature now runs at whatever flow allows rather than what you intended."
+          data-fix="Put a real number back in the speed field. AutoSpeed is a legitimate mode but it is not a good place to be by accident, and clearing a field is how people get there.">One feature runs at a speed you never set anywhere<span class="ff-tag">AutoSpeed</span></li>
+      <li class="ff-item"
+          data-cause="The machine's hotend ceiling was typed into the filament profile. Now every material on that printer carries the same limit — so TPU, which should be capped around 2-5 mm³/s, is allowed 24 and strips in the extruder."
+          data-fix="Put the hotend number in Print Settings → Speed and the material number in Filament Settings → Advanced. The lower of the two wins automatically, which is the whole point of there being two.">TPU strips in the extruder on your fastest printer<span class="ff-tag">Wrong profile</span></li>
+    </ul>
+    <div class="ff-panel"><div class="ff-cause"></div><div class="ff-fix"></div></div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">7</span>Check yourself</h2>
+  <p>From memory. Question 1 has arithmetic in it.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read section 3.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">0.2 mm layer, 0.45 mm width, 200 mm/s. What flow does that demand?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right: 0.2 × 0.45 × 200 = 18 mm³/s. That is past a stock MK3 hotend's 8–12 band and comfortably inside an MK4S high-flow nozzle's range.">18 mm³/s — beyond an MK3S, fine on an MK4S</button>
+      <button class="opt" data-feedback="That would be the answer at 100 mm/s. Flow scales linearly with speed, so doubling the speed doubles the demand on the hotend.">9 mm³/s — comfortable on any of the three</button>
+      <button class="opt" data-feedback="Too high by a factor of two. Check the layer height term — 0.2, not 0.4. It's the commonest slip in this calculation.">36 mm³/s — beyond every hotend in the fleet</button>
+      <button class="opt" data-feedback="Too low. Multiplying 0.2 by 0.45 gives 0.09 mm² of cross-section, and 0.09 × 200 is 18, not 4.5.">4.5 mm³/s — well inside every hotend's range</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read the warning in section 2.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">You set MVS to 0 during a test and never changed it back. What happens?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Zero means no limit, not disabled. Every requested speed now goes through unchecked, and the hotend under-delivers without anything reporting an error.">There is no flow ceiling at all on that profile</button>
+      <button class="opt" data-feedback="It doesn't fall back to a built-in default. PrusaSlicer takes zero literally and removes the constraint entirely, which is why the wording matters.">The slicer falls back to a safe built-in default</button>
+      <button class="opt" data-feedback="Zero in a per-feature speed field activates AutoSpeed. Zero in the MVS field removes the limit — same value, two different meanings in two different panes.">AutoSpeed activates and calculates speeds for you</button>
+      <button class="opt" data-feedback="Nothing warns you. That is precisely the danger — the print completes, looks fast, and is weaker than it should be with no message anywhere.">PrusaSlicer refuses to slice until you fix it</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read the callout in section 2.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">Why does MVS deliberately exist in both the print and the filament profile?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. The hotend's ceiling belongs to the machine and the material's ceiling belongs to the filament. The lower wins, so every machine-material pairing resolves correctly on its own.">One describes the hotend, one describes the material</button>
+      <button class="opt" data-feedback="They don't add or average. Prusa are explicit that the value chosen is always the lowest of the two, which is what makes filling in both meaningful.">The two values are summed to give a combined limit</button>
+      <button class="opt" data-feedback="Both are honoured at slice time regardless of where you set them. Neither pane is a fallback for the other having been left blank.">One is a fallback for when the other is left unset</button>
+      <button class="opt" data-feedback="Print and filament profiles are both fully editable here. The duplication is about what each number means, not about which one you're allowed to change.">The filament one is read-only on system profiles</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Find the ceiling, then take 85 % of it</h3>
+    <ol>
+      <li>Report which nozzle is physically fitted to the machine you're tuning — stock, high-flow, or
+      something you replaced. This changes which of Prusa's bands applies.</li>
+      <li>Set MVS to 40, add the <code>M220</code> ramp, and print the spiral-vase cylinder. Tell me the
+      profile speed you started from so the arithmetic works.</li>
+      <li>Report the band where the wall changed, <b>and</b> whether the extruder clicked before or after that
+      point. If clicking came first, the click is your real ceiling.</li>
+      <li>Compute the flow at that band, show the arithmetic, and give me 85 % of it.</li>
+      <li>Set it in <code>Filament Settings → Advanced</code>. Then slice a real part, switch the preview to
+      <b>Volumetric flow rate</b>, and tell me whether anything is being clamped and where.</li>
+      <li>Confirm the <code>M220</code> block is deleted.</li>
+    </ol>
+    <p class="go">→ Point 5 is the one that changes how you work. Once you've seen your own model coloured by
+    flow demand, "is this profile fast" stops being a feeling and starts being something you can look at.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>MVS is what the hotend can melt</strong>, and it only ever reduces speed — never raises
+      it.</li>
+      <li><strong>Two MVS settings, and the lower wins</strong>: hotend in the print profile, material in the
+      filament profile.</li>
+      <li><strong>Zero means no limit</strong>, and a zero in a <em>speed</em> field means AutoSpeed. Same
+      value, two different meanings.</li>
+      <li><strong>Measure the failure point, then take 85 %.</strong> Clicking often arrives a band before the
+      surface changes.</li>
+      <li><strong>The Volumetric flow rate preview settles arguments</strong> — and if most of a model is
+      clamped, lowering layer height gains detail for free.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/article/max-volumetric-speed_127176" target="_blank" rel="noopener">Max volumetric speed — Prusa Knowledge Base</a></div>
+      <div class="desc">The best-written article in Prusa's slicer documentation, and the source of nearly every
+      fact in this lesson. Read the comments as well — they are where you learn that the hotend table hasn't
+      been updated for the MK4S or Core One, which is exactly the kind of gap worth knowing about before you
+      trust a number.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> Send me your ramp arithmetic and I'll check it before you
+    commit a ceiling to a profile — an MVS that's 15 % too high is invisible until a big part comes out weak.
+    Screenshots of the volumetric flow preview are very easy to read together. Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#max-volumetric-speed">max volumetric speed</a>,
+    <a href="../reference/glossary.html#volumetric-flow-rate">volumetric flow rate</a>,
+    <a href="../reference/glossary.html#extrusion-equation">extrusion equation</a>,
+    <a href="../reference/glossary.html#autospeed">AutoSpeed</a>,
+    <a href="../reference/glossary.html#extrusion-width">extrusion width</a>,
+    <a href="../reference/glossary.html#layer-height">layer height</a>,
+    <a href="../reference/glossary.html#hotend">hotend</a>,
+    <a href="../reference/glossary.html#bedslinger">bedslinger</a>,
+    <a href="../reference/glossary.html#corexy">CoreXY</a>,
+    <a href="../reference/glossary.html#calibration-order">calibration order</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>Max volumetric speed</i>. MVS as "the maximum amount of plastic (mm³/s) your
+    hotend can reliably melt"; that it "never increases your speed, it can only reduce it"; the four limits
+    checked per extrusion move (per-feature speed, MVS, overhang &amp; cooling, layer time cooldown);
+    <code>Max speed = MVS / cross-section area</code> with a stadium-shaped cross-section model; that MVS is
+    settable in both <code>Print settings → Speed</code> and <code>Filament settings → Advanced</code> with the
+    lowest value winning and zero meaning no limit; AutoSpeed activation when a per-feature speed is set to 0;
+    "Start conservative and increase gradually" with extruder clicking, under-extrusion at high speeds and poor
+    layer adhesion as signs of MVS being too high; the effective MVS being limited by the weaker of hotend and
+    material; the filament table (PLA 12–20, PETG 8–15, ABS/ASA 10–16, TPU 2–5, PC 6–10, PA 8–12 mm³/s); the
+    hotend table (standard all-metal including Prusa MK3 stock 8–12, Prusa Nextruder MK4/XL 15–20, high-flow
+    nozzles 20–35, high-flow hotends 25–40 mm³/s); raising nozzle temperature with larger nozzles; and the
+    <b>Volumetric flow rate</b> preview mode with the advice to lower layer height when MVS is the binding
+    constraint. The MK4S and Core One figures quoted in section 4 come from the article's reader comments, not
+    from Prusa's tables, and are flagged as such in the lesson.
+    <a href="https://help.prusa3d.com/article/max-volumetric-speed_127176" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">Prusa Research. <i>Buddy firmware specific G-code commands</i>. <code>M220</code> — "Set speed
+    factor override percentage", parameter <code>S&lt;percent&gt;</code>.
+    <a href="https://help.prusa3d.com/article/buddy-firmware-specific-g-code-commands_633112" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r3">Prusa Research. <i>Cooling</i>. Min print speed and the layer-time brake — the limit most often
+    mistaken for an MVS cap.
+    <a href="https://help.prusa3d.com/article/cooling_127569" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r4">This course. <i>Master tuning guide</i>, §2.6, §3 and §4 — the <code>M220</code> ramp method,
+    the 85 % rule, the practical per-machine flow ceilings (MK3S ~11–13, MK4S and Core One ~22–28 mm³/s), and
+    the per-material MVS starting values.
+    <a href="../reference/source-material/prusaslicer-profile-tuning.md">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0013-cooling.html">
+      <div class="dir">← Previous · L13</div>
+      <div class="ttl">Cooling</div>
+    </a>
+    <a class="next" href="0015-speeds-and-accelerations.html">
+      <div class="dir">Next · L15</div>
+      <div class="ttl">Speeds and accelerations →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L14 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

@@ -42,7 +42,9 @@ actual menu paths and target numbers per model, and those differ between MK3S, M
   When temperature wobble is worth fixing (±5 °C is the threshold) and the LCD path. Use for: Lesson 8,
   MK3S section.
 - [Thermal model calibration](https://help.prusa3d.com/article/thermal-model-calibration_382488)
-  The Buddy-firmware equivalent of PID for the MK4 family. Use for: Lesson 8, MK4S / Core One sections.
+  **MK3/MK3S/MK3S+ only**, firmware 3.12.0+ — *not* a Buddy feature, despite what the name suggests. Use
+  for: Lesson 8, MK3S section. The MK4S and Core One have no user-run heater calibration at all; L8 has
+  them observe and log instead.
 - [Input Shaper (CORE One, MK4/S, MK3.9/S, MK3.5/S, XL, MINI/+)](https://help.prusa3d.com/article/input-shaper-core-one-mk4-s-mk3-9-s-mk3-5-s-xl-mini_451816)
   What Input Shaper does, which printers have it, and why belts must be right *first*. Use for:
   Lessons 6 and 8.
@@ -65,6 +67,29 @@ actual menu paths and target numbers per model, and those differ between MK3S, M
 
 ### Slicer
 
+- [Max volumetric speed](https://help.prusa3d.com/article/max-volumetric-speed_127176)
+  The best-written article in Prusa's slicer documentation. The four limits on final print speed, the
+  `Max speed = MVS / cross-section area` rule, the two MVS settings and which wins, AutoSpeed, the
+  per-material and per-hotend tables, and the Volumetric flow rate preview. Use for: Lesson 14. **Note the
+  hotend table predates the MK4S and Core One** — readers say so in the comments.
+- [Cooling](https://help.prusa3d.com/article/cooling_127569)
+  The whole cooling pane: Min/Max fan speed against the two layer-time thresholds with proportional
+  interpolation between, bridges fan speed, disable-fan-for-first-N, dynamic fan speeds, and Min print
+  speed with its heat-creep warning. Use for: Lesson 13. The article's dynamic-fan-speed example image is
+  backwards; the text is correct.
+- [Stringing and oozing](https://help.prusa3d.com/article/stringing-and-oozing_1805)
+  The full retraction setting list with Prusa's own cost notes, the 2 mm MK3-family ceiling, the MINI/+
+  Bowden default of 3.2 mm, and — importantly — moisture, temperature and nozzle cleanliness given equal
+  billing as causes. Use for: Lessons 9 and 12.
+- [Speed settings](https://help.prusa3d.com/article/speed-settings_480325)
+  That acceleration and jerk mean target speeds are often never reached, the Speed preview mode, and
+  dynamic overhang speed's four control points. Use for: Lesson 15.
+- [Pressure equalizer](https://help.prusa3d.com/article/pressure-equalizer_331504)
+  The clearest statement anywhere of what advance does (affects *extrusion*) versus what speed smoothing
+  does (affects *speed*), plus the speed hierarchy — infill fastest, external perimeter slowest. Use for:
+  Lesson 15, and as a remedial read for Lesson 11.
+- [Compare presets](https://help.prusa3d.com/article/compare-presets_301482)
+  PrusaSlicer's built-in preset diff. Use for: Lesson 15's task, auditing your profile against stock.
 - [PrusaSlicer releases / changelogs](https://github.com/prusa3d/PrusaSlicer/releases)
   Which version introduced which setting. Use for: checking a setting exists before teaching it.
 - [PrusaSlicer 2.9 — what's new](https://blog.prusa3d.com/prusaslicer-2-9-whats-new_107659/)
@@ -121,3 +146,14 @@ actual menu paths and target numbers per model, and those differ between MK3S, M
   given the Mauritius climate.
 - **Belt-tension frequency method for MK3S** — the KB gives a belt-status *number*, not a frequency.
   No verified frequency target exists for the MK3S the way it does for the Core One.
+- **No KB flow ceiling for the MK4S or Core One.** The Max volumetric speed article's hotend table stops
+  at "Prusa Nextruder (MK4/XL) 15–20 mm³/s" and never mentions either machine; readers flag this in the
+  comments. The 22–28 mm³/s figures this course uses come from the master guide plus comment-thread
+  reports of Prusa's MK4S launch claim (24 mm³/s for Prusament PLA) and a support answer. **Marketing copy
+  and forum reports, not specification** — flagged as such in L14.
+- **Pressure Advance article does not list the Core One.** It names the MK4, XL, MINI and MK3.9 families
+  from firmware 5.0.0. Almost certainly staleness rather than absence — the Core One runs Buddy and `M572`
+  is in the Buddy G-code reference — but L11 has the learner verify it in sliced G-code rather than assume.
+- **Prusa and this course's guide disagree on retraction for flexibles.** Prusa: flexibles need *longer*
+  retractions because the material stretches. The guide: keep them short or the filament buckles in the
+  drive path. Both mechanisms are real; L12 §4 states the conflict rather than picking a side.

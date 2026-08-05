@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L9 · The temperature tower</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 2 · The filament · L9</p>
+  <h1 class="lesson-title">The temperature tower</h1>
+  <p class="lesson-sub">One print, seven temperatures, one number. The first measurement of Phase 2, and the
+  one every other measurement is standing on.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~90 minutes, mostly printing</span><span class="sep">•</span>
+    <span>🖨 One print per material per brand</span><span class="sep">•</span>
+    <span class="tag accent">Phase 2</span>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>Temperature is first in the <a href="../reference/glossary.html#calibration-order">calibration
+    order</a> because it moves everything else. Viscosity sets how much plastic a given push delivers, how far
+    it oozes on a travel, how much pressure lags behind the extruder, and how quickly a bridge freezes. Measure
+    <a href="../reference/glossary.html#extrusion-multiplier">extrusion multiplier</a> at 245 °C, then decide
+    240 °C prints better, and your EM is a number for a material that no longer exists. So: temperature, then
+    everything else.</p>
+  </div>
+
+  <p>The method is a <a href="../reference/glossary.html#temperature-tower">temperature tower</a> — a single
+  tall print whose nozzle temperature drops by 5 °C every 10 mm. You get every candidate temperature on one
+  object, printed with one spool, on one machine, in one session. That is the only way to compare them
+  honestly: seven separate prints would differ by seven other things too.</p>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ Two gates before you print anything</div>
+    <p><b>The spool must be dry.</b> A wet spool pops, strings and bonds badly at <em>every</em> temperature,
+    so the tower's bands all look mediocre and you can't rank them. Prusa list moisture as a direct cause of
+    stringing, and suggest simply trying a different spool as a diagnostic.<span class="cite"><a href="#r2">2</a></span>
+    In Mauritius this is not an optional step — see <a href="0002-filament-is-a-material.html">Lesson 2</a>.</p>
+    <p><b>The machine must be signed off.</b> If the hotend wanders ±8 °C, your 5 °C bands overlap and the
+    tower is unreadable. That was <a href="0008-thermal-and-motion-trust.html">Lesson 8</a>. Don't skip
+    forward to here with an unmeasured machine — you'll write the machine's faults into a filament profile.</p>
+  </div>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>What you are actually looking for</h2>
+
+  <p>Not "the best-looking band". The goal is <b>the lowest temperature that still bonds layers properly</b>,
+  and those are different questions. Hotter almost always looks glossier and smoother — and strings more,
+  sags more on bridges, curls more on overhangs, and takes longer to freeze, which caps how fast you can
+  print later.</p>
+
+  <p>So you are searching downward from "obviously hot enough" until bonding fails, and then stepping back
+  one band. The failure you are hunting for is <em>invisible from the outside</em>, which is why the tower
+  gets destroyed afterwards.</p>
+
+  <div class="callout key">
+    <div class="callout-label">▲ Judge in this order, not in order of what's easiest to see</div>
+    <ol>
+      <li><b>Layer adhesion</b> — snap each band off afterwards. This outranks everything.</li>
+      <li><b>Bridge sag</b> — the underside of a bridged span, measured by eye against the band above.</li>
+      <li><b>Overhang curl</b> — does the edge lift and get hit by the nozzle next layer?</li>
+      <li><b>Stringing</b> — between the tower and any second object.</li>
+      <li><b>Surface sheen</b> — last, and only as a tie-breaker.</li>
+    </ol>
+    <p>Sheen is at the bottom deliberately. It is the most visible property and the least load-bearing one,
+    and ranking on it is how people end up printing PETG 15 °C hotter than it needs.</p>
+  </div>
+
+  <p>The <a href="../reference/glossary.html#snap-test">snap test</a> is the whole lesson in one action. Break
+  a band across the layer lines. A <b>granular, ragged</b> fracture that tears through the plastic means the
+  layers fused into one solid. A <b>clean, flat</b> separation along a layer line means they didn't — they are
+  stacked, not welded, and that part will fail in service no matter how good it looks.</p>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>Build the tower</h2>
+
+  <p>Any smooth-walled tall model with an overhang and a bridge will do. What matters is the G-code you wrap
+  around it. With a <a href="../reference/glossary.html#layer-height">layer height</a> of 0.2 mm, 50 layers
+  is exactly 10 mm — so a band change every 50 layers gives you 10 mm of each temperature.</p>
+
+  <p>Set the filament profile's nozzle temperature to the <b>highest</b> value in your sequence, then step
+  <em>down</em>. Stepping down means the machine is never asked to heat up mid-print and wait, which would
+  stall in place and leave a blob.</p>
+
+  <div class="codefig">
+    <div class="difflabel">Printer Settings → Custom G-code → After layer change G-code</div>
+    <pre><code><span class="c">;AFTER_LAYER_CHANGE</span>
+<span class="c">;[layer_z]</span>
+{if layer_num == <span class="n">50</span>}<span class="k">M104</span> <span class="f">S</span><span class="n">245</span>{endif}
+{if layer_num == <span class="n">100</span>}<span class="k">M104</span> <span class="f">S</span><span class="n">240</span>{endif}
+{if layer_num == <span class="n">150</span>}<span class="k">M104</span> <span class="f">S</span><span class="n">235</span>{endif}
+{if layer_num == <span class="n">200</span>}<span class="k">M104</span> <span class="f">S</span><span class="n">230</span>{endif}
+{if layer_num == <span class="n">250</span>}<span class="k">M104</span> <span class="f">S</span><span class="n">225</span>{endif}</code></pre>
+  </div>
+
+  <p><code>M104</code> sets the target and <b>returns immediately</b> — it does not wait for the nozzle to get
+  there.<span class="cite"><a href="#r1">1</a></span> That is what you want (a wait would pause the print and
+  scar the wall), but it has a consequence: the first two or three layers of each band are still on their way
+  to the new temperature. <b>Judge the middle of each band, never the boundary.</b></p>
+
+  <p><b>Open your machine.</b> The command is the same; where you put it and what else is already there is not.</p>
+
+  <details class="panel">
+    <summary>MK3S · Marlin, and the slow machine of the three</summary>
+    <div class="panel-body">
+      <p><b>Path:</b> <code>Printer Settings → Custom G-code → After layer change G-code</code>.</p>
+      <p>The MK3S's stock after-layer-change block is short. <b>Append</b> your conditional lines below
+      whatever is already there — don't replace it.</p>
+      <p><b>Print it at MK3S speeds.</b> Around 45–60 mm/s perimeters, per Lesson 8. A tower printed at speeds
+      this machine can't hold will show you cooling and flow problems that you'll misread as temperature.</p>
+      <p><b>Suggested ranges</b> (0.4 nozzle, 0.2 mm layer), highest first:</p>
+      <ul>
+        <li>PLA <b>230 → 200</b> · PETG <b>255 → 225</b> · TPU 95A <b>245 → 215</b></li>
+      </ul>
+      <p>Set the filament profile's <em>Other layers</em> nozzle temperature to the top of the range, and its
+      <em>First layer</em> temperature 5 °C above that — a cold first layer is an adhesion problem, not a
+      calibration one, and you don't want it confusing the print.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>MK4S · Buddy, and a stock profile that already runs hot</summary>
+    <div class="panel-body">
+      <p><b>Path:</b> <code>Printer Settings → Custom G-code → After layer change G-code</code>. Same pane,
+      and <code>M104</code> follows standard Marlin behaviour on Buddy firmware.<span class="cite"><a href="#r1">1</a></span></p>
+      <p><b>Read what's there first.</b> The MK4S stock block is longer than the MK3S's — it can carry
+      Input-Shaper- and nozzle-related lines. Append; never overwrite.</p>
+      <div class="callout note">
+        <div class="callout-label">⌁ Why the stock profile is hotter than you expect</div>
+        <p>Prusa's MK4S PLA profile runs around 230 °C, noticeably above the 210–215 °C that MK3S owners are
+        used to. That is not a different opinion about PLA — it is because the MK4S is built for high flow,
+        and Prusa themselves note that bigger flow wants more heat.<span class="cite"><a href="#r3">3</a></span>
+        So run your tower's range <em>higher</em> on this machine than you would on the MK3S, and expect the
+        answer to land higher too. If you later push <a href="../reference/glossary.html#max-volumetric-speed">MVS</a>
+        up in Lesson 14, you may have to come back and add heat.</p>
+      </div>
+      <p><b>Suggested ranges:</b> PLA <b>240 → 210</b> · PETG <b>260 → 230</b> · TPU 95A <b>245 → 215</b>.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Core One · same command, but the chamber is in the experiment</summary>
+    <div class="panel-body">
+      <p><b>Path:</b> <code>Printer Settings → Custom G-code → After layer change G-code</code>, exactly as
+      the MK4S. Same hotend class, same firmware, same suggested ranges.</p>
+      <div class="callout warning">
+        <div class="callout-label">⚠ Fix the chamber state, or the tower measures two variables</div>
+        <p>An enclosure that is heating up through the print changes the ambient temperature between band 1 and
+        band 7 — which is precisely the thing you are trying to isolate. <b>Decide the door and vent state
+        before you start, write it down, and don't touch it.</b> The tower's answer is only valid for that
+        state.</p>
+        <p>The working targets — vent open and chamber ≤ 30 °C for PLA, closed and 35–40 °C for PETG — are
+        <b>community consensus, not a Prusa specification</b>. Treat them as a starting point you are testing,
+        and log what your machine actually did.</p>
+      </div>
+      <p>Run the tower <b>twice</b> for PLA if you have the time: once vented, once closed. The difference is a
+      real property of this machine, and it is the single most useful Core One-specific number you can put in
+      your log.</p>
+    </div>
+  </details>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ Delete the block when you are finished</div>
+    <p>That conditional lives in the <b>printer</b> profile, so it applies to every filament and every model
+    you slice on that machine until you remove it. Leave it in and your next print silently drops 25 °C
+    partway up for no reason you'll be able to find. Delete it the moment the tower comes off the bed — this
+    is exactly the trap <a href="0004-the-calibration-mindset.html">Lesson 4</a> warned about.</p>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>Read it, then destroy it</h2>
+
+  <ul class="steps">
+    <li><span class="step-title">Photograph it first</span>
+      <span class="step-detail">Raking light from one side, ruler alongside. You are about to break it, and
+      the photo is the only thing that survives into the log.</span></li>
+    <li><span class="step-title">Mark the bands</span>
+      <span class="step-detail">Pencil the temperature on each 10 mm section while you still know which is
+      which. Every mis-recorded tower in history was mis-recorded at this step.</span></li>
+    <li><span class="step-title">Rank on bridges and overhangs</span>
+      <span class="step-detail">Look at the underside of each bridge and the edge of each overhang. Sag and
+      curl both get worse as temperature rises — find where they become acceptable.</span></li>
+    <li><span class="step-title">Snap every band</span>
+      <span class="step-detail">Across the layers, with pliers if needed. Granular tear = bonded. Clean split
+      along a layer = not bonded. Work from the coldest band upward and find the first one that tears rather
+      than splits.</span></li>
+    <li><span class="step-title">Take that band, not the one above it</span>
+      <span class="step-detail">The lowest temperature that passes the snap test is your answer. Then set the
+      <b>first layer</b> 5 °C above it, because the first layer is fighting a cold bed and a cold sheet.</span></li>
+  </ul>
+
+  <p>Write the winner into <code>Filament Settings → Filament → Nozzle</code>, both fields. Then log it —
+  with the machine, the spool, the colour and the date, per
+  <a href="0018-the-tuning-log.html">Lesson 18</a>. <b>Colour matters:</b> pigment loads change flow and
+  thermal behaviour within the same brand and material, so "eSun PETG" is not a spool identity, and
+  "eSun PETG, black, batch on the label" is.</p>
+
+  <div class="callout key">
+    <div class="callout-label">▲ What re-running this invalidates</div>
+    <p><b>Everything below it.</b> Temperature is step one of eight. If you come back and change this number
+    by more than a couple of degrees, your extrusion multiplier, advance value, retraction length, cooling
+    bands and MVS were all measured on a different material state and are now guesses. That is not a reason
+    never to re-run it — it is a reason to get it right once, at the start, with a dry spool.</p>
+  </div>
+
+  <!-- ===== INTERACTIVE WIDGET ===== -->
+  <h2><span class="num">4</span>Find the fault</h2>
+  <p>Click each. Every one of these produces a tower you can read confidently and wrongly.</p>
+  <div class="faultfinder">
+    <div class="ff-q">Why is this tower's answer worthless?</div>
+    <ul class="ff-list">
+      <li class="ff-item"
+          data-cause="The whole tower was printed with water in the filament. Every band pops, strings and bonds badly, so the ranking between them is noise — you are comparing seven flavours of steam damage."
+          data-fix="Dry the spool at its material temperature, then reprint. PETG 65 °C for 8 h; PLA 55 °C for 6–8 h; TPU 50–55 °C for 8–12 h. These times are community consensus, not Prusa-documented — treat them as a starting point.">The spool came straight off a shelf in a humid room<span class="ff-tag">Moisture</span></li>
+      <li class="ff-item"
+          data-cause="M104 does not wait for the nozzle to reach the new target, so the first few layers of each band are printed at an in-between temperature. Judging at the boundary means judging a temperature that isn't on your list."
+          data-fix="Judge the middle 6 mm of each 10 mm band and ignore the 2 mm either side. If you need tighter bands than that, make them taller, not more numerous.">Ranked by looking right at each band's boundary line<span class="ff-tag">Ramp</span></li>
+      <li class="ff-item"
+          data-cause="Surface sheen rises with temperature almost monotonically, so ranking on gloss will always pick the hottest band. You then inherit its stringing, its sag, and a lower achievable print speed."
+          data-fix="Rank on layer adhesion first, bridges second, overhangs third. Use sheen only to break a tie between two bands that already passed the snap test.">Picked the band with the nicest, glossiest surface<span class="ff-tag">Criteria</span></li>
+      <li class="ff-item"
+          data-cause="The Core One's chamber was still warming during the first bands and hot by the last, so ambient temperature moved alongside nozzle temperature. Two variables changed at once and the result cannot be attributed."
+          data-fix="Fix the door and vent state before starting, record it, and leave it alone. Re-run in the other state if you want to know the difference — as a separate, logged experiment.">The enclosure door was opened halfway through<span class="ff-tag">Ambient</span></li>
+      <li class="ff-item"
+          data-cause="The conditional block is still sitting in the printer profile, so it applies to every model sliced on that machine. Your next print drops 25 °C partway up and delaminates for no visible reason."
+          data-fix="Delete the after-layer-change block as soon as the tower is off the bed. Test G-code lives in the printer profile, which is shared — that is what makes leaving it there so expensive.">A perfect tower, and the G-code was never removed<span class="ff-tag">Cleanup</span></li>
+    </ul>
+    <div class="ff-panel"><div class="ff-cause"></div><div class="ff-fix"></div></div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">5</span>Check yourself</h2>
+  <p>From memory. Question 3 reaches back to Phase 0.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read the judging order in section 1.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">Two bands both pass the snap test. The hotter one is visibly glossier. Which wins?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Both bond, so the tie-break is everything else temperature costs you: stringing, sag, curl, and a longer freeze time that limits speed later.">The cooler one — bonding was already satisfied</button>
+      <button class="opt" data-feedback="Sheen is the most visible property and the least load-bearing. It is the tie-breaker of last resort, not the first criterion, and it always favours the hotter band.">The glossier one — surface finish is the goal</button>
+      <button class="opt" data-feedback="Averaging two temperatures gives you a value you never actually printed and never judged. The tower's whole point is that each band is evidence.">Neither — average the two and print that value</button>
+      <button class="opt" data-feedback="A tie on adhesion is normal and expected across a range of several degrees. It is information, not a reason to start over with narrower bands.">Neither — reprint with 2 °C bands to separate them</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read the M104 note in section 2.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">Why does the lesson tell you to step temperature <em>down</em> through the tower?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. M104 doesn't block, so a downward step just coasts to the new target while printing. An upward step would have the machine printing below target until it catches up.">Cooling down needs no wait; heating up would lag</button>
+      <button class="opt" data-feedback="Layer adhesion is judged per band after the fact, and the order the bands were printed in doesn't change how well any one of them bonded to itself.">Layer adhesion is only measurable in that direction</button>
+      <button class="opt" data-feedback="Warping is driven by the part geometry, the bed and the ambient air. The direction the tower steps through its range doesn't meaningfully change it.">Printing hot at the base reduces warping later on</button>
+      <button class="opt" data-feedback="M104 works identically in both directions and on both firmware families. The problem with stepping up is timing, not compatibility.">M104 only accepts decreasing targets mid-print</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read the invalidation callout.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">You finished all of Phase 2, then decided to drop PETG from 240 °C to 230 °C. What now?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Temperature is step one, so every measurement downstream of it was taken on a material in a different state. They are now starting points again, not measurements.">Every later Phase 2 number reverts to a guess</button>
+      <button class="opt" data-feedback="Extrusion multiplier does change with temperature, and it is the very next step — but it isn't the only thing affected. Advance, retraction, cooling and MVS all move too.">Only the extrusion multiplier needs re-measuring</button>
+      <button class="opt" data-feedback="Nothing downstream survives a 10 °C move unexamined. Viscosity is the input to flow, ooze, pressure lag and freeze time all at once.">Nothing — 10 °C is inside normal spool variation</button>
+      <button class="opt" data-feedback="Speeds are clamped by MVS, which is itself downstream of temperature. So they're affected — but they're the last thing to fix, not the first.">Only the speed and acceleration profile is affected</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>One tower, one material, one machine</h3>
+    <p>Pick the machine you signed off in Lesson 8 and the material you print most. Then:</p>
+    <ol>
+      <li>Confirm and record the spool's drying state — temperature, hours, date it came out.</li>
+      <li>Build the tower with the after-layer-change block, in your machine's suggested range. Paste me the
+      block before you print it if you want it checked.</li>
+      <li>Print, photograph, mark the bands, then <b>snap every one of them</b>.</li>
+      <li>Report: the temperature you chose, the band that first failed the snap test, and what the failure
+      looked like — clean split or granular tear.</li>
+      <li>Confirm you deleted the G-code block.</li>
+    </ol>
+    <p class="go">→ Paste me all five. The one I care most about is point 4: if you can describe the fracture,
+    you measured something. If you can only describe the surface, you ranked on sheen.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>Temperature is first because it moves everything else</strong> — flow, ooze, pressure lag and
+      freeze time are all downstream of viscosity.</li>
+      <li><strong>The target is the lowest temperature that still bonds</strong>, not the best-looking band.</li>
+      <li><strong>The snap test outranks every visible criterion.</strong> Granular tear means fused; clean
+      split along a layer means stacked.</li>
+      <li><strong><code>M104</code> doesn't wait</strong>, so the band edges are smeared — judge the middle.</li>
+      <li><strong>The test G-code lives in the printer profile</strong> and must be deleted, or it corrupts
+      every later print on that machine.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/article/stringing-and-oozing_1805" target="_blank" rel="noopener">Stringing and oozing — Prusa Knowledge Base</a></div>
+      <div class="desc">Read it now rather than in Lesson 12, because it makes the case that stringing is a
+      <em>temperature</em> symptom before it is a retraction symptom — Prusa's first suggestion is dropping the
+      nozzle 5–10 °C. That ordering is exactly why temperature comes before retraction in this course.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> Paste me your after-layer-change block before you print and
+    I'll check the layer numbers against your layer height, which is the commonest way a tower comes out with
+    bands in the wrong places. Photos of a snapped band are welcome too — fracture surfaces are genuinely hard
+    to read at first. Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#temperature-tower">temperature tower</a>,
+    <a href="../reference/glossary.html#snap-test">snap test</a>,
+    <a href="../reference/glossary.html#after-layer-change">after layer change G-code</a>,
+    <a href="../reference/glossary.html#calibration-order">calibration order</a>,
+    <a href="../reference/glossary.html#one-variable-rule">one-variable rule</a>,
+    <a href="../reference/glossary.html#hygroscopic">hygroscopic</a>,
+    <a href="../reference/glossary.html#drying">drying</a>,
+    <a href="../reference/glossary.html#layer-height">layer height</a>,
+    <a href="../reference/glossary.html#extrusion-multiplier">extrusion multiplier</a>,
+    <a href="../reference/glossary.html#max-volumetric-speed">max volumetric speed</a>,
+    <a href="../reference/glossary.html#tuning-log">tuning log</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>Buddy firmware specific G-code commands</i>. <code>M104</code> is listed as
+    "Set Extruder Temperature" with standard Marlin behaviour and no Buddy-specific parameters — it sets the
+    target and returns without waiting.
+    <a href="https://help.prusa3d.com/article/buddy-firmware-specific-g-code-commands_633112" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">Prusa Research. <i>Stringing and oozing</i>. Stringing is caused by "very high printing
+    temperatures and/or using incorrect retraction settings"; the recommendation to lower the nozzle by
+    5–10 °C; and the note that filament which "might have gathered moisture" will cause a lot of stringing.
+    <a href="https://help.prusa3d.com/article/stringing-and-oozing_1805" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r3">Prusa Research. <i>Max volumetric speed</i>. "With larger nozzles, consider increasing the
+    nozzle temperature to allow for even bigger MVS" — the documented link between heat and achievable flow
+    that explains why the MK4S ships hotter profiles than the MK3S.
+    <a href="https://help.prusa3d.com/article/max-volumetric-speed_127176" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r4">This course. <i>Master tuning guide</i>, §2.1 and §4 — the after-layer-change tower method, the
+    judging priority order, and the per-material starting temperatures.
+    <a href="../reference/source-material/prusaslicer-profile-tuning.md">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0008-thermal-and-motion-trust.html">
+      <div class="dir">← Previous · L8</div>
+      <div class="ttl">Thermal and motion trust</div>
+    </a>
+    <a class="next" href="0010-extrusion-multiplier.html">
+      <div class="dir">Next · L10</div>
+      <div class="ttl">Extrusion multiplier →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L9 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

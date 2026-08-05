@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L10 · Extrusion multiplier</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 2 · The filament · L10</p>
+  <h1 class="lesson-title">Extrusion multiplier</h1>
+  <p class="lesson-sub">One hollow box, a pair of calipers, and the only Phase 2 number you get to compute
+  rather than judge by eye.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~45 minutes, twice</span><span class="sep">•</span>
+    <span>📏 Digital calipers required</span><span class="sep">•</span>
+    <span class="tag accent">Phase 2</span>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>Every other Phase 2 measurement is a judgement — which band looks better, which corner is cleaner. This
+    one is arithmetic. You print a wall of known intended width, measure what actually came out, and divide.
+    That makes it the most trustworthy number in the whole course, and it is worth having early, because
+    <a href="../reference/glossary.html#pressure-advance">advance</a>, retraction and
+    <a href="../reference/glossary.html#max-volumetric-speed">MVS</a> are all judged on the appearance of
+    extruded lines — and lines that are 6 % too fat look wrong for reasons that have nothing to do with what
+    you're tuning.</p>
+  </div>
+
+  <p>The <a href="../reference/glossary.html#extrusion-multiplier">extrusion multiplier</a> is a scalar on how
+  much filament gets pushed for a given commanded volume, where <b>1 = 100 %</b>. It lives at
+  <code>Filament Settings → Extrusion Multiplier</code>, and Prusa note that adjusted values usually land
+  between <b>0.9 and 1.1</b>.<span class="cite"><a href="#r1">1</a></span></p>
+
+  <p>It exists because the slicer's arithmetic assumes a filament that is exactly 1.75 mm in diameter, exactly
+  round, and behaves exactly like the reference material. Yours is none of those things — and the deviation is
+  per-brand, per-colour and per-batch.</p>
+
+  <div class="callout key">
+    <div class="callout-label">▲ If your answer lands outside 0.9–1.1, stop</div>
+    <p>Prusa's stated range isn't a suggestion about taste, it's a sanity check. A computed EM of 0.78 or 1.24
+    almost never means your filament is unusual. It means something upstream is wrong: firmware flow isn't at
+    100 %, the extruder is skipping, the nominal width you divided by wasn't the one the slicer used, or the
+    wall you measured wasn't a single perimeter. <b>Go and find that before you write the number down.</b></p>
+  </div>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>The M221 trap — deal with this first</h2>
+
+  <p>There are <b>two independent</b> ways to scale the same thing, and neither knows the other exists. Prusa
+  state it plainly: total flow rate = firmware flow multiplier (<code>M221</code>) × extrusion multiplier in
+  PrusaSlicer, and "adjusting one of those two settings will not influence the value of the
+  other".<span class="cite"><a href="#r1">1</a></span></p>
+
+  <div class="codefig">
+    <div class="difflabel">The relationship you have to keep straight</div>
+    <pre><code>total flow = <span class="f">M221</span> (firmware, %) × <span class="f">EM</span> (slicer, ×)
+
+<span class="c"># firmware at 95 %, slicer at 0.95, and you have</span>
+<span class="c"># quietly corrected the same 5 % twice: 0.90 total</span></code></pre>
+  </div>
+
+  <p>So before you print anything: <b>get the firmware side to a known value and leave it there.</b> Measuring
+  with an unknown <code>M221</code> in play produces an EM that is correct only while that unknown persists —
+  and firmware flow is not saved in your profile, so it will silently change under you.</p>
+
+  <p><b>Open your machine.</b> This is the one place where the three printers genuinely differ.</p>
+
+  <details class="panel">
+    <summary>MK3S · and the legacy line in its start G-code</summary>
+    <div class="panel-body">
+      <p><b>During a print</b>, the LCD's <code>Tune</code> menu exposes a live flow percentage. Confirm it
+      reads 100 before you judge anything. Exact menu wording moves between firmware versions, so read your
+      machine rather than trusting a screenshot.</p>
+      <p><b>The MK3S-specific catch:</b> its stock system printer profile emits a conditional
+      <code>M221</code> in start G-code — a legacy correction that sets flow to <b>95 %</b> at normal layer
+      heights and 100 % only at very fine ones:<span class="cite"><a href="#r4">4</a></span></p>
+      <pre><code><span class="k">M221</span> <span class="f">S</span>{if layer_height&lt;<span class="n">0.075</span>}<span class="n">100</span>{else}<span class="n">95</span>{endif}</code></pre>
+      <div class="callout warning">
+        <div class="callout-label">⚠ Verify this on your own machine, don't take it on trust</div>
+        <p>Slice anything for the MK3S, open the G-code in a text editor, and search for <code>M221</code>.
+        Whatever you find there is the truth for <em>your</em> firmware and profile version. This is the same
+        habit as reading <code>printer_model</code> in <a href="0016-profile-structure-and-naming.html">Lesson
+        16</a>: verify the string, don't guess it.</p>
+        <p><b>Leave the line alone.</b> It is part of the system profile and Prusa's MK3S numbers are built
+        around it. Just don't correct for it a second time in the slicer. Your measured wall already contains
+        it, so the EM you compute is correct <em>as long as that line stays</em> — which is another reason to
+        record in your log that it was present.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>MK4S · Buddy, no legacy correction</summary>
+    <div class="panel-body">
+      <p><b>During a print</b>, the <code>Tune</code> menu on the touchscreen exposes a flow percentage.
+      Confirm 100 %.</p>
+      <p><b>Outside a print</b>, the reliable move is to send <code>M221 S100</code> explicitly.
+      <code>M221</code> is documented on Buddy firmware as "Set extrusion percentage", taking
+      <code>S&lt;percent&gt;</code>.<span class="cite"><a href="#r2">2</a></span></p>
+      <pre><code><span class="k">M221</span> <span class="f">S</span><span class="n">100</span> <span class="c">; firmware flow to a known state before measuring</span></code></pre>
+      <p>There is <b>no</b> MK3S-style legacy <code>M221</code> conditional in the MK4S start G-code. Slice
+      something and confirm that for yourself — if you find one, it's yours, not Prusa's, and it needs
+      explaining before you measure.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Core One · as MK4S, plus one measurement-hygiene note</summary>
+    <div class="panel-body">
+      <p><b>Identical to the MK4S:</b> <code>Tune</code> menu for the live value, <code>M221 S100</code> to set
+      it explicitly.<span class="cite"><a href="#r2">2</a></span> No legacy conditional in start G-code.</p>
+      <p><b>The enclosure note:</b> a hollow single-wall box in a warm chamber can soften enough on the upper
+      layers to distort slightly, which shows up as a wall that measures thicker at the top. Let the box cool
+      completely to room temperature before touching it with calipers, and if you're measuring PLA, run the
+      test with the vent open.</p>
+      <p>If the top and bottom of the same wall disagree by more than about 0.02 mm, that's not filament
+      variation — that's the part having moved, and you should reprint it cooler or vented rather than
+      averaging through it.</p>
+    </div>
+  </details>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>Print something with exactly one wall</h2>
+
+  <p>The whole method rests on the printed wall being <b>one perimeter thick and nothing else</b>. Two
+  perimeters, or a perimeter plus a sliver of gap fill, and you are measuring the slicer's overlap logic
+  instead of your filament.</p>
+
+  <p>Prusa offer two routes: a <b>Precise Method</b> using a downloadable cube printed in vase mode and
+  measured with calipers, and a <b>Visual Method</b> judged by eye.<span class="cite"><a href="#r1">1</a></span>
+  Take the precise one. The visual method is for people without calipers, and you are not tuning three
+  printers by eye.</p>
+
+  <div class="compare">
+    <figure class="before">
+      <div class="difflabel">Prusa's cube, vase mode</div>
+      <pre><code><span class="c"># upside</span>
+one perimeter, guaranteed
+no seam to avoid
+designed for this test
+
+<span class="c"># downside</span>
+<span class="hl">vase mode is a different
+extrusion regime to your
+real prints</span></code></pre>
+    </figure>
+    <figure class="after">
+      <div class="difflabel">Hollow box, perimeters = 1</div>
+      <pre><code><span class="c"># settings</span>
+30 x 30 x 12 mm
+perimeters 1, infill 0
+top 0, bottom 1
+ironing off, vase off
+
+<span class="c"># upside</span>
+<span class="ok">prints the way your
+real parts print</span></code></pre>
+    </figure>
+  </div>
+
+  <p>Either works. This course leans to the hollow box because it keeps the extrusion regime closer to normal
+  printing, but if you take Prusa's cube, take Prusa's whole procedure with it and don't mix the two.</p>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ Read the nominal width; do not assume 0.45</div>
+    <p>Prusa's formula divides by an extrusion width of <b>0.45 mm</b>, which is their default for a 0.4 mm
+    nozzle at 0.1–0.2 mm layers.<span class="cite"><a href="#r1">1</a></span> But it is a
+    <em>setting</em>, not a constant. Open <code>Print Settings → Advanced → Extrusion width → Perimeters</code>
+    and read the value your profile actually uses. If it says 0.45, fine. If it says 0.42, or a percentage, or
+    is left at 0 (meaning "derive it"), you need the real number — dividing by the wrong nominal produces a
+    confidently wrong EM.</p>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>Measure, then divide</h2>
+
+  <p>Prusa's instruction is to make <b>three or more measurements in the middle of each wall</b> and average
+  them.<span class="cite"><a href="#r1">1</a></span> Four walls × three points = twelve readings. That is not
+  bureaucracy — extruded walls vary along their length, and one reading is a sample of one.</p>
+
+  <ul class="steps">
+    <li><span class="step-title">Let it cool to room temperature</span>
+      <span class="step-detail">Warm plastic reads thick and squashes under the calipers. Ten minutes off the
+      bed, minimum.</span></li>
+    <li><span class="step-title">Avoid the seam</span>
+      <span class="step-detail">The vertical line where each layer starts and ends is thicker by design. Take
+      your three points from the middle of each wall, well away from it.</span></li>
+    <li><span class="step-title">Close the calipers gently</span>
+      <span class="step-detail">Thin single walls compress. Advance until they just touch and stop — a firm
+      squeeze can shave 0.03 mm off the reading, which is a whole EM step.</span></li>
+    <li><span class="step-title">Average all twelve</span>
+      <span class="step-detail">One number. If the four wall averages disagree by more than ~0.02 mm, look at
+      the part before you trust the average — that spread is usually a mechanical problem, not filament.</span></li>
+    <li><span class="step-title">Compute, apply, reprint once</span>
+      <span class="step-detail">Aim to land within ±0.01 mm of nominal on the second run. One iteration is
+      normal; three means something else is wrong.</span></li>
+  </ul>
+
+  <div class="codefig">
+    <div class="difflabel">The formula — Prusa's, and the general form</div>
+    <pre><code><span class="c"># Prusa's version, valid when your current EM is 1.00</span>
+EM = nominal width / average measured width
+
+<span class="c"># The general form — use this one, it always works</span>
+new EM = current EM × (nominal width / average measured width)
+
+<span class="c"># worked: nominal 0.45, measured 0.472, current EM 1.00</span>
+new EM = 1.00 × (0.45 / 0.472) = <span class="n">0.953</span></code></pre>
+  </div>
+
+  <p>Prusa's published formula is the special case where you start from 1.00, which is where a fresh system
+  profile puts you.<span class="cite"><a href="#r1">1</a></span> The moment you re-measure a profile that
+  already carries a tuned EM — which is exactly what your second run is — you need the general form, or you
+  will throw the first correction away.</p>
+
+  <h3 style="font-family:var(--sans);font-size:1rem;margin-top:2rem">Drill it</h3>
+  <p>Work each one out before opening it. Getting this arithmetic wrong is the single commonest way people end
+  up with an EM that makes things worse.</p>
+
+  <details class="panel">
+    <summary>Drill 1 · Nominal 0.45 mm, measured average 0.437 mm, current EM 1.00</summary>
+    <div class="panel-body">
+      <p><code>1.00 × (0.45 / 0.437) = <b>1.030</b></code></p>
+      <p>The wall came out <em>thin</em>, so you need <em>more</em> plastic — EM goes up. Sanity check: 1.03 is
+      comfortably inside Prusa's 0.9–1.1 band,<span class="cite"><a href="#r1">1</a></span> so this is a
+      believable result. Apply it and reprint.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Drill 2 · Nominal 0.45 mm, measured 0.461 mm, current EM 0.953 (your second run)</summary>
+    <div class="panel-body">
+      <p><code>0.953 × (0.45 / 0.461) = <b>0.930</b></code></p>
+      <p>Note what happens if you use Prusa's short form here instead: <code>0.45 / 0.461 = 0.976</code>, which
+      would <em>undo</em> most of your first correction and send you back toward over-extrusion. Same numbers,
+      opposite direction. <b>Always carry the current EM through.</b></p>
+      <p>Also worth noticing: your first correction overshot slightly and you're now correcting back. That is
+      normal and it is why the lesson says one iteration, then stop.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Drill 3 · Nominal 0.45 mm, measured 0.402 mm, current EM 1.00 — on an MK3S</summary>
+    <div class="panel-body">
+      <p><code>1.00 × (0.45 / 0.402) = <b>1.119</b></code></p>
+      <p>That is outside 0.9–1.1, so <b>do not write it down</b>. The likeliest explanation on this specific
+      machine is the legacy <code>M221 S95</code> line in start G-code: firmware is already delivering 95 %,
+      so the wall is thin for a reason that has nothing to do with the filament.</p>
+      <p>The fix is <em>not</em> to stack an EM of 1.12 on top of it. Confirm what <code>M221</code> is
+      actually doing, decide deliberately which of the two layers is carrying the correction, record that
+      decision in your log, and re-measure. An EM of 1.12 that silently depends on a firmware line you've
+      forgotten about is a trap you set for yourself six months from now.</p>
+    </div>
+  </details>
+
+  <!-- ===== SECTION 4 ===== -->
+  <h2><span class="num">4</span>What this invalidates</h2>
+
+  <p>EM is step two of eight. Re-running it voids <b>advance, retraction, cooling and MVS</b> — all four are
+  judged on how deposited lines look and behave, and you have just changed how much plastic is in every line.
+  It does <em>not</em> void your temperature, which is upstream.</p>
+
+  <p>The reverse dependency is the one to internalise: <b>if you change temperature, EM must be re-measured.</b>
+  Viscosity changes how much material a given push delivers, so a 10 °C move is a real change in flow, not
+  just in appearance.</p>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">5</span>Check yourself</h2>
+  <p>From memory. Question 2 is the one people get wrong in practice.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read section 1.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">Firmware flow sits at 95 % and you set the slicer's EM to 0.95. What is the total?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. Total flow is M221 × EM, and the two are independent — so a 5 % correction applied in both places becomes roughly a 10 % correction, which will visibly under-extrude.">About 0.90 — the same correction applied twice</button>
+      <button class="opt" data-feedback="They don't average. Prusa are explicit that these are two ways to adjust the same thing and that changing one does not influence the other; they multiply.">About 0.95 — the two settings average out</button>
+      <button class="opt" data-feedback="Nothing overrides anything. Both values are live at slice time and print time respectively, and both are applied.">About 0.95 — the slicer value overrides firmware</button>
+      <button class="opt" data-feedback="1.00 would require one of them to be inverse to the other. They are both reductions, so they compound in the same direction.">About 1.00 — they cancel each other out</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read Drill 2.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">Second run, current EM 0.95, nominal 0.45, measured 0.458. What is the new EM?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right: 0.95 × (0.45 / 0.458) = 0.933. Carrying the current EM through is what keeps the first correction from being discarded.">0.933 — multiply the current EM by the ratio</button>
+      <button class="opt" data-feedback="That's 0.45 / 0.458 on its own — Prusa's short form. It's only valid from a starting EM of 1.00, and using it here throws away your first correction.">0.983 — divide nominal by measured directly</button>
+      <button class="opt" data-feedback="Adding a delta to the current value happens to be close for tiny corrections but it isn't the relationship. Flow scales multiplicatively, not additively.">0.942 — subtract the difference from current</button>
+      <button class="opt" data-feedback="The wall is over nominal, so flow must come down, not up. Getting the direction wrong doubles the error instead of halving it.">0.967 — the wall is thin so flow goes up</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read the callout in section 2.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">Why does the lesson insist you read extrusion width out of the profile first?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. 0.45 mm is Prusa's default for a 0.4 nozzle, not a law. If your profile uses a different width, dividing by 0.45 gives a confidently wrong answer.">It is a profile setting, and yours may differ</button>
+      <button class="opt" data-feedback="Extrusion width does have to exceed the nozzle bore in practice, but the reason to look it up is that the formula divides by it — an assumed value poisons the arithmetic.">Extrusion width must always exceed nozzle size</button>
+      <button class="opt" data-feedback="Different features do use different widths, which is exactly why the lesson names the perimeter field specifically. But the core reason is that the number feeds the formula.">Each feature type prints at a different width</button>
+      <button class="opt" data-feedback="Width and layer height are independent settings. Changing one doesn't move the other, though both appear in the extrusion equation.">Layer height changes it automatically when set</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Measure flow on the machine you towered</h3>
+    <p>Same machine, same spool, same temperature you chose in Lesson 9. One variable at a time.</p>
+    <ol>
+      <li>Slice anything for that printer and report what <code>M221</code> is doing in your start G-code —
+      quote the literal line, or say there isn't one.</li>
+      <li>Read and report <code>Print Settings → Advanced → Extrusion width → Perimeters</code>.</li>
+      <li>Print the single-wall box. Take twelve caliper readings — three per wall, middle of the wall, away
+      from the seam — and paste me <b>all twelve</b>, not the average.</li>
+      <li>Compute the new EM with the general form, showing the arithmetic.</li>
+      <li>Apply it, reprint, re-measure, and report whether you landed within ±0.01 mm.</li>
+    </ol>
+    <p class="go">→ Twelve raw readings, please, not one average. Their <em>spread</em> tells me things the
+    average hides — a wall that varies by 0.05 mm along its length is a machine problem, and I'd rather catch
+    that now than have you tune advance on top of it.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>Total flow is <code>M221</code> × EM</strong>, and the two are independent — correcting in
+      both places corrects twice.</li>
+      <li><strong>The MK3S ships a legacy <code>M221</code> conditional</strong> in start G-code; verify it in
+      your own sliced file rather than assuming.</li>
+      <li><strong>Measure three points per wall on four walls and average</strong> — twelve readings, cooled,
+      away from the seam.</li>
+      <li><strong>Use the general formula</strong>, <code>new EM = current EM × (nominal / measured)</code>;
+      Prusa's short form only works from 1.00.</li>
+      <li><strong>An answer outside 0.9–1.1 is a fault report</strong>, not a filament property.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/article/extrusion-multiplier-calibration_2257" target="_blank" rel="noopener">Extrusion multiplier calibration — Prusa Knowledge Base</a></div>
+      <div class="desc">The whole procedure in Prusa's own words, both the precise and visual methods, plus the
+      downloadable cubes. Read it alongside this lesson and note where the two differ: Prusa assume you start
+      from an EM of 1.00, and this course doesn't.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> Paste me your twelve readings and I'll tell you whether the
+    spread is filament, machine, or measurement technique — that distinction is genuinely hard to make alone,
+    and getting it wrong sends you chasing the wrong fault for an evening. Confused beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#extrusion-multiplier">extrusion multiplier</a>,
+    <a href="../reference/glossary.html#extrusion-width">extrusion width</a>,
+    <a href="../reference/glossary.html#extrusion-equation">extrusion equation</a>,
+    <a href="../reference/glossary.html#volumetric-flow-rate">volumetric flow rate</a>,
+    <a href="../reference/glossary.html#calibration-order">calibration order</a>,
+    <a href="../reference/glossary.html#one-variable-rule">one-variable rule</a>,
+    <a href="../reference/glossary.html#pressure-advance">Pressure Advance</a>,
+    <a href="../reference/glossary.html#max-volumetric-speed">max volumetric speed</a>,
+    <a href="../reference/glossary.html#system-profile">system profile</a>,
+    <a href="../reference/glossary.html#tuning-log">tuning log</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>Extrusion multiplier calibration</i>. The setting's location in Filament
+    Settings; that adjusted values are "usually … between 0.9 and 1.1"; the Precise and Visual methods and
+    their cube models; "make three or more measurements in the middle of each wall and calculate the overall
+    average thickness"; the formula <code>Extrusion multiplier = (Extrusion width (0.45) / Average measured
+    wall thickness)</code>; and that "Total flow rate = Flow multiplier in firmware (M221) x Extrusion
+    multiplier in PrusaSlicer" with adjusting one not influencing the other.
+    <a href="https://help.prusa3d.com/article/extrusion-multiplier-calibration_2257" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">Prusa Research. <i>Buddy firmware specific G-code commands</i>. <code>M221</code> — "Set
+    extrusion percentage", parameters <code>T</code> (tool number) and <code>S&lt;percent&gt;</code>.
+    <a href="https://help.prusa3d.com/article/buddy-firmware-specific-g-code-commands_633112" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r3">Prusa Research. <i>Max volumetric speed</i>. PrusaSlicer's stadium-shaped cross-section model —
+    the reason a measured wall width is a meaningful proxy for delivered volume.
+    <a href="https://help.prusa3d.com/article/max-volumetric-speed_127176" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r4">This course. <i>Master tuning guide</i>, §2.2 — the single-wall box setup, the general
+    correction formula, and the MK3S start-G-code <code>M221</code> conditional. Verify the last of these
+    against your own sliced G-code rather than relying on the guide.
+    <a href="../reference/source-material/prusaslicer-profile-tuning.md">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0009-the-temperature-tower.html">
+      <div class="dir">← Previous · L9</div>
+      <div class="ttl">The temperature tower</div>
+    </a>
+    <a class="next" href="0011-pressure-and-linear-advance.html">
+      <div class="dir">Next · L11</div>
+      <div class="ttl">Pressure / Linear Advance →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L10 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

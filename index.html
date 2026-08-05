@@ -152,54 +152,56 @@
     </div>
     <p class="phase-intro">Now the machine is a constant and the filament is the variable. Seven
     measurements, always in this order, because each one assumes the ones before it are fixed. Re-run an
-    early step and every later number is void.</p>
+    early step and every later number is void. One legitimate exception, in L15.</p>
     <ul class="lesson-list">
-      <a class="lesson-card todo">
+      <a class="lesson-card" href="lessons/0009-the-temperature-tower.html">
         <span class="code">L9</span>
-        <span><span class="t">Temperature tower</span>
+        <span><span class="t">The temperature tower</span>
         <span class="d">Find the lowest temperature that still bonds layers. Custom G-code per band, and
         the snap test that tells you the truth.</span></span>
-        <span class="status-pill soon">Soon</span>
+        <span class="status-pill ready">Ready</span>
       </a>
-      <a class="lesson-card todo">
+      <a class="lesson-card" href="lessons/0010-extrusion-multiplier.html">
         <span class="code">L10</span>
-        <span><span class="t">Extrusion multiplier (flow)</span>
-        <span class="d">Single-wall box, calipers, one formula. Plus the <code>M221</code> trap that makes
-        people correct the same error twice.</span></span>
-        <span class="status-pill soon">Soon</span>
+        <span><span class="t">Extrusion multiplier</span>
+        <span class="d">Single-wall box, twelve caliper readings, one formula. Plus the <code>M221</code>
+        trap that makes people correct the same error twice.</span></span>
+        <span class="status-pill ready">Ready</span>
       </a>
-      <a class="lesson-card todo">
+      <a class="lesson-card" href="lessons/0011-pressure-and-linear-advance.html">
         <span class="code">L11</span>
         <span><span class="t">Pressure / Linear Advance</span>
         <span class="d">The single biggest quality win — and the one place where MK3S and MK4S numbers must
         never touch. Tuned at production speed or not at all.</span></span>
-        <span class="status-pill soon">Soon</span>
+        <span class="status-pill ready">Ready</span>
       </a>
-      <a class="lesson-card todo">
+      <a class="lesson-card" href="lessons/0012-retraction.html">
         <span class="code">L12</span>
         <span><span class="t">Retraction</span>
-        <span class="d">Filament overrides, spike towers, and why more retraction is not a free win on a
-        direct-drive machine.</span></span>
-        <span class="status-pill soon">Soon</span>
+        <span class="d">Rule out the other three causes of stringing first. Then spike towers, filament
+        overrides, and why more is not a free win on direct drive.</span></span>
+        <span class="status-pill ready">Ready</span>
       </a>
-      <a class="lesson-card todo">
+      <a class="lesson-card" href="lessons/0013-cooling.html">
         <span class="code">L13</span>
         <span><span class="t">Cooling</span>
-        <span class="d">Fan bands per material, and what changes when the printer is enclosed.</span></span>
-        <span class="status-pill soon">Soon</span>
+        <span class="d">Not one fan speed — two time thresholds, an interpolation and a speed brake. Fan
+        bands per material, and what an enclosure changes.</span></span>
+        <span class="status-pill ready">Ready</span>
       </a>
-      <a class="lesson-card todo">
+      <a class="lesson-card" href="lessons/0014-max-volumetric-speed.html">
         <span class="code">L14</span>
         <span><span class="t">Max volumetric speed</span>
-        <span class="d">Your real speed limit. Find where the wall goes matte, take 85 % of it, and let it
-        clamp everything else.</span></span>
-        <span class="status-pill soon">Soon</span>
+        <span class="d">Your real speed limit. Find where the wall goes matte, take 85 % of it, and read
+        the flow-rate preview to see it working.</span></span>
+        <span class="status-pill ready">Ready</span>
       </a>
-      <a class="lesson-card todo">
+      <a class="lesson-card" href="lessons/0015-speeds-and-accelerations.html">
         <span class="code">L15</span>
         <span><span class="t">Speeds and accelerations</span>
-        <span class="d">Only now. External perimeters low, travel high, dynamic overhang speed on.</span></span>
-        <span class="status-pill soon">Soon</span>
+        <span class="d">Only now. External perimeters low, travel high, dynamic overhang speed on — then
+        sign Phase 2 off.</span></span>
+        <span class="status-pill ready">Ready</span>
       </a>
     </ul>
   </div>
@@ -212,9 +214,9 @@
       <span class="ph-tag">turn measurements into profiles you keep</span>
     </div>
     <p class="phase-intro">Measurements that live in a notebook are lost. These lessons turn them into named,
-    machine-scoped, backed-up PrusaSlicer profiles — and a log that keeps a three-printer fleet honest. They
-    stand on their own: you can wire up profile structure and the sign-off criteria before Phase 2 is
-    written, and then have somewhere to put every number Phase 2 produces.</p>
+    machine-scoped, backed-up PrusaSlicer profiles — and a log that keeps a three-printer fleet honest. Each
+    of Phase 2's seven numbers now has somewhere to live, a test that says whether it worked, and a record
+    that says whether you measured it or inherited it.</p>
     <ul class="lesson-list">
       <a class="lesson-card" href="lessons/0016-profile-structure-and-naming.html">
         <span class="code">L16</span>

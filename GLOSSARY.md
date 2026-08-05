@@ -76,6 +76,18 @@ _Avoid_: "flow", "flow rate" (used for both this and MVS in the wild)
 Pulling filament back a short distance before a travel move, so the nozzle stops oozing. A printer
 setting whose correct value is material-dependent, so it is overridden per filament.
 
+**Dynamic overhang speed**:
+A print setting that slows extrusion in proportion to how little of it overlaps the previous layer, so
+overhangs get the cooling time they need without slowing the whole print. Shaped by four control points
+pairing an overlap percentage with a speed, linearly interpolated between. Shares its vocabulary with
+dynamic *fan* speeds, and the two should agree.
+
+**AutoSpeed**:
+What happens when a per-feature speed is set to 0: [max volumetric speed](#max-volumetric-speed) stops
+being a brake and becomes the basis for calculating that feature's speed. A legitimate mode, and a bad
+place to arrive by accident — clearing a speed field is enough to trigger it.
+_Avoid_: reading `0` as "disabled" (in the MVS field, 0 means *no limit*)
+
 ## C · Compensating for physics
 
 **Linear Advance (LA)**:
@@ -85,9 +97,13 @@ for a 0.4 mm nozzle are small, around 0.02–0.08.
 
 **Pressure Advance (PA)**:
 The Buddy-firmware equivalent of [Linear Advance](#linear-advance-la), used on the MK4 family and Core
-One from firmware 5.0.0. Set with `M572 S<value>`. **The scale is not the same as LA's** — an MK3S
-`M900 K` value and an MK4S or Core One `M572 S` value are not interchangeable, and copying one to the
-other is the most expensive mistake available in this course.
+One from firmware 5.0.0. Set with `M572 S<value>`, which also takes `D` (extruder number) and `W` (the
+velocity-averaging window, default 0.04 s). **A value is never transferable between the MK3S and the
+Buddy machines** — and the reason is subtler than a unit mismatch. Buddy converts a legacy `M900`
+command *1:1* into a PA value and applies whichever advance command came last, so a copied number is
+accepted silently. What differs is the *correct* value: it characterises that machine's extruder and
+melt zone, not the material. Prusa's MK3S defaults for a 0.4 nozzle are PLA 0.05 / PETG 0.08, while the
+MK4S family ships nearer 0.03–0.04 for PLA. Roughly double, for the same plastic.
 
 **Input Shaper (IS)**:
 A Buddy-firmware feature that cancels the frame resonances which cause [ghosting](#ghosting), letting
@@ -172,6 +188,18 @@ appears for. If it evaluates false the preset is hidden entirely, with no messag
 it a guard rather than a warning. Written against `printer_model` and `nozzle_diameter`.
 _Avoid_: "printer filter"
 
+**After layer change G-code**:
+A block in `Printer Settings → Custom G-code` that runs at every layer transition, and the mechanism
+behind every stepped test in Phase 2 — temperature towers, advance towers, flow ramps. It lives in the
+**printer** profile, so it applies to every filament and every model sliced on that machine until you
+delete it. Deleting it is part of the test, not an afterthought.
+
+**Filament overrides**:
+The section of Filament Settings that lets a filament preset override values structurally belonging to
+the printer profile — [retraction](#retraction) above all. Each value has a tickbox: unticked inherits
+from the printer, ticked freezes at what you set. Override what the material genuinely changes, and
+leave the rest inheriting.
+
 **Config bundle**:
 A single `.ini` holding every custom print, filament and printer preset in the current PrusaSlicer
 version. Exported via `File → Export → Export Config Bundle`. It is the only backup of your measured
@@ -194,6 +222,16 @@ The fixed dependency chain this course follows: **machine → temperature → ex
 pressure/linear advance → retraction → cooling → max volumetric speed → speeds and accelerations**.
 Each step assumes everything before it is fixed, so changing an earlier one invalidates every later
 measurement.
+
+**Temperature tower**:
+A single tall print whose nozzle temperature steps down by 5 °C every 10 mm, giving you every candidate
+temperature on one object, one spool, one machine, one session. The first measurement of Phase 2. Judge
+the middle of each band, never the boundary — `M104` doesn't wait for the nozzle to arrive.
+
+**Snap test**:
+Breaking a printed band across its layer lines to see how it fails. A **granular, ragged tear** through
+the plastic means the layers fused; a **clean, flat split** along a layer line means they merely stacked.
+It outranks every visible criterion, because the failure it detects is invisible from the outside.
 
 **One-variable rule**:
 Change exactly one thing between two test prints. Two changes give you a result you cannot attribute,

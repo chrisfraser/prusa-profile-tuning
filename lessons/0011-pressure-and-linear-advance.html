@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L11 · Pressure / Linear Advance</title>
+<link rel="stylesheet" href="../assets/styles.css">
+<script defer src="../assets/widgets.js"></script>
+</head>
+<body>
+
+<!-- NAV:START -->
+<header class="topbar">
+  <div class="wrap-wide">
+    <a class="brand" href="../index.html"><span class="dot">⬢</span> prusa-profile-tuning</a>
+    <nav>
+      <a href="../index.html#phase-0">Lessons</a>
+      <a href="../reference/calibration-card.html">The Calibration Card</a>
+      <a href="../reference/glossary.html">Glossary</a>
+    </nav>
+  </div>
+</header>
+<!-- NAV:END -->
+
+<main class="wrap">
+  <p class="kicker">Phase 2 · The filament · L11</p>
+  <h1 class="lesson-title">Pressure / Linear Advance</h1>
+  <p class="lesson-sub">The single biggest quality win in the course — and the one place where a number
+  copied between two of your machines does real damage.</p>
+  <div class="lesson-meta">
+    <span>⏱ ~60 minutes</span><span class="sep">•</span>
+    <span>⚠ Two firmware families, two commands</span><span class="sep">•</span>
+    <span class="tag accent">Phase 2</span>
+  </div>
+
+  <div class="callout mission">
+    <div class="callout-label">◎ Why this lesson</div>
+    <p>The extruder pushes filament at a commanded rate. The melt zone is a compressible spring. So when the
+    toolhead slows into a corner, the pressure already stored in the nozzle keeps pushing — you get a
+    <b>blob</b>. When it accelerates out of a corner or restarts after a travel, pressure has to rebuild before
+    plastic actually appears — you get a <b>gap</b>. Advance compensates for that lag by running the extruder
+    ahead of the motion. Get it right and bulging corners, seam blobs and post-travel thin patches all vanish
+    at once. This is the lesson with the largest visible payoff per hour spent.</p>
+  </div>
+
+  <div class="callout key">
+    <div class="callout-label">▲ The rule that outranks everything in this lesson</div>
+    <p>Your MK3S runs <b>Marlin</b> and takes <code>M900 K</code>
+    (<a href="../reference/glossary.html#linear-advance">Linear Advance</a>).<span class="cite"><a href="#r2">2</a></span>
+    Your MK4S and Core One run <b>Buddy</b> and take <code>M572 S</code>
+    (<a href="../reference/glossary.html#pressure-advance">Pressure Advance</a>).<span class="cite"><a href="#r1">1</a></span>
+    <b>Never copy a value between them.</b> Section 2 explains exactly why the reason is subtler — and more
+    dangerous — than most people assume.</p>
+  </div>
+
+  <!-- ===== SECTION 1 ===== -->
+  <h2><span class="num">1</span>What too little and too much look like</h2>
+
+  <p>Prusa give the diagnostic in one sentence: <em>"If sharp corners have blobs, increase the K value. If you
+  see missing filament, decrease the K value."</em><span class="cite"><a href="#r2">2</a></span> That is the
+  whole judging rule, and it works identically on both firmware families.</p>
+
+  <div class="compare">
+    <figure class="before">
+      <div class="difflabel">Too low — under-compensated</div>
+      <pre><code><span class="c"># at every corner</span>
+outside edge bulges
+corner looks rounded
+<span class="hl">dark glossy blob where
+the toolhead slowed</span>
+
+<span class="c"># after every travel</span>
+first few mm are fat
+seam is a lump</code></pre>
+    </figure>
+    <figure class="after">
+      <div class="difflabel">Too high — over-compensated</div>
+      <pre><code><span class="c"># at every corner</span>
+corner looks pinched
+<span class="hl">gap just after the turn
+wall thins then recovers</span>
+
+<span class="c"># after every travel</span>
+extrusion starts late
+visible dashed restart</code></pre>
+    </figure>
+  </div>
+
+  <p>The two failure modes are geometrically opposite and both appear <em>at the same features</em>, which is
+  what makes a stepped tower so much better than trial and error: you see the whole curve at once and the
+  correct value is the band where the corner stops being either.</p>
+
+  <p><b>The pattern to look for is not "the nicest corner".</b> It is the band where extrusion width stays
+  constant <em>through</em> the corner and <em>immediately after</em> a travel restart. Width consistency is
+  the signal; gloss and sharpness are side effects.</p>
+
+  <!-- ===== SECTION 2 ===== -->
+  <h2><span class="num">2</span>Why the number doesn't travel between machines</h2>
+
+  <p>Here is the trap, and it is worse than the usual telling of it. Prusa document that legacy
+  <code>M900</code> commands are <b>automatically converted 1:1 to a Pressure Advance value</b> on Buddy
+  firmware, and that the printer applies whichever command was issued most
+  recently.<span class="cite"><a href="#r1">1</a></span></p>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ 1:1 conversion is exactly what makes copying feel safe</div>
+    <p>Send <code>M900 K0.08</code> to an MK4S and it will not error, will not warn, and will not ignore you.
+    It will quietly become a Pressure Advance of 0.08 and print. <b>The command converts; the correctness does
+    not.</b></p>
+    <p>The value describes <em>that machine's</em> extruder and melt zone — not the material alone. Compare
+    Prusa's own numbers for a 0.4 mm nozzle: the MK3S Linear Advance defaults are <b>PLA 0.05, PETG 0.08,
+    ASA/ABS 0.04</b>,<span class="cite"><a href="#r2">2</a></span> while the MK4S family's stock start G-code
+    carries a much smaller Pressure Advance, in the region of 0.03–0.04 for PLA at the same nozzle
+    size.<span class="cite"><a href="#r4">4</a></span> Roughly a factor of two apart, for the same plastic —
+    because a Bondtech-driven MK3S hotend and a Nextruder are different mechanical systems.</p>
+    <p>So the failure mode isn't a rejected command or a nonsense value. It's a print that comes out
+    <em>plausibly</em>, with over-compensated corners you'll blame on cooling.</p>
+  </div>
+
+  <p>The corollary, which is genuinely useful: <b>your MK4S and Core One values will end up close to each
+  other</b> — same firmware, same Nextruder class, same hotend class. Close, not identical. Measure both, and
+  if they land within a step of each other, that agreement is itself evidence you measured correctly.</p>
+
+  <!-- ===== SECTION 3 ===== -->
+  <h2><span class="num">3</span>Run the tower</h2>
+
+  <p>A tall object with sharp 90° corners — a thin-walled square tube is ideal — with the advance value
+  stepped per band via <code>Printer Settings → Custom G-code → After layer change G-code</code>. Same
+  mechanism as <a href="0009-the-temperature-tower.html">Lesson 9</a>, different command.</p>
+
+  <div class="callout warning">
+    <div class="callout-label">⚠ Tune at production speeds and accelerations, or don't bother</div>
+    <p>Advance compensates for a pressure lag whose <em>size depends on how hard the machine accelerates</em>.
+    Calibrate it on a slow test print and the value will be too small for the pressures a fast print
+    generates — corners bulge anyway — or, if you compensated for the slow case's smaller lag with a large
+    value, it will starve your corners at speed.</p>
+    <p><b>Print the tower with the print profile you actually intend to use.</b> This is the one place in the
+    <a href="../reference/glossary.html#calibration-order">calibration order</a> where a later step
+    (<a href="0015-speeds-and-accelerations.html">Lesson 15</a>, speeds and accelerations) legitimately loops
+    back to an earlier one. If you significantly change acceleration in L15, come back here.</p>
+  </div>
+
+  <div class="checklist-widget">
+    <div class="cl-title">✓ Preflight — tick all of these before the tower goes on the bed</div>
+    <ul class="checklist">
+      <li data-check>Temperature is the value measured in Lesson 9, not a stock number</li>
+      <li data-check>Extrusion multiplier is the value measured in Lesson 10 and is in the profile</li>
+      <li data-check>Firmware flow (<code>M221</code>) is at the state I recorded in Lesson 10</li>
+      <li data-check>The print profile loaded is the one I intend to print production parts with</li>
+      <li data-check>Acceleration and external perimeter speed are at production values, not slowed</li>
+      <li data-check>The model has genuine sharp 90° corners, not fillets</li>
+      <li data-check>The model forces travel moves, so I can judge extrusion restart too</li>
+      <li data-check>I know which command my machine takes — <code>M900 K</code> or <code>M572 S</code></li>
+      <li data-check>My band values bracket the stock value for this machine, above and below</li>
+      <li data-check>The spool is the same one from Lessons 9 and 10, still dry</li>
+    </ul>
+    <div class="checklist-bar"><span>Tick as you go</span><span data-checklist-progress></span></div>
+  </div>
+
+  <p><b>Open your machine.</b> The command, the sensible band range and the stock starting point all differ.</p>
+
+  <details class="panel">
+    <summary>MK3S · <code>M900 K</code>, Linear Advance</summary>
+    <div class="panel-body">
+      <p>Linear Advance applies to the MK3-family and MK2-family printers; it was replaced by Pressure Advance
+      on the MK4 family, XL and MINI/+ from firmware 5.0.0.<span class="cite"><a href="#r1">1</a><a href="#r2">2</a></span>
+      Syntax is <code>M900 Kxx</code>.<span class="cite"><a href="#r2">2</a></span></p>
+      <p><b>Prusa's default K values for a 0.4 mm nozzle</b><span class="cite"><a href="#r2">2</a></span> —
+      start your bracket around these, don't ignore them:</p>
+      <ul>
+        <li>PLA <b>0.05</b> · PETG <b>0.08</b> · ASA/ABS <b>0.04</b> · Nylon (Taulman) <b>0.08</b> ·
+        Nylon (FX256) <b>0.1</b></li>
+      </ul>
+      <p><b>Tower block</b> — bracket generously either side of the default:</p>
+      <pre><code>{if layer_num == <span class="n">20</span>}<span class="k">M900</span> <span class="f">K</span><span class="n">0.02</span>{endif}
+{if layer_num == <span class="n">40</span>}<span class="k">M900</span> <span class="f">K</span><span class="n">0.04</span>{endif}
+{if layer_num == <span class="n">60</span>}<span class="k">M900</span> <span class="f">K</span><span class="n">0.06</span>{endif}
+{if layer_num == <span class="n">80</span>}<span class="k">M900</span> <span class="f">K</span><span class="n">0.08</span>{endif}
+{if layer_num == <span class="n">100</span>}<span class="k">M900</span> <span class="f">K</span><span class="n">0.10</span>{endif}
+{if layer_num == <span class="n">120</span>}<span class="k">M900</span> <span class="f">K</span><span class="n">0.12</span>{endif}</code></pre>
+      <p>Prusa also publish a ready-made Linear Advance test pattern in their calibration G-code
+      repository.<span class="cite"><a href="#r2">2</a></span> If you use it, use it as published — but note it
+      will run at <em>its</em> speeds and accelerations, not yours, which is precisely the caveat above. The
+      tower with your own print profile is the more honest test.</p>
+      <p><b>Print at MK3S speeds</b>, ~45–60 mm/s perimeters. A value tuned at 120 mm/s on this machine
+      describes a print you will never make.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>MK4S · <code>M572 S</code>, Pressure Advance</summary>
+    <div class="panel-body">
+      <p>Pressure Advance is available on the MK4 family from firmware 5.0.0 and above.<span class="cite"><a href="#r1">1</a></span>
+      The command takes three parameters:<span class="cite"><a href="#r1">1</a><a href="#r3">3</a></span></p>
+      <ul>
+        <li><code>D</code> — set the extruder number.</li>
+        <li><code>S&lt;value&gt;</code> — set the pressure advance value. <b>Zero disables pressure
+        advance.</b></li>
+        <li><code>W</code> — the time range in seconds used to average extruder velocity. Default
+        <b>0.04</b>. Leave it alone; it is not the knob you are looking for.</li>
+      </ul>
+      <p><b>The stock start G-code already contains an <code>M572</code></b> whose <code>S</code> parameter
+      varies by nozzle diameter, and Prusa explicitly recommend keeping that default, describing it as
+      optimised for most applications on their printers.<span class="cite"><a href="#r1">1</a></span></p>
+      <div class="callout note">
+        <div class="callout-label">⌁ So should you tune it at all?</div>
+        <p>Yes — but start from the stock value and treat it as the centre of your bracket, not as something
+        to replace. Prusa's default is a good value for Prusament on a stock machine. You are printing eSun
+        PETG that has spent a week absorbing Indian Ocean humidity. Measure, and if your answer lands on the
+        stock number, that is a real result worth logging — it means the default is right for your case and
+        you now <em>know</em> it rather than assuming it.</p>
+      </div>
+      <p><b>Find your stock value first:</b> slice anything and read the <code>M572</code> line out of the
+      G-code. Then bracket it:</p>
+      <pre><code>{if layer_num == <span class="n">20</span>}<span class="k">M572</span> <span class="f">S</span><span class="n">0.01</span>{endif}
+{if layer_num == <span class="n">40</span>}<span class="k">M572</span> <span class="f">S</span><span class="n">0.02</span>{endif}
+{if layer_num == <span class="n">60</span>}<span class="k">M572</span> <span class="f">S</span><span class="n">0.03</span>{endif}
+{if layer_num == <span class="n">80</span>}<span class="k">M572</span> <span class="f">S</span><span class="n">0.04</span>{endif}
+{if layer_num == <span class="n">100</span>}<span class="k">M572</span> <span class="f">S</span><span class="n">0.05</span>{endif}
+{if layer_num == <span class="n">120</span>}<span class="k">M572</span> <span class="f">S</span><span class="n">0.06</span>{endif}
+{if layer_num == <span class="n">140</span>}<span class="k">M572</span> <span class="f">S</span><span class="n">0.07</span>{endif}</code></pre>
+      <p>Because the last command wins,<span class="cite"><a href="#r1">1</a></span> each band cleanly
+      overrides the one in start G-code. Nothing needs deleting from the filament profile to run the tower —
+      but the tower block itself still has to come out of the printer profile afterwards.</p>
+    </div>
+  </details>
+
+  <details class="panel">
+    <summary>Core One · <code>M572 S</code>, and a documentation gap worth knowing</summary>
+    <div class="panel-body">
+      <p><b>Same command, same parameters, same method as the MK4S.</b> Use the same bracket.</p>
+      <div class="callout warning">
+        <div class="callout-label">⚠ The KB article doesn't name the Core One</div>
+        <p>Prusa's Pressure Advance article lists the MK4 family, XL family, MINI family and MK3.9 family from
+        firmware 5.0.0 — the Core One isn't in that list.<span class="cite"><a href="#r1">1</a></span> That is
+        almost certainly the article not having been updated rather than the feature being absent: the Core One
+        runs Buddy firmware and <code>M572</code> is documented in the Buddy G-code
+        reference.<span class="cite"><a href="#r3">3</a></span></p>
+        <p><b>Verify it rather than assuming it.</b> Slice something for the Core One and look for
+        <code>M572</code> in the start G-code. If it's there, you have your stock value and your answer. If it
+        isn't, tell me before you run the tower — a tower whose command does nothing produces seven identical
+        bands and an hour of confusion.</p>
+      </div>
+      <p><b>And fix the chamber state</b>, as in Lesson 9. Advance is a pressure phenomenon and pressure
+      depends on viscosity, which depends on how hot the ambient air is. Door and vent state decided,
+      recorded, unchanged.</p>
+    </div>
+  </details>
+
+  <!-- ===== SECTION 4 ===== -->
+  <h2><span class="num">4</span>Where the winning value lives</h2>
+
+  <p>Prusa are explicit, and it is the opposite of what most people guess: the value is set in the custom
+  G-code section of the <b>Filament Settings</b> tab, <b>not</b> under the printer-specific custom
+  G-code.<span class="cite"><a href="#r2">2</a></span> PrusaSlicer is unusual in offering per-filament custom
+  G-code, and that is exactly what makes the value follow the material when you switch
+  presets.<span class="cite"><a href="#r4">4</a></span></p>
+
+  <p>Put it in the printer profile instead and every filament on that machine inherits one material's value —
+  so your TPU prints with PETG's advance, which is roughly double what it wants.</p>
+
+  <div class="codefig">
+    <div class="difflabel">Filament Settings → Custom G-code → Start G-code</div>
+    <pre><code><span class="c">; keep it nozzle-aware, the way the stock profile does</span>
+<span class="k">M572</span> <span class="f">S</span>{if nozzle_diameter[<span class="n">0</span>]==<span class="n">0.4</span>}<span class="n">0.045</span>{elsif nozzle_diameter[<span class="n">0</span>]==<span class="n">0.6</span>}<span class="n">0.03</span>{else}<span class="n">0.02</span>{endif}
+<span class="c">; eSun PETG — measured on MK4S, 2026-08-05, production accel</span></code></pre>
+  </div>
+
+  <p>Two habits in that snippet worth keeping. The <b>conditional</b> means swapping to a 0.6 mm nozzle
+  doesn't silently apply a 0.4 mm value. The <b>comment</b> records which machine and which date — because in
+  four months the only thing standing between you and a guess is that line of text. That's
+  <a href="0018-the-tuning-log.html">Lesson 18</a>, arriving early.</p>
+
+  <p><b>Then delete the tower block</b> from <code>Printer Settings → Custom G-code → After layer change</code>.
+  Left in place, it overrides your carefully measured filament value on every subsequent print of every
+  material — and because the last command wins, it wins.<span class="cite"><a href="#r1">1</a></span></p>
+
+  <!-- ===== QUIZ ===== -->
+  <h2><span class="num">5</span>Check yourself</h2>
+  <p>From memory. Question 1 is the one that costs money.</p>
+
+  <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read the warning in section 2.">
+    <div class="q-kicker">Question 1 of 3</div>
+    <div class="q-text">You send <code>M900 K0.08</code> to your MK4S out of habit. What happens?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right, and this is the dangerous part. Buddy converts M900 to Pressure Advance 1:1, so it is accepted silently — at roughly double the value that machine wants.">It becomes a Pressure Advance of 0.08, silently</button>
+      <button class="opt" data-feedback="It would be much safer if it did. Prusa document that legacy M900 commands are converted rather than rejected, which is why this mistake produces a plausible print instead of an error.">The command is rejected as unsupported firmware</button>
+      <button class="opt" data-feedback="Nothing is ignored. The printer applies whichever advance command came last, and this one came last — so it takes effect and overrides your start G-code.">It is ignored and the stock value stays in force</button>
+      <button class="opt" data-feedback="No conversion factor is applied beyond 1:1. The number goes through unchanged, which is precisely the trap — the units match while the correct values don't.">It is rescaled to match the Nextruder's geometry</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read section 1's judging rule.">
+    <div class="q-kicker">Question 2 of 3</div>
+    <div class="q-text">A band shows a visible gap in the wall just after every 90° corner. What now?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. That is Prusa's 'missing filament' symptom — over-compensation. The extruder backed off too hard going into the corner, so pressure has to rebuild coming out of it.">Too high — decrease the value on the next band</button>
+      <button class="opt" data-feedback="Too low gives you the opposite symptom: a bulge or blob on the outside of the corner, where stored pressure kept extruding while the toolhead slowed.">Too low — increase the value on the next band</button>
+      <button class="opt" data-feedback="Cooling affects how quickly the extrudate freezes, not whether plastic arrives. A gap that appears only after corners is a pressure timing problem.">Cooling — raise fan speed over the corner region</button>
+      <button class="opt" data-feedback="Under-extrusion from a low EM would thin the whole wall uniformly, not create a gap that appears only downstream of direction changes.">Extrusion multiplier — the wall is under-extruded</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <div class="quiz" data-explain-right="Exactly." data-explain-wrong="Re-read the production-speed warning.">
+    <div class="q-kicker">Question 3 of 3</div>
+    <div class="q-text">Why is this the one step allowed to loop back after Lesson 15?</div>
+    <div class="q-options">
+      <button class="opt" data-correct data-feedback="Right. The size of the pressure lag scales with how hard the machine accelerates, so a large change to acceleration genuinely changes the correct advance value.">The lag it compensates for scales with acceleration</button>
+      <button class="opt" data-feedback="Speed does interact with flow, but that's the max volumetric speed relationship in Lesson 14. Advance is about the timing of pressure, not the quantity of it.">Higher speeds demand more flow than the hotend gives</button>
+      <button class="opt" data-feedback="Both commands work identically at any speed. The issue is physical — how much pressure builds up — not a firmware limitation at particular speeds.">The firmware applies the value only above a speed</button>
+      <button class="opt" data-feedback="Nothing about advance is time-limited or drift-prone in that way. It changes when the mechanical conditions it compensates for change.">The value drifts over long prints and needs resetting</button>
+    </div>
+    <div class="q-feedback"></div>
+  </div>
+
+  <!-- ===== TASK ===== -->
+  <div class="task">
+    <div class="task-label">✎ Your task · do this with your tutor</div>
+    <h3>Measure advance on one machine, at production speed</h3>
+    <ol>
+      <li>Report the <b>stock</b> advance line from your machine's sliced G-code — the literal
+      <code>M900</code> or <code>M572</code> text. If you can't find one, say so.</li>
+      <li>Paste me your tower block and the print profile you'll run it with, <em>before</em> printing. I will
+      check that the accelerations are production values.</li>
+      <li>Print it. Photograph one corner per band in raking light.</li>
+      <li>Report the winning value and <b>which symptom you saw in the band on each side of it</b> — blob
+      below, gap above. If you can't describe both neighbours, you haven't bracketed the answer.</li>
+      <li>Write it into the filament profile's start G-code with a nozzle conditional and a dated comment.
+      Paste me the finished line.</li>
+      <li>Confirm the tower block is deleted from the printer profile.</li>
+    </ol>
+    <p class="go">→ Point 4 is the assessment. A value with a blob on one side and a gap on the other is
+    measured. A value with nothing obviously wrong on either side means your bracket was too narrow and you
+    picked the middle of a plateau.</p>
+  </div>
+
+  <div class="recap">
+    <h3>What you can now say</h3>
+    <ol>
+      <li><strong>Advance compensates for melt-zone pressure lag</strong> — blobs into corners, gaps out of
+      them.</li>
+      <li><strong>Blobs mean increase, missing filament means decrease.</strong> Prusa's own rule, and it holds
+      on both firmware families.</li>
+      <li><strong><code>M900</code> is converted 1:1 on Buddy</strong>, which is exactly why copying a value
+      between your machines fails silently rather than loudly.</li>
+      <li><strong>Tune at production speeds and accelerations</strong>, or the value describes a print you will
+      never make.</li>
+      <li><strong>The value belongs in the <em>filament</em> profile's start G-code</strong>, nozzle-aware and
+      commented with machine and date.</li>
+    </ol>
+  </div>
+
+  <div class="sourcebox">
+    <div class="icon">📖</div>
+    <div>
+      <div class="label">Primary source · read this next</div>
+      <div class="title"><a href="https://help.prusa3d.com/article/pressure-advance_814986" target="_blank" rel="noopener">Pressure Advance — Prusa Knowledge Base</a></div>
+      <div class="desc">Short, and it contains the two facts this lesson is built on: the full
+      <code>M572</code> parameter list including the <code>W</code> averaging window, and the 1:1
+      <code>M900</code> conversion with last-command-wins. MK3S owners should read the
+      <a href="https://help.prusa3d.com/article/linear-advance_2252" target="_blank" rel="noopener">Linear Advance</a>
+      article instead — it has the default K values per material.</div>
+    </div>
+  </div>
+
+  <div class="ask-teacher">
+    💬 <b>I'm your tutor — ask me anything.</b> Send me the stock advance line from each of your three
+    machines and I'll tell you what a sensible bracket looks like for each. And if a tower comes out with seven
+    identical-looking bands, paste me the G-code — nine times in ten the conditional never fired. Confused
+    beats stuck.
+  </div>
+
+  <div class="crosslinks">
+    <b>Linked:</b> Glossary →
+    <a href="../reference/glossary.html#pressure-advance">Pressure Advance</a>,
+    <a href="../reference/glossary.html#linear-advance">Linear Advance</a>,
+    <a href="../reference/glossary.html#after-layer-change">after layer change G-code</a>,
+    <a href="../reference/glossary.html#extrusion-width">extrusion width</a>,
+    <a href="../reference/glossary.html#extrusion-multiplier">extrusion multiplier</a>,
+    <a href="../reference/glossary.html#input-shaper">Input Shaper</a>,
+    <a href="../reference/glossary.html#ghosting">ghosting</a>,
+    <a href="../reference/glossary.html#calibration-order">calibration order</a>,
+    <a href="../reference/glossary.html#one-variable-rule">one-variable rule</a>,
+    <a href="../reference/glossary.html#tuning-log">tuning log</a>.
+    Keep it close with → <a href="../reference/calibration-card.html">The Calibration Card</a>.
+  </div>
+
+  <h2 id="refs"><span class="num">§</span>References</h2>
+  <ol style="font-family:var(--sans);font-size:.84rem;color:var(--ink-soft);line-height:1.5">
+    <li id="r1">Prusa Research. <i>Pressure Advance</i>. Availability on the MK4 family, XL family, MINI family
+    and MK3.9 family from firmware 5.0.0; the <code>M572</code> parameters <code>D</code>,
+    <code>S&lt;value&gt;</code> (zero disables) and <code>W</code> (averaging window, default 0.04); that legacy
+    <code>M900</code> is "automatically converted 1:1 to Pressure Advance value" with the most recently issued
+    command applying; that the default start G-code contains an <code>M572</code> whose <code>S</code> varies
+    by nozzle diameter; and the recommendation to keep that default.
+    <a href="https://help.prusa3d.com/article/pressure-advance_814986" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r2">Prusa Research. <i>Linear Advance</i>. MK3-family and MK2-family applicability; replacement by
+    Pressure Advance from firmware 5.0.0; the <code>M900 Kxx</code> syntax; the default K values for a 0.4 mm
+    nozzle (PLA 0.05, PETG 0.08, ASA/ABS 0.04, Nylon Taulman 0.08, Nylon FX256 0.1); the test pattern in
+    Prusa's calibration G-code repository; the judging rule "If sharp corners have blobs, increase the K value.
+    If you see missing filament, decrease the K value."; and that the K value is set in the custom G-code
+    section of the Filament Settings tab, <b>not</b> under printer-specific custom G-code.
+    <a href="https://help.prusa3d.com/article/linear-advance_2252" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r3">Prusa Research. <i>Buddy firmware specific G-code commands</i>. <code>M572</code> — "Set or
+    report extruder pressure advance", with the <code>D</code>, <code>S</code> and <code>W</code> parameters.
+    <a href="https://help.prusa3d.com/article/buddy-firmware-specific-g-code-commands_633112" target="_blank" rel="noopener">Link</a>.</li>
+    <li id="r4">This course. <i>Master tuning guide</i>, §2.3 — the stepped-tower method, the
+    production-accelerations caveat, the nozzle-aware conditional, the reference point that MK4S PLA profiles
+    ship near 0.036 for a 0.4 nozzle, and that PrusaSlicer's per-filament custom G-code is what makes the value
+    follow the material.
+    <a href="../reference/source-material/prusaslicer-profile-tuning.md">Link</a>.</li>
+  </ol>
+
+  <nav class="lesson-nav">
+    <a href="0010-extrusion-multiplier.html">
+      <div class="dir">← Previous · L10</div>
+      <div class="ttl">Extrusion multiplier</div>
+    </a>
+    <a class="next" href="0012-retraction.html">
+      <div class="dir">Next · L12</div>
+      <div class="ttl">Retraction →</div>
+    </a>
+  </nav>
+
+  <p class="pagefoot">Lesson L11 of the prusa-profile-tuning course ·
+    <a href="../index.html">all lessons</a> ·
+    <a href="../reference/calibration-card.html">The Calibration Card</a> ·
+    <a href="../reference/glossary.html">glossary</a></p>
+</main>
+</body>
+</html>

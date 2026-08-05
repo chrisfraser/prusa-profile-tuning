@@ -114,6 +114,19 @@
   <p>Pulling filament back a short distance before a travel move, so the nozzle stops oozing. A printer
   setting whose correct value is material-dependent, so it is overridden per filament.</p>
 
+  <h3 id="dynamic-overhang-speed">dynamic overhang speed</h3>
+  <p>A print setting that slows extrusion in proportion to how little of it overlaps the previous layer, so
+  overhangs get the cooling time they need without slowing the whole print. Shaped by four control points
+  pairing an overlap percentage with a speed, linearly interpolated between. Shares its vocabulary with
+  dynamic <em>fan</em> speeds, and the two should agree.</p>
+
+  <h3 id="autospeed">AutoSpeed</h3>
+  <p>What happens when a per-feature speed is set to 0: <a href="#max-volumetric-speed">max volumetric
+  speed</a> stops being a brake and becomes the basis for calculating that feature's speed. A legitimate
+  mode, and a bad place to arrive by accident — clearing a speed field is enough to trigger it.
+  <small><em>Avoid</em>: reading <code>0</code> as "disabled" — in the MVS field, 0 means <em>no
+  limit</em>.</small></p>
+
   <h2><span class="num">C</span>Compensating for physics</h2>
 
   <h3 id="linear-advance">Linear Advance (LA)</h3>
@@ -123,9 +136,14 @@
 
   <h3 id="pressure-advance">Pressure Advance (PA)</h3>
   <p>The Buddy-firmware equivalent of <a href="#linear-advance">Linear Advance</a>, used on the MK4 family
-  and Core One from firmware 5.0.0. Set with <code>M572 S&lt;value&gt;</code>. <b>The scale is not the same
-  as LA's</b> — an MK3S <code>M900 K</code> value and an MK4S or Core One <code>M572 S</code> value are not
-  interchangeable, and copying one to the other is the most expensive mistake available in this course.</p>
+  and Core One from firmware 5.0.0. Set with <code>M572 S&lt;value&gt;</code>, which also takes
+  <code>D</code> (extruder number) and <code>W</code> (the velocity-averaging window, default 0.04 s).
+  <b>A value is never transferable between the MK3S and the Buddy machines</b> — and the reason is subtler
+  than a unit mismatch. Buddy converts a legacy <code>M900</code> command <em>1:1</em> into a PA value and
+  applies whichever advance command came last, so a copied number is accepted silently. What differs is the
+  <em>correct</em> value: it characterises that machine's extruder and melt zone, not the material. Prusa's
+  MK3S defaults for a 0.4 nozzle are PLA 0.05 / PETG 0.08, while the MK4S family ships nearer 0.03–0.04 for
+  PLA. Roughly double, for the same plastic.</p>
 
   <h3 id="input-shaper">Input Shaper (IS)</h3>
   <p>A Buddy-firmware feature that cancels the frame resonances which cause <a href="#ghosting">ghosting</a>,
@@ -210,6 +228,18 @@
   what makes it a guard rather than a warning. Written against <code>printer_model</code> and
   <code>nozzle_diameter</code>. <small><em>Avoid</em>: "printer filter".</small></p>
 
+  <h3 id="after-layer-change">after layer change G-code</h3>
+  <p>A block in <code>Printer Settings → Custom G-code</code> that runs at every layer transition, and the
+  mechanism behind every stepped test in Phase 2 — temperature towers, advance towers, flow ramps. It lives
+  in the <b>printer</b> profile, so it applies to every filament and every model sliced on that machine until
+  you delete it. Deleting it is part of the test, not an afterthought.</p>
+
+  <h3 id="filament-overrides">filament overrides</h3>
+  <p>The section of Filament Settings that lets a filament preset override values structurally belonging to
+  the printer profile — <a href="#retraction">retraction</a> above all. Each value has a tickbox: unticked
+  inherits from the printer, ticked freezes at what you set. Override what the material genuinely changes,
+  and leave the rest inheriting.</p>
+
   <h3 id="config-bundle">config bundle</h3>
   <p>A single <code>.ini</code> holding every custom print, filament and printer preset in the current
   PrusaSlicer version. Exported via <code>File → Export → Export Config Bundle</code>. It is the only backup
@@ -232,6 +262,17 @@
   pressure/linear advance → retraction → cooling → max volumetric speed → speeds and accelerations</b>.
   Each step assumes everything before it is fixed, so changing an earlier one invalidates every later
   measurement.</p>
+
+  <h3 id="temperature-tower">temperature tower</h3>
+  <p>A single tall print whose nozzle temperature steps down by 5 °C every 10 mm, giving you every candidate
+  temperature on one object, one spool, one machine, one session. The first measurement of Phase 2. Judge the
+  middle of each band, never the boundary — <code>M104</code> doesn't wait for the nozzle to arrive.</p>
+
+  <h3 id="snap-test">snap test</h3>
+  <p>Breaking a printed band across its layer lines to see how it fails. A <b>granular, ragged tear</b>
+  through the plastic means the layers fused; a <b>clean, flat split</b> along a layer line means they merely
+  stacked. It outranks every visible criterion, because the failure it detects is invisible from the
+  outside.</p>
 
   <h3 id="one-variable-rule">one-variable rule</h3>
   <p>Change exactly one thing between two test prints. Two changes give you a result you cannot attribute,

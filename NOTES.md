@@ -61,15 +61,30 @@
       up with *similar filament profiles* but *different speed/accel profiles* — the MK4S is still a
       bedslinger. `CONTEXT.md` and `reference/source-material/` still carry the old MK4 row; they are
       preserved as the original brief, with a correction note in `CONTEXT.md`.
-- [ ] **Write Phase 2 (lessons 9–15)** from `reference/source-material/prusaslicer-profile-tuning.md` §2.
-      This is now the only gap in the course. When L15 lands, repoint L16's prev nav link from
-      `../index.html#phase-2` to `0015-*.html`.
+- [x] **Phase 2 (lessons 9–15) written 2026-08-05.** All 18 lessons now exist; the course has no gaps.
+      L16's prev nav repointed to `0015-*.html`. Written from `prusaslicer-profile-tuning.md` §2 and §4,
+      but every claim re-grounded against a live KB fetch — which turned up several places where the
+      guide and the KB diverge (recorded in `RESOURCES.md § Gaps` and stated in-lesson).
 - [x] Phase 3 (lessons 16–18) written 2026-08-05, ahead of Phase 2 at the learner's request. It stands
       alone and gives Phase 2 somewhere to put its results.
-- [x] `reference/calibration-card.html` carries Phase 1 targets, the calibration order, the arithmetic
-      and the method rules. **Still to add when Phase 2 lands:** the per-material starting tables and the
-      custom G-code tower blocks.
+- [x] `reference/calibration-card.html` is complete: calibration order, Phase 1 targets, the arithmetic,
+      the three Phase 2 material tables, the three test G-code blocks, a Phase 2 diagnostic shorthand
+      table, method rules, and the shipping section.
+- [ ] **Glossary correction made 2026-08-05, worth remembering.** The old Pressure Advance entry said
+      "the scale is not the same as LA's". The KB says Buddy converts `M900` to PA **1:1**, so that was
+      wrong as stated. Rewritten: the *command* converts, the *correct value* doesn't transfer, because it
+      characterises the machine's extruder and melt zone. Evidence: Prusa's own MK3S defaults (PLA 0.05,
+      PETG 0.08) against the MK4S family's ~0.03–0.04 for PLA. This makes the danger sharper — a copied
+      value is accepted silently rather than rejected.
 - [ ] Find a better source for drying temperatures/times (see RESOURCES.md § Gaps).
+- [ ] **Open question raised by L11:** the Pressure Advance KB article does not list the Core One among
+      supported printers. Almost certainly stale documentation, but the lesson has the learner verify by
+      finding `M572` in sliced Core One G-code. Follow up on their answer.
+- [ ] **Open question raised by L14:** what is the Core One's *measured* flow ceiling with the door closed
+      versus vented? Warmer intake air helps melting; a warmer heatsink hurts. No public source. L14's task
+      asks for both runs — this is genuinely new data for the log.
+- [ ] Next natural additions, if the course ever grows: a Phase 4 on multi-material / MMU, and a lesson on
+      dimensional accuracy and shrinkage compensation (currently only touched at L17's elephant-foot step).
 
 - [ ] Profile naming was corrected 2026-08-05: bundle presets renamed `@MK4` → `@MK4S`. The
       `compatible_printers_condition` was deliberately **left** as `/.*MK4.*/` — L16's task has the
