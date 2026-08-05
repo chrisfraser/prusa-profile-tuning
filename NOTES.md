@@ -2,7 +2,7 @@
 
 ## The learner
 
-- Owns and runs three Prusa printers: **MK3S** (Marlin), **MK4** (Buddy), **Core One** (Buddy, CoreXY,
+- Owns and runs three Prusa printers: **MK3S** (Marlin), **MK4S** (Buddy), **Core One** (Buddy, CoreXY,
   enclosed). Located in **Mauritius** — high ambient humidity.
 - Already researched and wrote a full PrusaSlicer tuning guide (now at
   `reference/source-material/prusaslicer-profile-tuning.md`) and an importable starter `.ini` bundle
@@ -17,8 +17,8 @@
 ## Hard constraints
 
 - **Two firmware families, never interchangeable.** MK3S = Marlin, Linear Advance, `M900 K`.
-  MK4 + Core One = Buddy, Pressure Advance, `M572 S`. Any lesson with a menu path or a G-code command
-  **must** carry separate MK3S / MK4 / Core One sections. This is the single most important
+  MK4S + Core One = Buddy, Pressure Advance, `M572 S`. Any lesson with a menu path or a G-code command
+  **must** carry separate MK3S / MK4S / Core One sections. This is the single most important
   course-specific rule.
 - High humidity. Drying is a prerequisite, not an optimisation.
 - Evenings and weekends only — lessons finishable in one sitting.
@@ -44,7 +44,7 @@
 - `GLOSSARY.md` is canonical; `reference/glossary.html` mirrors it. Edit the `.md` first.
 - Quiz options stay equal-length so formatting gives no clue.
 - **Per-machine sections use `details.panel`**, one per printer family, in the fixed order
-  MK3S → MK4 / MK4S → Core One. Always all three, even when two are identical — the user needs to be
+  MK3S → MK4S → Core One. Always all three, even when two are identical — the user needs to be
   able to open exactly their machine and read only that.
 - Original research lives in `reference/source-material/`. It is the *input*; lessons are the output.
   Don't edit source material to match a lesson — update the lesson, or note the divergence.
@@ -55,8 +55,12 @@
       per-machine panels, but the tasks assume one machine at a time.
 - [ ] Does the Core One firmware here expose the **Belt tuning wizard** (Settings → Manual Belt Tuning,
       firmware 6.4.0+) or does it need the manual strum-and-measure method?
-- [ ] Is the MK4 an MK4 or an MK4S? Flow ceiling and stock PLA temperature differ materially
-      (~15–20 vs ~22–28 mm³/s). Phase 2 numbers hinge on it.
+- [x] **Resolved 2026-08-05: the fleet is MK3S, MK4**S**, Core One.** Not a plain MK4. Consequences for
+      Phase 2: flow ceiling ~22–28 mm³/s not ~15–20; MK4S-class hotend, the same class as the Core One;
+      stock PLA profiles run hotter (~230 °C) to support that ceiling. So the MK4S and Core One will end
+      up with *similar filament profiles* but *different speed/accel profiles* — the MK4S is still a
+      bedslinger. `CONTEXT.md` and `reference/source-material/` still carry the old MK4 row; they are
+      preserved as the original brief, with a correction note in `CONTEXT.md`.
 - [ ] Write Phase 2 (lessons 9–15) from `reference/source-material/prusaslicer-profile-tuning.md` §2.
 - [ ] Write Phase 3 (lessons 16–18) from §1, §6 and the CONTEXT.md conventions.
 - [ ] Fill `reference/calibration-card.html` once Phase 1 is signed off — it should carry the

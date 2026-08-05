@@ -2,7 +2,7 @@
 
 ## Why
 
-I run a three-printer Prusa fleet — an MK3S, an MK4, and a Core One — in Mauritius, where ambient
+I run a three-printer Prusa fleet — an MK3S, an MK4S, and a Core One — in Mauritius, where ambient
 humidity is high enough to sabotage a print on its own. I want to stop guessing. I want PrusaSlicer
 profiles for PLA, PETG and TPU on each machine that I *trust*: hit print, walk away, get a part that's
 dimensionally right and doesn't delaminate. Not maximum speed — repeatable quality at a sane speed.
@@ -25,7 +25,7 @@ earns it.
 
 ## Constraints
 
-- **Three machines, two firmware families.** MK3S is Marlin (`M900 K`, Linear Advance); MK4 and Core
+- **Three machines, two firmware families.** MK3S is Marlin (`M900 K`, Linear Advance); MK4S and Core
   One are Buddy (`M572 S`, Pressure Advance). Values are not interchangeable — every lesson that
   touches a machine-specific path or number must split by machine.
 - **High-humidity environment (Mauritius).** Drying assumptions are aggressive throughout; a wet spool

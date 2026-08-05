@@ -70,7 +70,7 @@
 
   <table>
     <caption>The same job, two mechanical answers.</caption>
-    <thead><tr><th>&nbsp;</th><th><a href="../reference/glossary.html#bedslinger">Bedslinger</a> — MK3S, MK4</th><th><a href="../reference/glossary.html#corexy">CoreXY</a> — Core One</th></tr></thead>
+    <thead><tr><th>&nbsp;</th><th><a href="../reference/glossary.html#bedslinger">Bedslinger</a> — MK3S, MK4S</th><th><a href="../reference/glossary.html#corexy">CoreXY</a> — Core One</th></tr></thead>
     <tbody>
       <tr><td>What moves on Y</td><td>the bed, plus your whole part</td><td>nothing — the head does X and Y</td></tr>
       <tr><td>Moving mass</td><td><b>grows as the print grows</b></td><td>constant, and small</td></tr>
@@ -128,10 +128,15 @@
 
   <div class="callout note">
     <div class="callout-label">⌁ The one number that separates your three machines</div>
-    <p>Practical flow ceiling on a 0.4 mm nozzle: <b>MK3S ~11–13 mm³/s</b>, <b>MK4 ~15–20</b> (MK4S and
-    high-flow nozzles: 22–28), <b>Core One ~22–28</b>. Same plastic, same nozzle diameter — nearly three
-    times the throughput, purely from how much heat the hotend can put into the strand per second. These
+    <p>Practical flow ceiling on a 0.4 mm nozzle: <b>MK3S ~11–13 mm³/s</b>, <b>MK4S ~22–28</b>,
+    <b>Core One ~22–28</b>. Same plastic, same nozzle diameter — roughly <em>twice</em> the throughput on
+    the two newer machines, purely from how much heat the hotend can put into the strand per second. These
     are the working figures from your own tuning guide, to be replaced by measured ones in Phase 2.</p>
+    <p>Note what that does <em>not</em> mean. Your MK4S and Core One share an MK4S-class hotend, so their
+    <em>melting</em> capacity is comparable — but the MK4S is a bedslinger dragging your part around on Y
+    while the Core One flings a light head around a fixed gantry. Same flow ceiling, different
+    <em>motion</em> ceiling. Their filament profiles will look similar; their speed and acceleration
+    profiles will not.</p>
   </div>
 
   <!-- ===== SECTION 3 ===== -->
@@ -176,7 +181,7 @@ with the spool.</span></code></pre>
   <ul>
     <li><b><a href="../reference/glossary.html#input-shaper">Input Shaper</a></b> cancels the frame
       resonances that cause <a href="../reference/glossary.html#ghosting">ghosting</a>, so the printer can
-      run much higher acceleration for the same surface finish. Your MK4 and Core One have it; the MK3S
+      run much higher acceleration for the same surface finish. Your MK4S and Core One have it; the MK3S
       does not.<span class="cite"><a href="#r1">1</a></span> Note what it does <em>not</em> do: it
       compensates for resonance, it does not tighten a belt. Prusa are explicit that belt adjustment and
       general maintenance come first, because those mechanical factors limit how much Input Shaper can
@@ -265,7 +270,7 @@ with the spool.</span></code></pre>
     sheet from what's on the bed right now. Don't copy them from the guide.</p>
     <pre><code><span class="c">| Printer | Firmware ver | Kinematics | Probe | Nozzle | Sheet | Last hardware change |</span>
 | MK3S     | ? | bedslinger | PINDA    | 0.4 | ? | ? |
-| MK4      | ? | bedslinger | loadcell | 0.4 | ? | ? |
+| MK4S     | ? | bedslinger | loadcell | 0.4 | ? | ? |
 | Core One | ? | CoreXY     | loadcell | 0.4 | ? | ? |</code></pre>
     <p>Then add one sentence per machine: <em>"The first thing that will limit quality on this printer
     is ___, because ___."</em></p>

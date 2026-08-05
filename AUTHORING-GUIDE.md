@@ -17,7 +17,7 @@ specific to **this** course.
 
 ### The per-machine rule (the one that matters most here)
 
-This fleet is **two firmware families**: MK3S is Marlin (Linear Advance, `M900 K`); MK4/MK4S and Core One
+This fleet is **two firmware families**: MK3S is Marlin (Linear Advance, `M900 K`); MK4S and Core One
 are Buddy (Pressure Advance, `M572 S`). Menu paths, target numbers and G-code all differ.
 
 Whenever a lesson contains a **menu path, a target number, or a G-code command**, it must be split into
@@ -30,7 +30,7 @@ identical, because the reader opens exactly one:
   <div class="panel-body">…</div>
 </details>
 <details class="panel">
-  <summary>MK4 / MK4S · …</summary>
+  <summary>MK4S · …</summary>
   <div class="panel-body">…</div>
 </details>
 <details class="panel">

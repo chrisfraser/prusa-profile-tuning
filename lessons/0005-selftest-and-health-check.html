@@ -89,7 +89,7 @@
   </details>
 
   <details class="panel">
-    <summary>MK4 / MK4S · Buddy firmware</summary>
+    <summary>MK4S · Buddy firmware</summary>
     <div class="panel-body">
       <p><b>Path:</b> the full Calibration Wizard runs automatically on first power-on or after a factory
       reset. Afterwards, each step can be run individually from
@@ -101,7 +101,7 @@
         automatically before every print during mesh bed levelling, and no Live Adjust Z is
         required.<span class="cite"><a href="#r5">5</a></span> Do not skip it.</li>
         <li>There is <b>no belt-tension number</b> written by the selftest the way the MK3S writes one. Belt
-        tension on the MK4 is adjusted by feel and by the physical procedure in Lesson 6.</li>
+        tension on the MK4S is adjusted by feel and by the physical procedure in Lesson 6.</li>
         <li><b><a href="../reference/glossary.html#input-shaper">Input Shaper</a> is present</b> and is
         normally not something you calibrate on a stock printer — but it depends on the machine being
         mechanically sound, so it comes after belts, not before.<span class="cite"><a href="#r6">6</a></span></li>
@@ -117,7 +117,7 @@
     <div class="panel-body">
       <p><b>Path:</b> same as the MK4 family — full wizard on first power-on or factory reset, individual
       steps afterwards at <code>LCD → Control → Calibrations &amp; tests</code>.<span class="cite"><a href="#r4">4</a></span></p>
-      <p><b>What's different from the MK4:</b></p>
+      <p><b>What's different from the MK4S:</b></p>
       <ul>
         <li><b>Kinematics.</b> A <a href="../reference/glossary.html#corexy">CoreXY</a> gantry can be out of
         square in a way a <a href="../reference/glossary.html#bedslinger">bedslinger</a> can't, because both
@@ -128,7 +128,7 @@
         machines. This matters most for PLA, whose
         <a href="../reference/glossary.html#glass-transition">glass transition</a> is close to achievable
         chamber temperatures.</li>
-        <li><b>Loadcell</b>, as on the MK4 — same automatic first layer, same one-time selftest
+        <li><b>Loadcell</b>, as on the MK4S — same automatic first layer, same one-time selftest
         step.<span class="cite"><a href="#r5">5</a></span></li>
       </ul>
       <p><b>If it fails:</b> see
@@ -167,7 +167,7 @@
     behaviour per firmware version, and menu paths move between releases. If a path in this course isn't
     where it says, check your version first.<br>
     <b>PrusaSlicer in Expert mode</b>, with the Configuration Wizard run so the system profiles for MK3S,
-    MK4/MK4S and Core One are installed with the nozzle sizes you actually own. Half the settings this
+    MK4S and Core One are installed with the nozzle sizes you actually own. Half the settings this
     course touches are hidden in Simple and Advanced mode.</p>
   </div>
 
@@ -184,9 +184,9 @@
       <li data-check>Firmware version noted and current</li>
       <li data-check>Nozzle size and rough age known and written down</li>
       <li data-check>Frame screws and bed mounts checked for movement by hand</li>
-      <li data-check>Selftest run and passed (MK3S: Calibration → Selftest · MK4/Core One: Control → Calibrations &amp; tests)</li>
+      <li data-check>Selftest run and passed (MK3S: Calibration → Selftest · MK4S/Core One: Control → Calibrations &amp; tests)</li>
       <li data-check>MK3S only: Calibrate XYZ run, skew result read from Support → XYZ cal. details</li>
-      <li data-check>MK4 / Core One only: loadcell calibration step completed</li>
+      <li data-check>MK4S / Core One only: loadcell calibration step completed</li>
       <li data-check>Core One only: door and vent state decided and recorded</li>
       <li data-check>Belt tension measured and in spec (Lesson 6)</li>
       <li data-check>First layer calibrated and judged (Lesson 7)</li>
@@ -208,19 +208,19 @@
     <div class="q-text">Your selftest passes but prints still show ghosting. What has the pass actually told you?</div>
     <div class="q-options">
       <button class="opt" data-correct data-feedback="Right. A pass proves parts are connected and moving; it doesn't prove tension, squareness, first-layer height or thermal stability.">That the parts work, not that they're adjusted right</button>
-      <button class="opt" data-feedback="On the MK3S the selftest does report a belt-tension number, but a pass there only means it's within a broad range — and on the MK4 and Core One it reports nothing of the kind.">That belt tension has been verified within spec</button>
+      <button class="opt" data-feedback="On the MK3S the selftest does report a belt-tension number, but a pass there only means it's within a broad range — and on the MK4S and Core One it reports nothing of the kind.">That belt tension has been verified within spec</button>
       <button class="opt" data-feedback="If the machine is mechanically sound, filament is a reasonable next suspect — but ghosting is a positional error, so it points at motion long before it points at plastic.">That the fault must lie in the filament instead</button>
       <button class="opt" data-feedback="Input Shaper isn't part of the selftest, and on the MK3S it doesn't exist at all. A pass says nothing about it either way.">That Input Shaper is calibrated and working well</button>
     </div>
     <div class="q-feedback"></div>
   </div>
 
-  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read the MK4 and Core One panels.">
+  <div class="quiz" data-explain-right="Yes." data-explain-wrong="Re-read the MK4S and Core One panels.">
     <div class="q-kicker">Question 2 of 3</div>
     <div class="q-text">Why does the MK4-family selftest include a loadcell step that the MK3S has no equivalent for?</div>
     <div class="q-options">
       <button class="opt" data-correct data-feedback="Right. The loadcell senses nozzle-to-sheet contact directly, so once it's calibrated the first layer is measured automatically before every print.">Its probe senses the nozzle itself, not the steel sheet</button>
-      <button class="opt" data-feedback="The MK4 does have a different extruder, but the loadcell lives in the hotend heatsink and its job is bed sensing, not filament driving.">Its extruder needs a force reading to feed properly</button>
+      <button class="opt" data-feedback="The MK4S does have a different extruder, but the loadcell lives in the hotend heatsink and its job is bed sensing, not filament driving.">Its extruder needs a force reading to feed properly</button>
       <button class="opt" data-feedback="Buddy firmware is newer, but the step exists because of a hardware difference — the MK3S runs Buddy variants in some models and still uses PINDA.">Its firmware family runs a longer calibration wizard</button>
       <button class="opt" data-feedback="Both machines do mesh bed levelling. What differs is what finds the surface: an inductive probe reading metal, versus a force sensor reading contact.">Its bed is not flat enough for a single probe point</button>
     </div>
@@ -249,7 +249,7 @@
       <li>Printer, firmware version, date.</li>
       <li>Selftest result — and if anything failed, exactly which step and what the message said.</li>
       <li><b>MK3S:</b> the skew value from <code>Support → XYZ cal. details</code>.<br>
-      <b>MK4 / Core One:</b> confirmation that the loadcell step completed, plus (Core One) the door and
+      <b>MK4S / Core One:</b> confirmation that the loadcell step completed, plus (Core One) the door and
       vent state you've decided on.</li>
       <li>Nozzle: size, and your honest estimate of how much filament has gone through it.</li>
       <li>One line: <em>"The thing about this machine I am least confident in is ___."</em></li>
@@ -264,7 +264,7 @@
       <li><strong>The selftest is the floor of the calibration order</strong> — free, ten minutes, and
       everything downstream assumes it passed.</li>
       <li><strong>The path differs by firmware family:</strong> <code>Calibration → Selftest</code> on the
-      MK3S, <code>Control → Calibrations &amp; tests</code> on the MK4 and Core One.</li>
+      MK3S, <code>Control → Calibrations &amp; tests</code> on the MK4S and Core One.</li>
       <li><strong>The MK3S selftest measures belts; the Buddy machines don't</strong> — which is why Lesson 6
       looks completely different on each.</li>
       <li><strong>A pass proves connection and motion, not adjustment.</strong> Tension, squareness, first
@@ -280,7 +280,7 @@
       <div class="label">Primary source · read this next</div>
       <div class="title"><a href="https://help.prusa3d.com/category/calibration_199" target="_blank" rel="noopener">Calibration — Prusa Knowledge Base</a></div>
       <div class="desc">The per-model calibration hub. Find your exact printer in the model list before
-      reading anything — the KB splits these articles by model family, and following an MK4 article on an
+      reading anything — the KB splits these articles by model family, and following an MK4S article on an
       MK3S will give you a menu path that doesn't exist.</div>
     </div>
   </div>

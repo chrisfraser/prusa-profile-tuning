@@ -36,7 +36,7 @@
   <div class="callout key">
     <div class="callout-label">▲ Never mix these two</div>
     <p><b>MK3S = Marlin.</b> Linear Advance, <code>M900 K</code>, values ~0.02–0.08 for a 0.4 nozzle.<br>
-    <b>MK4 / Core One = Buddy.</b> Pressure Advance, <code>M572 S</code>.<br>
+    <b>MK4S / Core One = Buddy.</b> Pressure Advance, <code>M572 S</code>.<br>
     Different features, different scales, no conversion between them. One profile per printer family.</p>
   </div>
 
@@ -64,7 +64,7 @@
 
   <table>
     <caption>Belt tension. Three machines, three units — the numbers do not transfer.</caption>
-    <thead><tr><th>&nbsp;</th><th>MK3S</th><th>MK4 / MK4S</th><th>Core One</th></tr></thead>
+    <thead><tr><th>&nbsp;</th><th>MK3S</th><th>MK4S</th><th>Core One</th></tr></thead>
     <tbody>
       <tr><td>Measure</td><td><code>Calibration → Belt test</code><br>read at <code>Support → Belt status</code></td><td>by feel — no number reported</td><td><code>Settings → Manual Belt Tuning</code> (fw 6.4.0+)<br>or strum + phone tuner</td></tr>
       <tr><td>Target</td><td>X ≈ <b>250</b> · Y ≈ <b>275</b> (±15)</td><td>low bass string when plucked</td><td>both belts <b>90–98 Hz</b></td></tr>
@@ -76,7 +76,7 @@
 
   <table>
     <caption>Selftest, first layer, thermal and motion.</caption>
-    <thead><tr><th>&nbsp;</th><th>MK3S</th><th>MK4 / MK4S</th><th>Core One</th></tr></thead>
+    <thead><tr><th>&nbsp;</th><th>MK3S</th><th>MK4S</th><th>Core One</th></tr></thead>
     <tbody>
       <tr><td>Selftest</td><td><code>Calibration → Selftest</code></td><td colspan="2"><code>Control → Calibrations &amp; tests</code></td></tr>
       <tr><td>Probe</td><td>PINDA — senses the sheet</td><td colspan="2">Loadcell — senses the nozzle</td></tr>
@@ -104,11 +104,11 @@
     <ul class="checklist">
       <li data-check>Firmware current and version recorded</li>
       <li data-check>Selftest passed</li>
-      <li data-check>MK3S: Calibrate XYZ run, skew recorded · MK4/Core One: loadcell step done</li>
+      <li data-check>MK3S: Calibrate XYZ run, skew recorded · MK4S/Core One: loadcell step done</li>
       <li data-check>Belt tension measured and in spec</li>
       <li data-check>First layer calibrated — per sheet</li>
       <li data-check>Thermal stability confirmed</li>
-      <li data-check>MK4/Core One: Input Shaper frequency inside 35–70 Hz</li>
+      <li data-check>MK4S/Core One: Input Shaper frequency inside 35–70 Hz</li>
       <li data-check>Nozzle size and rough age recorded</li>
       <li data-check>Test cube printed at production acceleration and judged</li>
       <li data-check>Everything above written into <code>tuning-log.md</code> with a date</li>
@@ -136,8 +136,8 @@ total flow = M221 (firmware, %) × extrusion multiplier (slicer)</code></pre>
     <thead><tr><th>Machine</th><th class="num">mm³/s</th><th>Note</th></tr></thead>
     <tbody>
       <tr><td>MK3S</td><td class="num">~11–13</td><td>the slow machine — accept 45–60 mm/s perimeters</td></tr>
-      <tr><td>MK4</td><td class="num">~15–20</td><td>MK4S / high-flow nozzle: 22–28</td></tr>
-      <tr><td>Core One</td><td class="num">~22–28</td><td>MK4S-class hotend</td></tr>
+      <tr><td>MK4S</td><td class="num">~22–28</td><td>MK4S hotend; bedslinger, so <em>motion</em> limits before flow does</td></tr>
+      <tr><td>Core One</td><td class="num">~22–28</td><td>same hotend class as the MK4S; CoreXY, so it can actually use it</td></tr>
     </tbody>
   </table>
 

@@ -89,13 +89,13 @@
       <tr><td><code>M221 S95</code></td><td>firmware flow multiplier, in %</td><td>all three printers</td></tr>
       <tr><td><code>M220 S150</code></td><td>feedrate override, in %</td><td>all three printers</td></tr>
       <tr><td><code>M900 K0.04</code></td><td>set <a href="../reference/glossary.html#linear-advance">Linear Advance</a></td><td><b>MK3S only</b> (Marlin)</td></tr>
-      <tr><td><code>M572 S0.045</code></td><td>set <a href="../reference/glossary.html#pressure-advance">Pressure Advance</a></td><td><b>MK4 / Core One only</b> (Buddy)</td></tr>
+      <tr><td><code>M572 S0.045</code></td><td>set <a href="../reference/glossary.html#pressure-advance">Pressure Advance</a></td><td><b>MK4S / Core One only</b> (Buddy)</td></tr>
     </tbody>
   </table>
 
   <div class="callout warning">
     <div class="callout-label">⚠ K and S are not the same scale</div>
-    <p>An MK3S <code>M900 K</code> value and an MK4 <code>M572 S</code> value both compensate for melt-zone
+    <p>An MK3S <code>M900 K</code> value and an MK4S <code>M572 S</code> value both compensate for melt-zone
     pressure, and they are <em>not interchangeable numbers</em>. Pressure Advance replaced Linear Advance on
     the MK4 family from firmware 5.0.0.<span class="cite"><a href="#r1">1</a></span> Copying 0.05 from one to
     the other is the single most expensive mistake available in this course, because the print will still
@@ -294,7 +294,7 @@
     <div>
       <div class="label">Primary source · read this next</div>
       <div class="title"><a href="https://help.prusa3d.com/article/buddy-firmware-specific-g-code-commands_633112" target="_blank" rel="noopener">Buddy firmware-specific G-code commands — Prusa Knowledge Base</a></div>
-      <div class="desc">The authoritative list of what <code>M572</code> and its neighbours accept on the MK4
+      <div class="desc">The authoritative list of what <code>M572</code> and its neighbours accept on the MK4S
       family and Core One. Worth skimming now so that when Phase 2 asks you to write a custom G-code block,
       you're checking a reference rather than guessing.</div>
     </div>

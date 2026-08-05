@@ -6,11 +6,19 @@ Building properly dialled PrusaSlicer filament/print profiles across a three-pri
 
 ## Hardware
 
+> **Correction, 2026-08-05.** The fleet is **MK3S, MK4S, Core One** — the middle machine is an MK4**S**,
+> not a plain MK4. The table below has been updated. Note that `docs/`-derived material now under
+> `reference/source-material/` still describes the MK4 case in places; it is preserved as originally
+> written, and the course lessons are the corrected source of truth.
+
 | Printer | Firmware family | Advance G-code | Kinematics | Practical flow ceiling (0.4 mm) |
 |---|---|---|---|---|
 | Prusa MK3S | Marlin | `M900 K` (Linear Advance 1.5) | Bedslinger | ~11–13 mm³/s |
-| Prusa MK4 | Buddy (Input Shaper) | `M572 S` (Pressure Advance) | Bedslinger | ~15–20 mm³/s (MK4S/HF: 22–28) |
+| Prusa MK4S | Buddy (Input Shaper) | `M572 S` (Pressure Advance) | Bedslinger | ~22–28 mm³/s |
 | Prusa Core One | Buddy (Input Shaper) | `M572 S` (Pressure Advance) | CoreXY, enclosed | ~22–28 mm³/s |
+
+The MK4S and Core One share an MK4S-class hotend, so their **flow** ceilings match; they differ in
+**motion** (bedslinger vs CoreXY, enclosed). Expect similar filament profiles, different speed/accel.
 
 **Critical invariant:** MK3S values and MK4/Core One values are NOT interchangeable. LA (K) and PA (S) are on different scales. Every filament gets one profile per printer family.
 

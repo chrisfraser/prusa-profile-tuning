@@ -85,9 +85,9 @@
   </details>
 
   <details class="panel">
-    <summary>MK4 / MK4S · adjust by feel, verify by print</summary>
+    <summary>MK4S · adjust by feel, verify by print</summary>
     <div class="panel-body">
-      <p>The MK4 does <b>not</b> report a belt-status number. There is no screen to read; you adjust the
+      <p>The MK4S does <b>not</b> report a belt-status number. There is no screen to read; you adjust the
       hardware and verify in a print. That makes this the least satisfying of the three procedures and the
       one most worth doing carefully.</p>
       <p><b>The feel target:</b> plucked at its midpoint, the belt should sound like a low bass string. You
@@ -193,7 +193,7 @@ suddenly isn't</span></code></pre>
 
   <p>The asymmetry is worth noticing: <b>too loose degrades gracefully and visibly; too tight fails
   abruptly and quietly.</b> People overtighten because loose is the failure they've been taught to look for.
-  On the MK3S the belt-status number protects you from this — under 240 means <em>loosen</em>. On the MK4,
+  On the MK3S the belt-status number protects you from this — under 240 means <em>loosen</em>. On the MK4S,
   where you're going by feel, err towards the low-bass-string end rather than the high one.</p>
 
   <div class="callout key">
@@ -231,7 +231,7 @@ suddenly isn't</span></code></pre>
           >Quality is perfect for 40 mm, then degrades steadily upward<span class="ff-tag">Not belts</span></li>
       <li class="ff-item"
           data-cause="Over-tension, and this one is dangerous because it's silent until it isn't. Loaded bearings and pulleys run warm and eventually the stepper skips a step under load, giving a layer shift with no warning."
-          data-fix="Back the tension off towards the low end of the range. When in doubt on the MK4, where there's no number to read, aim for the low-bass-string feel rather than the higher, tighter one.">Motors whine audibly, bearings warm to the touch<span class="ff-tag">Over-tight</span></li>
+          data-fix="Back the tension off towards the low end of the range. When in doubt on the MK4S, where there's no number to read, aim for the low-bass-string feel rather than the higher, tighter one.">Motors whine audibly, bearings warm to the touch<span class="ff-tag">Over-tight</span></li>
     </ul>
     <div class="ff-panel"><div class="ff-cause"></div><div class="ff-fix"></div></div>
   </div>
@@ -284,7 +284,7 @@ suddenly isn't</span></code></pre>
     <code>tuning-log.md</code>:</p>
     <ol>
       <li><b>The before number.</b> MK3S: belt status X and Y. Core One: upper and lower Hz, and the gap
-      between them. MK4: describe the feel, and note the pluck pitch if you can measure it.</li>
+      between them. MK4S: describe the feel, and note the pluck pitch if you can measure it.</li>
       <li><b>What you changed</b>, in physical terms — which screw, how many turns, which direction.</li>
       <li><b>The after number</b>, measured the same way as the before.</li>
       <li><b>MK3S only:</b> re-run <code>Calibrate XYZ</code> and log the skew result again. Did it move?</li>
@@ -301,7 +301,7 @@ suddenly isn't</span></code></pre>
     <h3>What you can now say</h3>
     <ol>
       <li><strong>Each machine expresses belt tension in a different unit</strong> — a number on the MK3S,
-      a feel on the MK4, a frequency on the Core One.</li>
+      a feel on the MK4S, a frequency on the Core One.</li>
       <li><strong>On the MK3S, lower means tighter.</strong> Under 240, loosen; over 290, tighten.</li>
       <li><strong>On the Core One both belts must match within 8 Hz</strong>, and the tensioners are turned
       evenly and alternately so the gantry stays square.</li>
@@ -317,7 +317,7 @@ suddenly isn't</span></code></pre>
     <div>
       <div class="label">Primary source · read this next</div>
       <div class="title"><a href="https://help.prusa3d.com/article/adjusting-belt-tension-mk4-s-mk3-9-s-mk3-5-s-mk3-s_112380" target="_blank" rel="noopener">Adjusting belt tension (MK4/S, MK3.9/S, MK3.5/S, MK3/S/+) — Prusa Knowledge Base</a></div>
-      <div class="desc">The source of every MK3S and MK4 number above, with photographs of each screw. Core
+      <div class="desc">The source of every MK3S and MK4S number above, with photographs of each screw. Core
       One owners want the <a href="https://help.prusa3d.com/article/adjusting-belt-tension-core-one_845048" target="_blank" rel="noopener">CORE One article</a>
       instead — different machine, different procedure, different units.</div>
     </div>
@@ -357,7 +357,7 @@ suddenly isn't</span></code></pre>
     <li id="r3">Prusa Research. <i>Check Axis Length X/Y/Z (MK3S)</i>. Slightly too tight or too loose belt
     tension is a common cause of axis-length errors.
     <a href="https://help.prusa3d.com/article/check-axis-length-x-y-z-mk3s_134223" target="_blank" rel="noopener">Link</a>.</li>
-    <li id="r4">Prusa Research. <i>Adjusting belt tension</i>, MK4 section. The X-end-motor rear screw with a
+    <li id="r4">Prusa Research. <i>Adjusting belt tension</i>, MK4S section. The X-end-motor rear screw with a
     2.5 mm Allen ball end, the X-carriage cover route for large adjustments, and the M3x10 screws behind the
     LCD module for Y.
     <a href="https://help.prusa3d.com/article/adjusting-belt-tension-mk4-s-mk3-9-s-mk3-5-s-mk3-s_112380" target="_blank" rel="noopener">Link</a>.</li>

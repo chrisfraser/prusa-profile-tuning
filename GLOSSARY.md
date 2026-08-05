@@ -6,7 +6,7 @@ A term appears here only once it has been taught and used correctly.
 ## A · The machine
 
 **Bedslinger**:
-A printer whose bed moves on the Y axis while the toolhead moves on X and Z. The MK3S and MK4 are
+A printer whose bed moves on the Y axis while the toolhead moves on X and Z. The MK3S and MK4S are
 bedslingers. The moving mass grows with the part, which is why acceleration and external-perimeter
 speed are the first things to give.
 _Avoid_: "i3-style" (describes the frame, not the constraint that matters)
@@ -85,9 +85,9 @@ for a 0.4 mm nozzle are small, around 0.02–0.08.
 
 **Pressure Advance (PA)**:
 The Buddy-firmware equivalent of [Linear Advance](#linear-advance-la), used on the MK4 family and Core
-One from firmware 5.0.0. Set with `M572 S<value>`. **The scale is not the same as LA's** — an MK3S K
-value and an MK4 S value are not interchangeable, and copying one to the other is the most expensive
-mistake available in this course.
+One from firmware 5.0.0. Set with `M572 S<value>`. **The scale is not the same as LA's** — an MK3S
+`M900 K` value and an MK4S or Core One `M572 S` value are not interchangeable, and copying one to the
+other is the most expensive mistake available in this course.
 
 **Input Shaper (IS)**:
 A Buddy-firmware feature that cancels the frame resonances which cause [ghosting](#ghosting), letting

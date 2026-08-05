@@ -3,7 +3,7 @@
 **Status:** active
 
 The learner arrived with a complete, self-fact-checked PrusaSlicer tuning guide covering calibration order,
-per-machine notes, starting tables for PLA/PETG/TPU across MK3S/MK4/Core One, and an importable `.ini`
+per-machine notes, starting tables for PLA/PETG/TPU across MK3S/MK4S/Core One, and an importable `.ini`
 bundle for eSUN PETG and eSun eTPU-95A. They can navigate PrusaSlicer, understand profile inheritance and
 `compatible_printers_condition`, and already use the Phase 2 vocabulary correctly in writing.
 

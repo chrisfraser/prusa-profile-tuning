@@ -19,7 +19,7 @@ actual menu paths and target numbers per model, and those differ between MK3S, M
   Failure-by-failure diagnosis. Use for: when the health check stops you dead.
 - [Adjusting belt tension (MK4/S, MK3.9/S, MK3.5/S, MK3/S/+)](https://help.prusa3d.com/article/adjusting-belt-tension-mk4-s-mk3-9-s-mk3-5-s-mk3-s_112380)
   Belt-status target numbers for MK3S (X ≈ 250, Y ≈ 275) and the physical adjustment procedure for
-  MK4. Use for: Lesson 6.
+  MK4S. Use for: Lesson 6.
 - [Adjusting belt tension (CORE One)](https://help.prusa3d.com/article/adjusting-belt-tension-core-one_845048)
   CoreXY belt frequencies (90–98 Hz, ≤ 8 Hz apart) and the alternating-tensioner rule that keeps the
   gantry square. Use for: Lesson 6, Core One section.
@@ -35,14 +35,14 @@ actual menu paths and target numbers per model, and those differ between MK3S, M
   direction moves the nozzle closer. Use for: Lesson 7.
 - [Loadcell (MK4/S, MK3.9/S, XL)](https://help.prusa3d.com/article/loadcell-mk4-s-mk3-9-s-xl_401253)
   Why MK4-family printers don't need a manual first-layer calibration, and what the selftest step
-  actually sets. Use for: Lesson 7, MK4 / Core One sections.
+  actually sets. Use for: Lesson 7, MK4S / Core One sections.
 - [Loadcell troubleshooting](https://help.prusa3d.com/article/loadcell-troubleshooting_815397)
   When automatic first layer goes wrong. Use for: Lesson 7 diagnosis.
 - [PID tuning](https://help.prusa3d.com/article/pid-tuning_2265)
   When temperature wobble is worth fixing (±5 °C is the threshold) and the LCD path. Use for: Lesson 8,
   MK3S section.
 - [Thermal model calibration](https://help.prusa3d.com/article/thermal-model-calibration_382488)
-  The Buddy-firmware equivalent of PID for the MK4 family. Use for: Lesson 8, MK4 / Core One sections.
+  The Buddy-firmware equivalent of PID for the MK4 family. Use for: Lesson 8, MK4S / Core One sections.
 - [Input Shaper (CORE One, MK4/S, MK3.9/S, MK3.5/S, XL, MINI/+)](https://help.prusa3d.com/article/input-shaper-core-one-mk4-s-mk3-9-s-mk3-5-s-xl-mini_451816)
   What Input Shaper does, which printers have it, and why belts must be right *first*. Use for:
   Lessons 6 and 8.
@@ -54,13 +54,13 @@ actual menu paths and target numbers per model, and those differ between MK3S, M
   for: Lesson 10.
 - [Pressure Advance (`M572`)](https://help.prusa3d.com/article/pressure-advance_814986)
   PA on MK4-family and Core One; replaces Linear Advance from firmware 5.0.0. Use for: Lesson 11,
-  MK4 / Core One sections.
+  MK4S / Core One sections.
 - [Linear Advance (`M900 K`)](https://help.prusa3d.com/article/linear-advance_2252)
   LA 1.5 on the MK3S — a different scale to PA, not interchangeable. Use for: Lesson 11, MK3S section.
 - [Extruder linearity correction calibration](https://help.prusa3d.com/article/extruder-linearity-correction-calibration_2254)
   MK3/MK3S-only Trinamic driver correction. Use for: Lesson 8, MK3S section.
 - [Buddy firmware-specific G-code commands](https://help.prusa3d.com/article/buddy-firmware-specific-g-code-commands_633112)
-  The authoritative list of what `M572` and friends accept on MK4 / Core One. Use for: writing custom
+  The authoritative list of what `M572` and friends accept on MK4S / Core One. Use for: writing custom
   G-code blocks without guessing.
 
 ### Slicer

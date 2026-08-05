@@ -103,7 +103,7 @@
   </details>
 
   <details class="panel">
-    <summary>MK4 / MK4S · nothing to tune, something to watch</summary>
+    <summary>MK4S · nothing to tune, something to watch</summary>
     <div class="panel-body">
       <p><b>There is no user-run PID or thermal model calibration here.</b> Prusa's PID tuning and thermal
       model calibration articles are written for the MK3 family;<span class="cite"><a href="#r1">1</a><a href="#r2">2</a></span>
@@ -125,7 +125,7 @@
   </details>
 
   <details class="panel">
-    <summary>Core One · as MK4, but the chamber is a thermal variable</summary>
+    <summary>Core One · as MK4S, but the chamber is a thermal variable</summary>
     <div class="panel-body">
       <p><b>Same as the MK4 family</b> — no user-run PID or thermal model calibration; watch and log
       instead.</p>
@@ -157,7 +157,7 @@
     <div class="panel-body">
       <p>The MK3S has no Input Shaper. Its motion trust comes from belts being in spec (Lesson 6), a solid
       frame, and <b>accepting that it is the slow machine of the three</b>.</p>
-      <p>The practical consequence for Phase 2: don't try to make the MK3S hit MK4 numbers. Around 45–60 mm/s
+      <p>The practical consequence for Phase 2: don't try to make the MK3S hit MK4S numbers. Around 45–60 mm/s
       perimeters is the sensible operating region, and quality comes from staying there rather than from
       fighting ringing at 120 mm/s. Its <a href="../reference/glossary.html#bedslinger">bedslinger</a> Y axis
       is carrying your part; there is no filter for mass.</p>
@@ -168,7 +168,7 @@
   </details>
 
   <details class="panel">
-    <summary>MK4 / MK4S and Core One · verify rather than calibrate</summary>
+    <summary>MK4S and Core One · verify rather than calibrate</summary>
     <div class="panel-body">
       <p><b>Calibration is usually unnecessary on a stock printer.</b><span class="cite"><a href="#r4">4</a></span>
       The shipped values are correct for the shipped hardware. Prusa offer an optional accelerometer set for
@@ -202,17 +202,17 @@
     <div class="cl-title">✓ Phase 1 sign-off — one printer, all of it logged with today's date</div>
     <ul class="checklist">
       <li data-check>Firmware version current and recorded</li>
-      <li data-check>Selftest passed (MK3S: Calibration → Selftest · MK4/Core One: Control → Calibrations &amp; tests)</li>
+      <li data-check>Selftest passed (MK3S: Calibration → Selftest · MK4S/Core One: Control → Calibrations &amp; tests)</li>
       <li data-check>MK3S: Calibrate XYZ run, skew result recorded from Support → XYZ cal. details</li>
-      <li data-check>MK4 / Core One: loadcell selftest step completed</li>
+      <li data-check>MK4S / Core One: loadcell selftest step completed</li>
       <li data-check>Belt tension measured, in spec, and the numbers written down</li>
       <li data-check>Core One: the two belt frequencies are within 8 Hz of each other</li>
       <li data-check>First layer calibrated and judged — per sheet, not per machine</li>
       <li data-check>MK3S: PID calibration run at my usual print temperature</li>
       <li data-check>MK3S: thermal model calibration run if anomalies were appearing</li>
-      <li data-check>MK4 / Core One: hotend temperature observed steady for a minute at 100 % fan</li>
+      <li data-check>MK4S / Core One: hotend temperature observed steady for a minute at 100 % fan</li>
       <li data-check>Core One: chamber state decided, recorded, and observed hot as well as cold</li>
-      <li data-check>MK4 / Core One: Input Shaper frequency read and inside 35–70 Hz</li>
+      <li data-check>MK4S / Core One: Input Shaper frequency read and inside 35–70 Hz</li>
       <li data-check>Nozzle size and rough age recorded</li>
       <li data-check>A test cube printed at production acceleration and judged clean</li>
     </ul>
@@ -276,7 +276,7 @@
     <ol>
       <li>Every number you measured, with its target next to it.</li>
       <li><b>MK3S:</b> the PID calibration temperature you chose, and <em>why</em> that temperature.
-      <b>MK4 / Core One:</b> your one-minute temperature observation at 100 % fan, and the Input Shaper
+      <b>MK4S / Core One:</b> your one-minute temperature observation at 100 % fan, and the Input Shaper
       frequency.</li>
       <li>A photo of a 40 mm cube printed at your intended production acceleration.</li>
       <li>One sentence: <em>"This machine is now a constant with respect to ___, and still a variable with
@@ -293,7 +293,7 @@
       still looks like data.</li>
       <li><strong>PID tuning is for ±5 °C wobble.</strong> Bigger swings are a fan, thermistor or connector
       fault, and tuning around them hides them.</li>
-      <li><strong>PID and thermal model calibration are MK3-family features</strong>; on the MK4 and Core One
+      <li><strong>PID and thermal model calibration are MK3-family features</strong>; on the MK4S and Core One
       you observe and log rather than calibrate.</li>
       <li><strong>Input Shaper on a stock machine is verified, not calibrated</strong> — and its frequency
       landing outside 35–70 Hz sends you back to belts.</li>
@@ -308,7 +308,7 @@
       <div class="label">Primary source · read this next</div>
       <div class="title"><a href="https://help.prusa3d.com/article/pid-tuning_2265" target="_blank" rel="noopener">PID tuning — Prusa Knowledge Base</a></div>
       <div class="desc">Two minutes to read, and it contains the single most useful diagnostic threshold in
-      this lesson: ±5 °C is a tuning problem, more than that is hardware. MK4 and Core One owners should read
+      this lesson: ±5 °C is a tuning problem, more than that is hardware. MK4S and Core One owners should read
       it anyway, to understand what the selftest's heater checks are standing in for.</div>
     </div>
   </div>

@@ -41,7 +41,7 @@
   <h2><span class="num">A</span>The machine</h2>
 
   <h3 id="bedslinger">bedslinger</h3>
-  <p>A printer whose bed moves on the Y axis while the toolhead moves on X and Z. The MK3S and MK4 are
+  <p>A printer whose bed moves on the Y axis while the toolhead moves on X and Z. The MK3S and MK4S are
   bedslingers. The moving mass grows with the part, which is why acceleration and external-perimeter
   speed are the first things to give. <small><em>Avoid</em>: "i3-style" — that describes the frame, not
   the constraint that matters.</small></p>
@@ -124,8 +124,8 @@
   <h3 id="pressure-advance">Pressure Advance (PA)</h3>
   <p>The Buddy-firmware equivalent of <a href="#linear-advance">Linear Advance</a>, used on the MK4 family
   and Core One from firmware 5.0.0. Set with <code>M572 S&lt;value&gt;</code>. <b>The scale is not the same
-  as LA's</b> — an MK3S K value and an MK4 S value are not interchangeable, and copying one to the other is
-  the most expensive mistake available in this course.</p>
+  as LA's</b> — an MK3S <code>M900 K</code> value and an MK4S or Core One <code>M572 S</code> value are not
+  interchangeable, and copying one to the other is the most expensive mistake available in this course.</p>
 
   <h3 id="input-shaper">Input Shaper (IS)</h3>
   <p>A Buddy-firmware feature that cancels the frame resonances which cause <a href="#ghosting">ghosting</a>,

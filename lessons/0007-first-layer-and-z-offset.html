@@ -25,7 +25,7 @@
 <main class="wrap">
   <p class="kicker">Phase 1 · The machine · L7</p>
   <h1 class="lesson-title">First layer and Z-offset</h1>
-  <p class="lesson-sub">The one measurement where your MK3S and your MK4 are not doing remotely the same
+  <p class="lesson-sub">The one measurement where your MK3S and your MK4S are not doing remotely the same
   thing — one senses metal, the other senses touch.</p>
   <div class="lesson-meta">
     <span>⏱ ~25 minutes on the machine</span><span class="sep">•</span>
@@ -61,7 +61,7 @@
 
   <table>
     <caption>Why the procedure is not shared.</caption>
-    <thead><tr><th>&nbsp;</th><th><a href="../reference/glossary.html#pinda">PINDA</a> — MK3S</th><th><a href="../reference/glossary.html#loadcell">Loadcell</a> — MK4, Core One</th></tr></thead>
+    <thead><tr><th>&nbsp;</th><th><a href="../reference/glossary.html#pinda">PINDA</a> — MK3S</th><th><a href="../reference/glossary.html#loadcell">Loadcell</a> — MK4S, Core One</th></tr></thead>
     <tbody>
       <tr><td>Senses</td><td>metal, inductively, from a distance</td><td>force — the nozzle physically touching</td></tr>
       <tr><td>Knows where the nozzle is?</td><td><b>No.</b> It knows where the probe is</td><td><b>Yes.</b> The nozzle is the sensor</td></tr>
@@ -112,7 +112,7 @@
   </details>
 
   <details class="panel">
-    <summary>MK4 / MK4S · automatic, with a temporary override</summary>
+    <summary>MK4S · automatic, with a temporary override</summary>
     <div class="panel-body">
       <p><b>The short version: there is nothing to calibrate.</b> Provided the loadcell step of the selftest
       completed (Lesson 5), first layer height is measured automatically during mesh bed levelling before
@@ -133,7 +133,7 @@
   </details>
 
   <details class="panel">
-    <summary>Core One · as MK4, plus the enclosure</summary>
+    <summary>Core One · as MK4S, plus the enclosure</summary>
     <div class="panel-body">
       <p><b>Identical to the MK4 family</b> — loadcell, automatic per-print measurement, long-press to nudge
       the current print only, <code>Printer Settings → General → Z offset</code> for a persistent
@@ -206,7 +206,7 @@ clogs, Z dimension error</span></code></pre>
     <ul class="ff-list">
       <li class="ff-item"
           data-cause="Height, and too high. The lines never got squashed into each other, so they stayed round in cross-section and never fused side to side."
-          data-fix="MK3S: Live Adjust Z counter-clockwise, a notch at a time, while the calibration print runs. MK4/Core One: this shouldn't happen — re-run the loadcell selftest step rather than dialling in an offset.">Round separated lines you can pick apart with a fingernail<span class="ff-tag">Too high</span></li>
+          data-fix="MK3S: Live Adjust Z counter-clockwise, a notch at a time, while the calibration print runs. MK4S/Core One: this shouldn't happen — re-run the loadcell selftest step rather than dialling in an offset.">Round separated lines you can pick apart with a fingernail<span class="ff-tag">Too high</span></li>
       <li class="ff-item"
           data-cause="Height, and too low. Excess material has nowhere to go, so it piles into ridges and the nozzle ploughs through what it just laid down. Thin translucent patches are where it scraped material away."
           data-fix="Back off — clockwise on the MK3S. Left alone this also produces elephant foot and a part that is short in Z by a measurable amount.">Ridged surface with thin translucent patches<span class="ff-tag">Too low</span></li>
@@ -229,23 +229,23 @@ clogs, Z dimension error</span></code></pre>
 
   <div class="quiz" data-explain-right="Correct." data-explain-wrong="Re-read section 1.">
     <div class="q-kicker">Question 1 of 3</div>
-    <div class="q-text">Why does the MK3S need a manual Z offset when the MK4 doesn't?</div>
+    <div class="q-text">Why does the MK3S need a manual Z offset when the MK4S doesn't?</div>
     <div class="q-options">
       <button class="opt" data-correct data-feedback="Right. PINDA senses the sheet, not the nozzle, so the probe-to-nozzle gap has to be supplied by hand. The loadcell is the nozzle, so there's no gap to supply.">Its probe senses the sheet rather than the nozzle</button>
-      <button class="opt" data-feedback="Its bed is no less flat than the MK4's, and both machines run mesh bed levelling to handle shape. The difference is height sensing, not flatness.">Its bed is less flat and needs more compensation</button>
+      <button class="opt" data-feedback="Its bed is no less flat than the MK4S's, and both machines run mesh bed levelling to handle shape. The difference is height sensing, not flatness.">Its bed is less flat and needs more compensation</button>
       <button class="opt" data-feedback="Marlin versus Buddy changes which commands the printer accepts, but the reason for the manual step is the probe hardware, not the firmware running it.">Its firmware cannot store an offset automatically</button>
       <button class="opt" data-feedback="It is an older machine, but age isn't the mechanism — an inductive probe simply cannot know where the nozzle tip is, at any age.">Its design predates automatic first-layer measurement</button>
     </div>
     <div class="q-feedback"></div>
   </div>
 
-  <div class="quiz" data-explain-right="Yes — and that catches people out." data-explain-wrong="Re-read the MK4 panel.">
+  <div class="quiz" data-explain-right="Yes — and that catches people out." data-explain-wrong="Re-read the MK4S panel.">
     <div class="q-kicker">Question 2 of 3</div>
     <div class="q-text">You long-press the knob and nudge Z during a print. On which machines does that stick?</div>
     <div class="q-options">
       <button class="opt" data-correct data-feedback="Right. On the MK3S it's saved and persists after power-down; on loadcell machines it applies to the current print only.">MK3S only — the loadcell machines forget it</button>
-      <button class="opt" data-feedback="It's the same gesture on all three, which is exactly why the difference in what it does is easy to miss. On the MK4 and Core One the nudge is temporary.">All three — the gesture is identical on each</button>
-      <button class="opt" data-feedback="That's backwards. The loadcell machines re-measure before every print, so an in-print nudge has nothing persistent to write itself into.">MK4 and Core One — the MK3S forgets it</button>
+      <button class="opt" data-feedback="It's the same gesture on all three, which is exactly why the difference in what it does is easy to miss. On the MK4S and Core One the nudge is temporary.">All three — the gesture is identical on each</button>
+      <button class="opt" data-feedback="That's backwards. The loadcell machines re-measure before every print, so an in-print nudge has nothing persistent to write itself into.">MK4S and Core One — the MK3S forgets it</button>
       <button class="opt" data-feedback="None would mean the MK3S's Live Adjust Z did nothing lasting, which would make per-sheet calibration impossible. It does persist there.">None — the value resets on the next power cycle</button>
     </div>
     <div class="q-feedback"></div>
@@ -268,13 +268,13 @@ clogs, Z dimension error</span></code></pre>
     <div class="task-label">✎ Your task · do this with your tutor</div>
     <h3>Calibrate and photograph a first layer</h3>
     <p>On the machine you've been working through Phase 1 with, print a first-layer test — the MK3S's built-in
-    calibration, or a 60 × 60 mm single-layer square on the MK4 and Core One. Then:</p>
+    calibration, or a 60 × 60 mm single-layer square on the MK4S and Core One. Then:</p>
     <ol>
       <li>Photograph it under a bright light at a low angle. Low angle matters — flat lighting hides
       everything.</li>
       <li>Write down your verdict <b>before</b> you send it: too high, too low, or right — and which specific
       feature in the photo you're basing that on.</li>
-      <li>Log the values. <b>MK3S:</b> the Live Adjust Z value <em>and which sheet</em>. <b>MK4 / Core
+      <li>Log the values. <b>MK3S:</b> the Live Adjust Z value <em>and which sheet</em>. <b>MK4S / Core
       One:</b> confirmation that it was automatic, plus any Z offset you've set in PrusaSlicer and why.</li>
       <li>Repeat for each sheet you own. This is the only Phase 1 item that is per-sheet rather than per
       machine.</li>
@@ -290,7 +290,7 @@ clogs, Z dimension error</span></code></pre>
       fixes height; neither substitutes for the other.</li>
       <li><strong>PINDA senses the sheet, the loadcell senses the nozzle</strong> — which is why one needs a
       manual offset and the other doesn't.</li>
-      <li><strong>An in-print nudge persists on the MK3S and evaporates on the MK4 and Core One.</strong></li>
+      <li><strong>An in-print nudge persists on the MK3S and evaporates on the MK4S and Core One.</strong></li>
       <li><strong>Too high gives round separated lines; too low gives ridges and thin patches.</strong>
       Judge under a low-angle light.</li>
       <li><strong>The offset is per sheet, not per machine</strong> — and PETG wants less squish than PLA,

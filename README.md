@@ -1,12 +1,12 @@
 # Dialled In — Prusa machine & profile tuning
 
-Take a Prusa MK3S, MK4, or Core One from out-of-the-box to a print profile you actually trust.
+Take a Prusa MK3S, MK4S, or Core One from out-of-the-box to a print profile you actually trust.
 
 **▶ Live course: https://chrisfraser.github.io/prusa-profile-tuning/**
 
 Machine first, then filament, then profile — in that order. Every number in this course is one you
 *measure*, on your machine, with your spool. Menu paths and target values are split per printer
-throughout, because `M900 K` (MK3S, Marlin) and `M572 S` (MK4 / Core One, Buddy) are not the same thing.
+throughout, because `M900 K` (MK3S, Marlin) and `M572 S` (MK4S / Core One, Buddy) are not the same thing.
 
 ## Start here
 
