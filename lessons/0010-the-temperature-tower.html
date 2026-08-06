@@ -126,6 +126,47 @@
   scar the wall), but it has a consequence: the first two or three layers of each band are still on their way
   to the new temperature. <b>Judge the middle of each band, never the boundary.</b></p>
 
+  <div class="calc">
+    <div class="calc-title">⌁ Tower block generator — your range, exact G-code</div>
+    <p class="calc-lede">The block above is the worked PETG example; type your own range and this writes
+    the exact lines. Band 1 is deliberately absent from the block — it prints at the filament profile's
+    own temperature, which you set to the hottest value. Paste the result <b>below</b> whatever is already
+    in the after-layer-change pane.</p>
+    <div class="calc-grid tight">
+      <label class="calc-field">Hottest band <span class="u">°C</span>
+        <input type="number" data-var="t" value="250" step="1"></label>
+      <label class="calc-field">Step down <span class="u">°C</span>
+        <input type="number" data-var="s" value="5" step="1" min="1"></label>
+      <label class="calc-field">Bands
+        <input type="number" data-var="b" value="6" step="1" min="2" max="8"></label>
+      <label class="calc-field">Layer height <span class="u">mm</span>
+        <input type="number" data-var="lh" value="0.2" step="0.05" min="0.05"></label>
+      <label class="calc-field">Band height <span class="u">mm</span>
+        <input type="number" data-var="bh" value="10" step="1" min="1"></label>
+    </div>
+    <div class="calc-outs">
+      <div class="calc-out"><span class="lab">Layers per band</span>
+        <span class="val" data-out="round(bh/lh)"></span></div>
+      <div class="calc-out"><span class="lab">Coldest band</span>
+        <span class="val" data-out="t-(b-1)*s" data-dp="0" data-suffix=" °C"></span></div>
+      <div class="calc-out"><span class="lab">Tower height used</span>
+        <span class="val" data-out="b*bh" data-dp="0" data-suffix=" mm"></span></div>
+    </div>
+    <div class="calc-flag bad" data-when="b*bh > 70"><b>Past the top of the tower.</b>
+      <code>temp-tower.stl</code> is 70 mm — only the bands that fit will print. Fewer bands, or shorter
+      ones.</div>
+    <div class="calc-flag warn" data-when="abs(round(bh/lh)*lh - bh) > 0.001">This layer height doesn't
+      divide the band height exactly, so the temperature changes drift away from the STL's band
+      boundaries. Slice at 0.2 mm and the maths stays honest.</div>
+    <div class="calc-tpl" id="towerblock" data-tpl="${gtower(round(bh/lh), b-1, 'M104', 'S', t-s, -s, 0)}"></div>
+    <div class="calc-foot">
+      <button type="button" class="copy-btn" data-copy="#towerblock">Copy the block</button>
+      <button type="button" data-calc-reset>Reset</button>
+      <span>Set the filament profile's other-layers temperature to the hottest value first — and delete
+      this block from the printer profile the moment the tower comes off the bed.</span>
+    </div>
+  </div>
+
   <p><b>Open your machine.</b> The command is the same; where you put it and what else is already there is not.</p>
 
   <details class="panel">

@@ -170,6 +170,34 @@ printer_model=~/.*COREONE.*/ and nozzle_diameter[<span class="n">0</span>]==<spa
     prevent.</p>
   </div>
 
+  <div class="calc">
+    <div class="calc-title">⌁ Scope-and-advance builder — condition and start line, ready to paste</div>
+    <p class="calc-lede">The two lines every shipped filament preset needs, generated together so they
+    can't disagree. Defaults reproduce the MK3S panel above. The condition uses the loose family pattern —
+    verify <code>printer_model</code> from a sliced file's config comments before tightening it.</p>
+    <div class="calc-grid tight">
+      <label class="calc-field">Machine
+        <select data-var="p"><option>MK3S</option><option>MK4S</option><option>Core One</option></select></label>
+      <label class="calc-field">Nozzle
+        <select data-var="noz"><option>0.4</option><option>0.6</option></select></label>
+      <label class="calc-field">Advance value
+        <input type="number" data-var="v" value="0.07" step="0.005" min="0"></label>
+      <label class="calc-field">Material
+        <input type="text" data-var="mat" value="eSun PETG"></label>
+    </div>
+    <div class="calc-tpl" id="scopepair" data-tpl="; Filament Settings → Dependencies → Compatible printers condition
+${p == 'MK3S' ? 'printer_model=~/.*MK3.*/' : p == 'MK4S' ? 'printer_model=~/.*MK4.*/' : 'printer_model=~/.*COREONE.*/'} and nozzle_diameter[0]==${noz}
+
+; Filament Settings → Custom G-code → Start G-code
+${p == 'MK3S' ? 'M900 K' : 'M572 S'}${v} ; ${mat} — measured L12, ${p} only"></div>
+    <div class="calc-foot">
+      <button type="button" class="copy-btn" data-copy="#scopepair">Copy both</button>
+      <button type="button" data-calc-reset>Reset</button>
+      <span>Paste each bare line into the pane its label names. The condition field takes only the
+      expression — no label line; the start line's trailing comment is safe to keep.</span>
+    </div>
+  </div>
+
   <!-- ===== SECTION 4 ===== -->
   <h2><span class="num">4</span>Inherit, or stand alone?</h2>
 
@@ -293,8 +321,9 @@ you own every value</code></pre>
       <li>Compare each against the regex in the bundle. Does <code>/.*MK4.*/</code> match your MK4S's actual
       string? Does <code>/.*COREONE.*/</code> match your Core One's? Decide — with the evidence in front of
       you — whether to tighten <code>/.*MK4.*/</code> to <code>/.*MK4S.*/</code>.</li>
-      <li>Import the bundle and confirm each profile appears on exactly one machine and disappears on the
-      other two. That's the test that matters; the file being correct is not the same as it working.</li>
+      <li>Import the bundle and confirm each profile appears on exactly one machine — with the matching
+      nozzle selected, since the conditions scope by nozzle too — and disappears on the other two. That's
+      the test that matters; the file being correct is not the same as it working.</li>
       <li>Export your own config bundle and save it into this repo. Note what it contains that the starter
       bundle doesn't.</li>
     </ol>

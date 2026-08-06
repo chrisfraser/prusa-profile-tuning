@@ -1,26 +1,29 @@
 # eSun Starter Profiles — eTPU-95A & eSUN PETG (MK3S · MK4S · Core One)
 
-> **Revised 2026-08-05.** The fleet is MK3S / **MK4S** / Core One. The `@MK4` presets in the bundle
-> have been renamed `@MK4S`. Their `compatible_printers_condition` still matches on `/.*MK4.*/`,
-> which also matches an MK4S — see Lesson 17 for how to verify the real `printer_model` and tighten
-> it. Note also that the MK4S hotend is the same class as the Core One's, so their flow ceilings
-> match (~22–28 mm³/s) even though their motion systems do not.
+> **Revised 2026-08-06.** The bundle now carries **24 presets**: the six 0.4 mm filament presets
+> tabled below, six 0.6 mm filament variants, and twelve print presets — one paired with each
+> filament preset, speeds pre-clamped to that filament's max volumetric speed. Preset names use the
+> printer *family* — `@MK3S`, `@MK4`, `@COREONE` — matching their deliberately loose
+> `compatible_printers_condition` (`/.*MK4.*/` also matches an MK4S); the fleet is MK3S / **MK4S** /
+> Core One, and Lesson 17 covers reading the real `printer_model` and tightening name and condition
+> (e.g. to `@MK4S`). Note also that the MK4S hotend is the same class as the Core One's, so their
+> flow ceilings match (~22–28 mm³/s) even though their motion systems do not.
 
 ## Importing the bundle
 
-The companion file `esun-starter-profiles-bundle.ini` contains all six profiles ready to import.
+The companion file `esun-starter-profiles-bundle.ini` contains all 24 presets ready to import.
 
 1. **File → Import → Import Config Bundle…** → select `esun-starter-profiles-bundle.ini`.
-2. PrusaSlicer reports the imported presets. They appear in the **Filament** dropdown as *User presets* (above the system ones).
-3. Each profile carries a `compatible_printers_condition`, so it only shows when the matching printer **and a 0.4 nozzle** are selected — if a profile seems missing, check the active printer/nozzle first.
+2. PrusaSlicer reports the imported presets. Filament presets appear in the **Filament** dropdown, print presets in the **Print Settings** dropdown, both as *User presets* (above the system ones).
+3. Each preset carries a `compatible_printers_condition`, so it only shows when the matching printer **and matching nozzle (0.4 or 0.6)** are selected — if a preset seems missing, check the active printer/nozzle first. Switching the nozzle swaps which set is visible.
 4. The profiles are self-contained (no `inherits`), so they survive Prusa system-profile updates but also won't pick them up — that's intentional for a tuning baseline.
 5. After tuning EM / PA / retraction, just **Save** over the same preset name, and re-export your own bundle (**File → Export → Export Config Bundle**) as backup.
 
 Notes on the bundle:
-- `@MK4S` profiles match any MK4-family model, because the condition is `/.*MK4.*/`; MK3S profiles match MK3-family; Core One matches COREONE.
+- `@MK4` profiles match any MK4-family model, because the condition is `/.*MK4.*/`; MK3S profiles match MK3-family; Core One matches COREONE.
 - `filament_colour` is just a UI swatch (green = PETG, orange = TPU) — change freely.
 - The PA/LA starting value lives in each profile's **Custom G-code → Start G-code**; that's the line you edit after running the tower test.
-- If you print with other nozzle sizes, duplicate the preset, rename (e.g. `@MK4S 0.6`), change the condition to `nozzle_diameter[0]==0.6`, and re-tune MVS + PA.
+- 0.4 and 0.6 nozzles are both covered. For any other size, duplicate the nearest preset, rename (e.g. `@MK4 0.8`), change the condition to `nozzle_diameter[0]==0.8`, and re-tune MVS + PA at that nozzle.
 
 Manufacturer datasheet values cross-checked against community results on Prusa hardware. The tables below document what's inside the bundle.
 
@@ -109,6 +112,51 @@ Manufacturer datasheet values cross-checked against community results on Prusa h
 - If overhangs droop at 245+, don't add fan — drop temperature to 235 first. This filament's flow ceiling is high enough that it doesn't need the hot end of eSun's range at quality speeds.
 - Dry 65 °C / 6–8 h if it's been out of the bag more than a couple of weeks (Mauritius humidity will get it faster than that — consider a dry box in rotation).
 - First layer: one or two Live-Z clicks less squish than your PLA setting.
+
+---
+
+## 0.6 mm nozzle variants — what changes and why
+
+The 0.6 presets are not renames of the 0.4 ones. A wider orifice melts a larger cross-section per
+millimetre of travel (more heat needed), restricts flow less (higher ceiling), and builds less
+back-pressure per unit of flow (lower advance). All 0.6 values are starting points in the same sense
+as the 0.4 ones — re-measure EM, advance and MVS at the new nozzle.
+
+| Setting (first / other where relevant) | PETG 0.4 | PETG 0.6 | eTPU-95A 0.4 | eTPU-95A 0.6 |
+|---|---|---|---|---|
+| Nozzle °C — MK3S | 240 / 238 | 245 / 242 | 235 / 230 | 232 / 230 |
+| Nozzle °C — MK4 / Core One | 240 / 235 | 245 / 240 | 230 / 228 | 232 / 230 |
+| MVS mm³/s — MK3S / MK4 / Core One | 8 / 13 / 14 | 10 / 15 / 16 | 1.8 / 3.5 / 3.5 | 2.5 / 5 / 5 |
+| Advance — MK3S | `M900 K0.07` | `M900 K0.05` | `M900 K0` | `M900 K0` |
+| Advance — MK4 / Core One | `M572 S0.05` | `M572 S0.035` | `M572 S0.03` | `M572 S0.022` |
+
+The MK4 0.6 PETG note in the bundle: MVS 15 assumes a stock MK4 hotend — on an MK4S it can be pushed
+toward 18–20 once measured.
+
+## Print presets — paired, and pre-clamped to MVS
+
+One print preset per filament preset, named `<layer height> <material> @<PRINTER> <nozzle>`. The
+layer height follows the nozzle: 0.20 mm at 0.4 (0.45 width), 0.32 mm at 0.6 (0.68 width) for PETG;
+0.25 / 0.30 mm for TPU. Every speed obeys `speed ≤ MVS / (layer height × extrusion width)`, so until
+L15–L16 replace the inherited ceilings with measured ones, the slicer can never demand more flow than
+the filament preset allows. The fastest line in each preset, checked:
+
+| Print preset | Fastest demand (infill) | Filament MVS |
+|---|---|---|
+| 0.20 PETG @MK3S 0.4 | 55 × 0.45 × 0.20 = 4.95 mm³/s | 8 |
+| 0.20 PETG @MK4 0.4 | 140 × 0.45 × 0.20 = 12.6 mm³/s | 13 |
+| 0.20 PETG @COREONE 0.4 | 155 × 0.45 × 0.20 = 13.95 mm³/s | 14 |
+| 0.32 PETG @MK3S 0.6 | 42 × 0.68 × 0.32 = 9.14 mm³/s | 10 |
+| 0.32 PETG @MK4 0.6 | 65 × 0.68 × 0.32 = 14.1 mm³/s | 15 |
+| 0.32 PETG @COREONE 0.6 | 70 × 0.68 × 0.32 = 15.2 mm³/s | 16 |
+| 0.25 TPU @MK3S 0.4 | 15 × 0.48 × 0.25 = 1.8 mm³/s | 1.8 |
+| 0.25 TPU @MK4 / @COREONE 0.4 | 28 × 0.48 × 0.25 = 3.36 mm³/s | 3.5 |
+| 0.30 TPU @MK3S 0.6 | 11 × 0.68 × 0.30 = 2.24 mm³/s | 2.5 |
+| 0.30 TPU @MK4 / @COREONE 0.6 | 22 × 0.68 × 0.30 = 4.49 mm³/s | 5 |
+
+Beyond speeds: gyroid infill 15 % (18 % TPU), 3 perimeters at 0.4 (2 at 0.6, where the wall is
+wider), dynamic overhang speeds on, TPU presets add `avoid_crossing_perimeters` to cut retraction
+count. Accelerations are per-machine (MK3S 1000, MK4 4000, Core One 4500 default) — L16's subject.
 
 ---
 

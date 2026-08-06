@@ -265,7 +265,23 @@
       round: function (x, d) { var m = Math.pow(10, d || 0); return isFinite(x) ? Math.round(x * m) / m : NaN; },
       fixed: function (x, d) { return isFinite(x) ? Number(x).toFixed(d == null ? 2 : d) : '…'; },
       clamp: function (x, a, b) { return Math.min(Math.max(x, a), b); },
-      abs: Math.abs, floor: Math.floor, ceiling: Math.ceil, pow: Math.pow, sqrt: Math.sqrt
+      abs: Math.abs, floor: Math.floor, ceiling: Math.ceil, pow: Math.pow, sqrt: Math.sqrt,
+      /* Tower-block builder for the after-layer-change G-code lessons (L10, L12,
+         L15): `lines` conditional lines, one per band change — line i fires at
+         layer layerStep*i and sets first + step*(i-1), printed to dp decimals so
+         0.10 stays "0.10". The bottom band is never in the block; it prints at
+         whatever the profile set. Returns '' (renders as …) until inputs are sane. */
+      gtower: function (layerStep, lines, cmd, letter, first, step, dp) {
+        var per = Math.round(layerStep), n = Math.round(lines);
+        if (!isFinite(per) || per < 1 || !isFinite(n) || n < 1 || n > 40 ||
+            !isFinite(first) || !isFinite(step)) return '';
+        var out = [];
+        for (var i = 1; i <= n; i++) {
+          out.push('{if layer_num == ' + (per * i) + '}' + cmd + ' ' + letter +
+                   (first + step * (i - 1)).toFixed(dp || 0) + '{endif}');
+        }
+        return out.join('\n');
+      }
     };
   })();
 

@@ -93,6 +93,14 @@ acceptance test.** L3's flow calculator returns 4.05 and 18.00 mm³/s for its dr
 drill 3; L11's returns 0.953 for the worked example; L14's returns 60 % / 51 % / 40 % for its three drills.
 If you change a formula, re-check it against the prose before committing.
 
+**G-code generators** (added 2026-08-06) are `.calc` widgets whose `data-tpl` calls the `gtower()`
+helper in widgets.js to emit after-layer-change tower blocks. Five exist: L10 (M104 temperature
+tower), L12 (M900/M572 advance tower, plus a nozzle-conditional start-line builder), L15 (M220 ramp),
+and L17 (compatibility condition + start line pair). Their acceptance test is the same idea: **at
+default inputs each generator reproduces its lesson's static sample block byte-for-byte** — the static
+`codefig` stays in the lesson as the taught example and no-JS fallback; the generator sits below it.
+`data-tpl` expressions cannot contain `}`, so ternaries yes, object literals no.
+
 Two constraints learned the hard way:
 
 - **Don't reuse a class name the stylesheet already owns.** `.calc-out.hero` inherited the index page's
@@ -177,7 +185,11 @@ the sample G-code, the 30 × 30 × 12 EM box, 40 mm spike spacing, and so on). L
 If a lesson's print spec changes, change the generator to match and re-run it — the STL and the prose
 must never disagree. The L9 bundle download links straight to
 `reference/source-material/esun-starter-profiles-bundle.ini` (single source; do not copy it into
-`downloads/`).
+`downloads/`). The bundle was regenerated 2026-08-06: **24 presets** — 12 filament (2 materials ×
+3 printers × 0.4/0.6 nozzles) + 12 paired print presets with speeds pre-clamped to the filament MVS.
+Preset names use the printer family (`@MK3S` / `@MK4` / `@COREONE`) to match their loose conditions;
+L17 teaches tightening to `@MK4S`. If the bundle changes again, re-check L9's counts and spot-check
+numbers and the tables in `esun-starter-profiles.md`.
 
 Source material for Phases 2–3: `reference/source-material/prusaslicer-profile-tuning.md`. **It is the
 input, not the authority.** Where Phase 2 lessons diverge from it, the divergence is stated in the lesson

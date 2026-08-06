@@ -25,9 +25,10 @@
 <main class="wrap">
   <p class="kicker">Phase 2 · The filament · L9</p>
   <h1 class="lesson-title">Import the starter profiles</h1>
-  <p class="lesson-sub">Twenty minutes at the desk, no printing. Load six ready-made filament presets so
-  every measurement you take in the next seven lessons has somewhere to live — and know exactly how much
-  to trust them, which is: not yet.</p>
+  <p class="lesson-sub">Twenty minutes at the desk, no printing. Load the starter bundle — filament and
+  print presets for two materials, three machines and two nozzles — so every measurement you take in the
+  next seven lessons has somewhere to live — and know exactly how much to trust them, which is: not
+  yet.</p>
   <div class="lesson-meta">
     <span>⏱ ~20 minutes, at the computer</span><span class="sep">•</span>
     <span>🖨 Nothing printed</span><span class="sep">•</span>
@@ -40,8 +41,10 @@
     start from Prusa's generic profiles and adjust as you go — but then every lesson begins with ten minutes
     of setup, and the first tower would print with a PETG temperature range meant for a different brand. The
     bundle below carries a documented starting point for <b>this fleet's two materials on all three
-    machines</b>: eSUN PETG and eSun eTPU-95A, one preset per printer. Import it once, and Lessons 10–16
-    become pure measurement: run the test, replace one number, save.</p>
+    machines</b>: eSUN PETG and eSun eTPU-95A, one filament preset per printer per nozzle (0.4 and
+    0.6 mm), each with a matching print preset whose speeds are already held under that filament's flow
+    ceiling. Import it once, and Lessons 10–16 become pure measurement: run the test, replace one number,
+    save.</p>
   </div>
 
   <div class="callout warning">
@@ -59,25 +62,38 @@
   <div class="callout build">
     <div class="callout-label">⬇ Download</div>
     <p><a href="../reference/source-material/esun-starter-profiles-bundle.ini" download><b>esun-starter-profiles-bundle.ini</b></a>
-    — a PrusaSlicer <a href="../reference/glossary.html#config-bundle">config bundle</a> holding six filament
-    presets. The companion document
+    — a PrusaSlicer <a href="../reference/glossary.html#config-bundle">config bundle</a> holding
+    twenty-four presets: twelve filament, twelve print. The companion document
     <a href="../reference/source-material/esun-starter-profiles.md">esun-starter-profiles.md</a> tables every
     value inside it and says where each came from.</p>
   </div>
 
-  <p>Six presets: two materials × three printers.</p>
+  <p>Twelve <b>filament</b> presets — two materials × three printers × two nozzles:</p>
   <ul>
-    <li><code>eSun PETG @MK3S 0.4</code> · <code>eSun PETG @MK4S 0.4</code> · <code>eSun PETG @COREONE 0.4</code></li>
-    <li><code>eSun eTPU-95A @MK3S 0.4</code> · <code>eSun eTPU-95A @MK4S 0.4</code> · <code>eSun eTPU-95A @COREONE 0.4</code></li>
+    <li><code>eSun PETG @MK3S 0.4</code> · <code>eSun PETG @MK4 0.4</code> · <code>eSun PETG @COREONE 0.4</code> — and the same three again as <code>0.6</code></li>
+    <li><code>eSun eTPU-95A @MK3S 0.4</code> · <code>eSun eTPU-95A @MK4 0.4</code> · <code>eSun eTPU-95A @COREONE 0.4</code> — and the same three again as <code>0.6</code></li>
+  </ul>
+  <p>And twelve <b>print</b> presets, one paired with each filament preset — the layer height in the name
+  moves with the nozzle:</p>
+  <ul>
+    <li>PETG: <code>0.20 PETG @MK3S 0.4</code> and <code>0.32 PETG @MK3S 0.6</code> — likewise <code>@MK4</code> and <code>@COREONE</code></li>
+    <li>TPU: <code>0.25 TPU @MK3S 0.4</code> and <code>0.30 TPU @MK3S 0.6</code> — likewise <code>@MK4</code> and <code>@COREONE</code></li>
   </ul>
 
-  <p>Three properties matter before you click import:</p>
+  <p>Four properties matter before you click import:</p>
   <ul class="steps">
     <li><span class="step-title">They are per-machine, not per-material</span>
       <span class="step-detail">The same spool of eSUN PETG gets a max volumetric speed of 8 mm³/s on the
       MK3S and 13–14 mm³/s on the Nextruder machines, and a <code>M900 K</code> advance line on one firmware
       family versus <code>M572 S</code> on the other. This is the course's one-rule-that-outranks-everything,
-      already baked in — which is why there are six presets and not two.</span></li>
+      already baked in — which is why there are twelve filament presets and not two.</span></li>
+    <li><span class="step-title">The 0.6 mm variants are not renames — the numbers move</span>
+      <span class="step-detail">A wider orifice melts a bigger cross-section per millimetre of travel, so
+      the 0.6 PETG presets run ~5 °C hotter (242/240 vs 238/235), carry a higher flow ceiling (10 / 15 /
+      16 mm³/s vs 8 / 13 / 14), and start with a <em>lower</em> advance value (<code>M900 K0.05</code> vs
+      <code>K0.07</code>; <code>M572 S0.035</code> vs <code>S0.05</code>) — less back-pressure through a
+      bigger hole. Every 0.6 value is a fresh starting point: when you switch nozzles, Phase 2's
+      measurements are due again at that nozzle.</span></li>
     <li><span class="step-title">They are self-contained — no <code>inherits</code></span>
       <span class="step-detail">Each preset carries every value explicitly rather than referencing a Prusa
       system profile. That means a PrusaSlicer update can never silently move your baseline — and also that
@@ -86,9 +102,18 @@
     <li><span class="step-title">They are scoped by a visibility condition</span>
       <span class="step-detail">Each preset carries a
       <a href="../reference/glossary.html#compatible-printers-condition">compatible-printers condition</a>
-      matching one printer family <b>and a 0.4 mm nozzle</b>. A preset that doesn't apply to the selected
+      matching one printer family <b>and one nozzle diameter</b>. A preset that doesn't apply to the selected
       printer is hidden entirely, with no message. That is a feature — it makes selecting the MK3S numbers on
-      the Core One impossible — but it reads as "my import vanished" until you know it's there.</span></li>
+      the Core One impossible, and the nozzle half means changing the printer profile's nozzle from 0.4 to
+      0.6 swaps which set you see — but it reads as "my import vanished" until you know it's there.</span></li>
+    <li><span class="step-title">The print presets' speeds are pre-clamped to the filament's flow ceiling</span>
+      <span class="step-detail">Speed × <a href="../reference/glossary.html#extrusion-width">extrusion
+      width</a> × <a href="../reference/glossary.html#layer-height">layer height</a> is the flow the slicer
+      demands (Lesson 3), and every speed in these print presets was chosen so that product stays at or
+      under the paired filament's <a href="../reference/glossary.html#max-volumetric-speed">max volumetric
+      speed</a> — e.g. <code>0.20 PETG @MK4 0.4</code> infill: 140 mm/s × 0.45 × 0.2 = 12.6 mm³/s against a
+      13 mm³/s cap. Until Lessons 15–16 measure your own ceilings, the pairing guarantees the demand never
+      exceeds the datasheet flow.</span></li>
   </ul>
 
   <!-- ===== SECTION 2 ===== -->
@@ -99,15 +124,17 @@
   <ul class="steps">
     <li><span class="step-title">File → Import → Import Config Bundle…</span>
       <span class="step-detail">Point it at <code>esun-starter-profiles-bundle.ini</code>. PrusaSlicer
-      reports how many presets it imported — you want <b>6</b>.<span class="cite"><a href="#r1">1</a></span></span></li>
-    <li><span class="step-title">Find them in the Filament dropdown</span>
-      <span class="step-detail">They appear under <b>User presets</b>, above the system ones. Only the two
-      matching the currently selected printer are visible — the other four are hidden by their conditions,
-      not gone.</span></li>
-    <li><span class="step-title">Check the nozzle if anything seems missing</span>
-      <span class="step-detail">The conditions also require a 0.4 mm nozzle. A printer profile set to 0.6
-      hides all six. Printing other nozzle sizes is a Lesson 17 topic — duplicate, rename, re-condition,
-      re-tune.</span></li>
+      reports how many presets it imported — you want <b>24</b>.<span class="cite"><a href="#r1">1</a></span></span></li>
+    <li><span class="step-title">Find them in two dropdowns, not one</span>
+      <span class="step-detail">The filament presets appear under <b>User presets</b> in the Filament
+      dropdown; the print presets under User presets in the <b>Print Settings</b> dropdown. In each, only
+      the pair matching the currently selected printer <em>and its nozzle</em> is visible — the rest are
+      hidden by their conditions, not gone.</span></li>
+    <li><span class="step-title">Flip the nozzle and watch the sets swap</span>
+      <span class="step-detail">Change the printer profile's nozzle from 0.4 to 0.6 and the
+      <code>0.4</code> presets hide while the <code>0.6</code> set — including the thicker-layered print
+      presets — appears in their place. A nozzle that is neither 0.4 nor 0.6 hides everything; covering a
+      third size is a Lesson 17 exercise — duplicate, rename, re-condition, re-tune.</span></li>
     <li><span class="step-title">Open one and look at Custom G-code</span>
       <span class="step-detail">The advance starting value lives in each preset's start G-code — that is the
       line Lesson 12's tower will replace. Find it now so that lesson starts on familiar ground.</span></li>
@@ -116,37 +143,45 @@
   <p><b>Open your machine.</b> Same import on every machine; what you should see afterwards differs.</p>
 
   <details class="panel">
-    <summary>MK3S · two presets, Marlin numbers</summary>
+    <summary>MK3S · four presets per nozzle, Marlin numbers</summary>
     <div class="panel-body">
-      <p>With an MK3S printer profile and 0.4 nozzle selected, the Filament dropdown shows
-      <code>eSun PETG @MK3S 0.4</code> and <code>eSun eTPU-95A @MK3S 0.4</code>.</p>
-      <p>Spot-checks that you're looking at the right preset: PETG max volumetric speed <b>8 mm³/s</b>, TPU
-      <b>1.8 mm³/s</b>, and the start G-code advance line is <code>M900 K0.07</code> for PETG — Linear
-      Advance, this machine's firmware family.</p>
+      <p>With an MK3S printer profile and 0.4 nozzle selected: Filament shows
+      <code>eSun PETG @MK3S 0.4</code> and <code>eSun eTPU-95A @MK3S 0.4</code>; Print Settings shows
+      <code>0.20 PETG @MK3S 0.4</code> and <code>0.25 TPU @MK3S 0.4</code>. Switch the nozzle to 0.6 and
+      the <code>0.6</code> quartet replaces them, led by <code>0.32 PETG @MK3S 0.6</code>.</p>
+      <p>Spot-checks that you're looking at the right preset: PETG max volumetric speed <b>8 mm³/s</b>
+      (0.4) or <b>10 mm³/s</b> (0.6), TPU <b>1.8 / 2.5 mm³/s</b>, and the start G-code advance line is
+      <code>M900 K0.07</code> for 0.4 PETG, <code>K0.05</code> for 0.6 — Linear Advance, this machine's
+      firmware family.</p>
       <p>The condition matches MK3-family printers, so the presets also appear for an MK3S+ profile. Fine —
       same machine class.</p>
     </div>
   </details>
 
   <details class="panel">
-    <summary>MK4S · two presets, Buddy numbers, one loose condition</summary>
+    <summary>MK4S · four presets per nozzle, Buddy numbers, one loose condition</summary>
     <div class="panel-body">
-      <p>With the MK4S selected: <code>eSun PETG @MK4S 0.4</code> and <code>eSun eTPU-95A @MK4S 0.4</code>.
-      Spot-checks: PETG MVS <b>13 mm³/s</b>, advance line <code>M572 S0.05</code> — Pressure Advance.</p>
-      <p><b>Known looseness:</b> these presets' condition matches on <code>/.*MK4.*/</code>, so they would
-      also show for a plain MK4 or MK4S MMU profile. The values were chosen for the MK4S, and
-      <a href="0017-profile-structure-and-naming.html">Lesson 17</a> tightens the condition once you've read
-      the real <code>printer_model</code> off the machine. Until then, just don't slice for a printer you
-      don't own.</p>
+      <p>With the MK4S and a 0.4 nozzle selected: <code>eSun PETG @MK4 0.4</code> and
+      <code>eSun eTPU-95A @MK4 0.4</code> in Filament, <code>0.20 PETG @MK4 0.4</code> and
+      <code>0.25 TPU @MK4 0.4</code> in Print Settings. Spot-checks: PETG MVS <b>13 mm³/s</b> at 0.4,
+      <b>15 mm³/s</b> at 0.6; advance line <code>M572 S0.05</code> at 0.4, <code>S0.035</code> at 0.6 —
+      Pressure Advance.</p>
+      <p><b>Known looseness — name and condition:</b> these presets are named <code>@MK4</code>, the
+      family, and their condition matches on <code>/.*MK4.*/</code>, so they would also show for a plain
+      MK4 or MK4S MMU profile. The values were chosen for the MK4S.
+      <a href="0017-profile-structure-and-naming.html">Lesson 17</a> tightens both — rename to
+      <code>@MK4S</code> and narrow the pattern — once you've read the real <code>printer_model</code> off
+      the machine. Until then, just don't slice for a printer you don't own.</p>
     </div>
   </details>
 
   <details class="panel">
-    <summary>Core One · two presets, MK4S-class flow, chamber notes</summary>
+    <summary>Core One · four presets per nozzle, MK4S-class flow, chamber notes</summary>
     <div class="panel-body">
-      <p>With the Core One selected: <code>eSun PETG @COREONE 0.4</code> and
-      <code>eSun eTPU-95A @COREONE 0.4</code>. Spot-checks: PETG MVS <b>14 mm³/s</b>, advance line
-      <code>M572 S0.05</code>.</p>
+      <p>With the Core One and a 0.4 nozzle selected: <code>eSun PETG @COREONE 0.4</code> and
+      <code>eSun eTPU-95A @COREONE 0.4</code> in Filament, <code>0.20 PETG @COREONE 0.4</code> and
+      <code>0.25 TPU @COREONE 0.4</code> in Print Settings. Spot-checks: PETG MVS <b>14 mm³/s</b> at 0.4,
+      <b>16 mm³/s</b> at 0.6; advance line <code>M572 S0.05</code> at 0.4, <code>S0.035</code> at 0.6.</p>
       <p>The numbers sit close to the MK4S ones deliberately — same hotend class, so the flow ceilings
       match — but they are not identical: cooling is set lower because the enclosure holds heat, and the PETG
       preset assumes the door closed. The chamber-state discipline from
@@ -160,7 +195,9 @@
   <p>From Lesson 10 onward the workflow is always the same: run the test, take the measurement, type it into
   the matching preset, and <b>Save over the same preset name</b> — the ⟳/💾 icon beside the Filament
   dropdown, keeping the exact name. The preset accretes measured values one lesson at a time, and the name
-  keeps meaning "the current best state of this material on this machine".</p>
+  keeps meaning "the current best state of this material on this machine". The print presets work the same
+  way — they mostly sit untouched until <a href="0016-speeds-and-accelerations.html">Lesson 16</a>, where
+  your measured speeds and accelerations get saved over them.</p>
 
   <p>Never write your numbers into a Prusa
   <a href="../reference/glossary.html#system-profile">system profile</a> — those belong to Prusa and get
@@ -179,12 +216,14 @@
   <div class="checklist-widget">
     <div class="cl-title">✓ Import sign-off — all three machines, one sitting</div>
     <ul class="checklist">
-      <li data-check>Downloaded the bundle and imported it — PrusaSlicer reported 6 presets</li>
-      <li data-check>MK3S selected: both <code>@MK3S</code> presets visible under User presets</li>
-      <li data-check>MK4S selected: both <code>@MK4S</code> presets visible, the MK3S ones hidden</li>
-      <li data-check>Core One selected: both <code>@COREONE</code> presets visible</li>
+      <li data-check>Downloaded the bundle and imported it — PrusaSlicer reported 24 presets</li>
+      <li data-check>MK3S selected: <code>@MK3S</code> filament <em>and</em> print presets visible under User presets</li>
+      <li data-check>MK4S selected: the <code>@MK4</code> presets visible, the MK3S ones hidden</li>
+      <li data-check>Core One selected: the <code>@COREONE</code> presets visible</li>
+      <li data-check>Flipped one printer's nozzle 0.4 → 0.6 and watched the <code>0.6</code> set replace the <code>0.4</code> set</li>
       <li data-check>Opened one preset's start G-code and found its advance line (<code>M900 K</code> or <code>M572 S</code>)</li>
-      <li data-check>Checked PETG max volumetric speed differs per machine (8 / 13 / 14 mm³/s) — proof I'm reading per-machine presets</li>
+      <li data-check>Checked PETG max volumetric speed differs per machine (8 / 13 / 14 mm³/s at 0.4) — proof I'm reading per-machine presets</li>
+      <li data-check>Opened one print preset and understood why its speeds are modest: they're clamped to the paired filament's flow ceiling</li>
       <li data-check>I can say out loud what every number in these presets is: inherited, not measured</li>
     </ul>
     <div class="checklist-bar"><span>Tick as you go</span><span data-checklist-progress></span></div>
@@ -198,8 +237,8 @@
     <div class="q-kicker">Question 1 of 3</div>
     <div class="q-text">You import the bundle on the Core One, and the Filament dropdown shows no eSun presets at all. Most likely cause?</div>
     <div class="q-options">
-      <button class="opt" data-correct data-feedback="Right. The compatible-printers condition requires the matching printer family AND a 0.4 mm nozzle, and a preset that fails it is hidden silently. Check the active printer profile and its nozzle diameter first.">The active printer profile isn't what the condition expects</button>
-      <button class="opt" data-feedback="A failed import reports an error or a count of 0 — it doesn't succeed quietly. If PrusaSlicer said it imported 6 presets, they're in your configuration; they're being hidden, not lost.">The import silently failed and must be re-run</button>
+      <button class="opt" data-correct data-feedback="Right. The compatible-printers condition requires the matching printer family AND a matching nozzle diameter (0.4 or 0.6), and a preset that fails it is hidden silently. Check the active printer profile and its nozzle first.">The active printer profile isn't what the condition expects</button>
+      <button class="opt" data-feedback="A failed import reports an error or a count of 0 — it doesn't succeed quietly. If PrusaSlicer said it imported 24 presets, they're in your configuration; they're being hidden, not lost.">The import silently failed and must be re-run</button>
       <button class="opt" data-feedback="The bundle's presets are self-contained precisely so that PrusaSlicer version changes can't touch them. Version skew isn't what hides a user preset from the dropdown.">The PrusaSlicer version is too old for the bundle</button>
       <button class="opt" data-feedback="User presets sit above the system ones in the same dropdown — there is no separate menu to enable. If they're missing, a visibility condition is evaluating false.">User presets need enabling in Expert mode first</button>
     </div>
@@ -236,9 +275,11 @@
     <h3>Import, verify on all three, and read one preset closely</h3>
     <ol>
       <li>Download and import the bundle. Note the preset count PrusaSlicer reported.</li>
-      <li>Cycle through all three printer profiles and list which eSun presets appear for each.</li>
+      <li>Cycle through all three printer profiles — and one nozzle change — and list which eSun filament
+      and print presets appear for each.</li>
       <li>For the machine you'll calibrate first: open its eSun PETG preset and paste me the advance line
-      from its start G-code and its max volumetric speed.</li>
+      from its start G-code and its max volumetric speed. Then open the paired print preset and check one
+      speed against that ceiling: infill speed × extrusion width × layer height — is it under?</li>
       <li>Tell me which value in that preset you expect Phase 2 to change the <em>most</em>, and why.</li>
       <li>If any preset didn't appear where you expected — paste me the active printer name and nozzle
       diameter instead, and we'll read the condition together.</li>
@@ -250,12 +291,15 @@
   <div class="recap">
     <h3>What you can now say</h3>
     <ol>
-      <li><strong>Six presets, two materials × three machines</strong> — because advance commands, flow
-      ceilings and cooling genuinely differ per printer, the fleet's one unbreakable rule.</li>
+      <li><strong>Twenty-four presets: two materials × three machines × two nozzles, filament and
+      print</strong> — because advance commands, flow ceilings and cooling genuinely differ per printer,
+      the fleet's one unbreakable rule, and the numbers move again at 0.6.</li>
       <li><strong>Every value in them is inherited, not measured.</strong> Phase 2 exists to replace them,
       one lesson at a time, saving over the same preset name.</li>
       <li><strong>A hidden preset is usually a visibility condition doing its job</strong> — check the
-      selected printer and the 0.4 nozzle before suspecting the import.</li>
+      selected printer and its nozzle diameter before suspecting the import.</li>
+      <li><strong>The print presets' speeds are clamped to the paired filament's flow ceiling</strong> —
+      speed × width × layer height stays under MVS until Lessons 15–16 measure your own numbers.</li>
       <li><strong>Self-contained means stable ground:</strong> no system-profile update can move the
       baseline while you're measuring against it.</li>
       <li><strong>Export your own bundle once real measurements land</strong> — that file, not this one, is
@@ -302,8 +346,9 @@
     bundle, tabled per machine, with provenance: manufacturer datasheet cross-checked against community
     results on Prusa hardware.
     <a href="../reference/source-material/esun-starter-profiles.md">Link</a>.</li>
-    <li id="r3">This course. <i>esun-starter-profiles-bundle.ini</i>. The bundle itself — six self-contained
-    filament presets with per-family compatibility conditions.
+    <li id="r3">This course. <i>esun-starter-profiles-bundle.ini</i>. The bundle itself — twenty-four
+    self-contained presets (twelve filament, twelve print, 0.4 and 0.6 mm nozzles) with per-family,
+    per-nozzle compatibility conditions and print speeds pre-clamped to each filament's flow ceiling.
     <a href="../reference/source-material/esun-starter-profiles-bundle.ini">Link</a>.</li>
   </ol>
 

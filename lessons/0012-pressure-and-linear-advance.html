@@ -256,6 +256,50 @@ visible dashed restart</code></pre>
     </div>
   </details>
 
+  <div class="calc">
+    <div class="calc-title">⌁ Advance tower generator — your bracket, in your machine's command</div>
+    <p class="calc-lede">Pick the machine and the block writes itself in the right command. Defaults are
+    the MK3S bracket above; for the MK4S or Core One, set first value 0.01, step 0.01, 7 steps to get the
+    Buddy bracket. The bottom band is absent on purpose — it prints at whatever the start G-code already
+    set, so your bracket sits on top of the stock value.</p>
+    <div class="calc-grid tight">
+      <label class="calc-field">Machine
+        <select data-var="printer"><option>MK3S</option><option>MK4S</option><option>Core One</option></select></label>
+      <label class="calc-field">First value
+        <input type="number" data-var="f" value="0.02" step="0.01" min="0"></label>
+      <label class="calc-field">Step
+        <input type="number" data-var="st" value="0.02" step="0.01" min="0.001"></label>
+      <label class="calc-field">Steps
+        <input type="number" data-var="n" value="6" step="1" min="1" max="12"></label>
+      <label class="calc-field">Layers per band
+        <input type="number" data-var="L" value="20" step="1" min="1"></label>
+      <label class="calc-field">Layer height <span class="u">mm</span>
+        <input type="number" data-var="lh" value="0.2" step="0.05" min="0.05"></label>
+    </div>
+    <div class="calc-outs">
+      <div class="calc-out"><span class="lab">Command</span>
+        <span class="val" data-out="printer == 'MK3S' ? 'M900 K' : 'M572 S'"></span></div>
+      <div class="calc-out"><span class="lab">Top band value</span>
+        <span class="val" data-out="f+(n-1)*st" data-dp="2"></span></div>
+      <div class="calc-out"><span class="lab">Height used</span>
+        <span class="val" data-out="(n+1)*L*lh" data-dp="1" data-suffix=" mm"></span></div>
+    </div>
+    <div class="calc-flag warn" data-when="printer == 'MK3S'"><code>M900 K</code> — Linear Advance,
+      Marlin. Bracket around Prusa's default for your material (PETG 0.08).</div>
+    <div class="calc-flag warn" data-when="printer != 'MK3S'"><code>M572 S</code> — Pressure Advance,
+      Buddy. Bracket around the stock value you read out of a sliced file's start G-code.</div>
+    <div class="calc-flag bad" data-when="(n+1)*L*lh > 32"><b>Past the top of the tower.</b>
+      <code>pa-corner-tower.stl</code> is 32 mm — the last bands won't print. Fewer steps or shorter
+      bands.</div>
+    <div class="calc-tpl" id="advtower" data-tpl="${gtower(L, n, printer == 'MK3S' ? 'M900' : 'M572', printer == 'MK3S' ? 'K' : 'S', f, st, st &lt; 0.01 ? 3 : 2)}"></div>
+    <div class="calc-foot">
+      <button type="button" class="copy-btn" data-copy="#advtower">Copy the block</button>
+      <button type="button" data-calc-reset>Reset</button>
+      <span>Paste below the existing after-layer-change G-code. Production print profile, production
+      accelerations — and the block comes out again after the print.</span>
+    </div>
+  </div>
+
   <!-- ===== SECTION 4 ===== -->
   <h2><span class="num">4</span>Where the winning value lives</h2>
 
@@ -279,6 +323,38 @@ visible dashed restart</code></pre>
   doesn't silently apply a 0.4 mm value. The <b>comment</b> records which machine and which date — because in
   four months the only thing standing between you and a guess is that line of text. That's
   <a href="0019-the-tuning-log.html">Lesson 19</a>, arriving early.</p>
+
+  <div class="calc">
+    <div class="calc-title">⌁ Start G-code builder — the winning value, nozzle-aware</div>
+    <p class="calc-lede">Type what you measured and copy the finished lines into
+    <code>Filament Settings → Custom G-code → Start G-code</code>. Defaults reproduce the snippet above.
+    If you haven't measured 0.6 yet, the bundle's 0.6 starting value is the honest placeholder — mark it
+    inherited in the log. The fallback covers any other nozzle at a deliberately low value.</p>
+    <div class="calc-grid tight">
+      <label class="calc-field">Machine
+        <select data-var="gp"><option>MK4S</option><option>Core One</option><option>MK3S</option></select></label>
+      <label class="calc-field">0.4 value
+        <input type="number" data-var="v4" value="0.045" step="0.005" min="0"></label>
+      <label class="calc-field">0.6 value
+        <input type="number" data-var="v6" value="0.03" step="0.005" min="0"></label>
+      <label class="calc-field">Fallback
+        <input type="number" data-var="vx" value="0.02" step="0.005" min="0"></label>
+      <label class="calc-field">Material
+        <input type="text" data-var="mat" value="eSun PETG"></label>
+      <label class="calc-field">Measured on
+        <input type="date" data-var="d"></label>
+    </div>
+    <div class="calc-flag warn" data-when="gp == 'MK3S'">Marlin machine — the builder has switched to
+      <code>M900 K</code>. A <code>M572</code> line here would be silently ignored by the MK3S.</div>
+    <div class="calc-tpl" id="advline" data-tpl="; keep it nozzle-aware, the way the stock profile does
+${gp == 'MK3S' ? 'M900 K' : 'M572 S'}{if nozzle_diameter[0]==0.4}${v4}{elsif nozzle_diameter[0]==0.6}${v6}{else}${vx}{endif}
+; ${mat} — measured on ${gp}, ${d}, production accel"></div>
+    <div class="calc-foot">
+      <button type="button" class="copy-btn" data-copy="#advline">Copy the lines</button>
+      <button type="button" data-calc-reset>Clear</button>
+      <span>Filament settings, never printer settings — the value must follow the material.</span>
+    </div>
+  </div>
 
   <p><b>Then delete the tower block</b> from <code>Printer Settings → Custom G-code → After layer change</code>.
   Left in place, it overrides your carefully measured filament value on every subsequent print of every

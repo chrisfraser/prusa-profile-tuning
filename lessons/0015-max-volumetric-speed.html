@@ -164,6 +164,48 @@
   <p><b>Set MVS artificially high — 40 or so — before printing this.</b> The whole point is to find where the
   hotend fails, and a correctly-set MVS would prevent exactly that. Put it back afterwards.</p>
 
+  <div class="calc">
+    <div class="calc-title">⌁ M220 ramp generator — and the flow each band demands</div>
+    <p class="calc-lede">Defaults reproduce the ramp above. Add your vase wall speed and the calculator
+    shows the flow sweep, so you know before printing whether the ramp actually crosses your machine's
+    expected ceiling — a ramp that tops out below it finds nothing. Paste the block below whatever is
+    already in the after-layer-change pane; the bottom band runs at 100&nbsp;%.</p>
+    <div class="calc-grid tight">
+      <label class="calc-field">First factor <span class="u">%</span>
+        <input type="number" data-var="f" value="150" step="10" min="105"></label>
+      <label class="calc-field">Step <span class="u">%</span>
+        <input type="number" data-var="st" value="50" step="5" min="5"></label>
+      <label class="calc-field">Steps
+        <input type="number" data-var="n" value="4" step="1" min="1" max="10"></label>
+      <label class="calc-field">Layers per band
+        <input type="number" data-var="L" value="30" step="1" min="1"></label>
+      <label class="calc-field">Layer height <span class="u">mm</span>
+        <input type="number" data-var="lh" value="0.2" step="0.05" min="0.05"></label>
+      <label class="calc-field">Wall speed <span class="u">mm/s</span>
+        <input type="number" data-var="sp" placeholder="e.g. 60" min="1"></label>
+      <label class="calc-field">Extrusion width <span class="u">mm</span>
+        <input type="number" data-var="w" value="0.45" step="0.01" min="0.1"></label>
+    </div>
+    <div class="calc-outs">
+      <div class="calc-out"><span class="lab">Flow at 100 %</span>
+        <span class="val" data-out="lh*w*sp" data-dp="1" data-suffix=" mm³/s"></span></div>
+      <div class="calc-out primary"><span class="lab">Flow at top band</span>
+        <span class="val" data-out="lh*w*sp*(f+(n-1)*st)/100" data-dp="1" data-suffix=" mm³/s"></span></div>
+      <div class="calc-out"><span class="lab">Height used</span>
+        <span class="val" data-out="(n+1)*L*lh" data-dp="0" data-suffix=" mm"></span></div>
+    </div>
+    <div class="calc-flag bad" data-when="(n+1)*L*lh > 40"><b>Past the top of the cylinder.</b>
+      <code>mvs-vase-cylinder.stl</code> is 40 mm — the last bands won't print. Fewer steps or shorter
+      bands.</div>
+    <div class="calc-tpl" id="m220block" data-tpl="${gtower(L, n, 'M220', 'S', f, st, 0)}"></div>
+    <div class="calc-foot">
+      <button type="button" class="copy-btn" data-copy="#m220block">Copy the block</button>
+      <button type="button" data-calc-reset>Reset</button>
+      <span>MVS to 40 before the print, back to the measured value after — and the block comes out of the
+      printer profile with it.</span>
+    </div>
+  </div>
+
   <ul class="steps">
     <li><span class="step-title">Find where the wall changes</span>
       <span class="step-detail">Look for the band where the surface goes <b>matte, thin or glassy</b> instead
